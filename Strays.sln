@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strays.DesktopGL", "Strays\Strays.DesktopGL\Strays.DesktopGL.csproj", "{BADB48E9-DE69-447E-8945-6B746FF07718}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strays.Core", "Strays\Strays.Core\Strays.Core.csproj", "{1930676C-F694-4B4A-9153-65067C881D6B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BADB48E9-DE69-447E-8945-6B746FF07718}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BADB48E9-DE69-447E-8945-6B746FF07718}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BADB48E9-DE69-447E-8945-6B746FF07718}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BADB48E9-DE69-447E-8945-6B746FF07718}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1930676C-F694-4B4A-9153-65067C881D6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1930676C-F694-4B4A-9153-65067C881D6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1930676C-F694-4B4A-9153-65067C881D6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1930676C-F694-4B4A-9153-65067C881D6B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
