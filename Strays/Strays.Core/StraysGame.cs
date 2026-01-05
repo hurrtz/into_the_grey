@@ -118,9 +118,8 @@ namespace Strays.Core
             var selectedLanguage = languages[settingsManager.Settings.Language].Name;
             LocalizationManager.SetCulture(selectedLanguage);
 
-            // Add background and main menu screens.
-            screenManager.AddScreen(new BackgroundScreen(), null);
-            screenManager.AddScreen(new MainMenuScreen(), null);
+            // Start directly in top-down gameplay mode with the new DefaultMale character
+            screenManager.AddScreen(new TopDownGameplayScreen(), null);
         }
 
         /// <summary>
