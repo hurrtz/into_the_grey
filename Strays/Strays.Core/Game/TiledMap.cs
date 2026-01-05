@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -117,27 +118,71 @@ namespace Strays.Core
             int tileCount = int.Parse(tilesetElement.Attribute("tilecount")?.Value ?? "0");
             int columns = int.Parse(tilesetElement.Attribute("columns")?.Value ?? "1");
 
-            // Get image element
-            var imageElement = tilesetElement.Element("image");
-            Texture2D texture = null;
+            // Check if this is an image collection tileset (columns == 0 with individual tile images)
+            var tileElements = tilesetElement.Elements("tile").ToList();
+            bool isImageCollection = columns == 0 && tileElements.Any(t => t.Element("image") != null);
 
-            if (imageElement != null)
+            if (isImageCollection)
             {
-                string imageSource = imageElement.Attribute("source").Value;
-                string imagePath = Path.Combine(basePath, imageSource);
-
-                // Try to load the texture
-                if (File.Exists(imagePath))
+                // Load individual tile images
+                var tileImages = new Dictionary<int, Texture2D>();
+                foreach (var tileElement in tileElements)
                 {
-                    using (var stream = File.OpenRead(imagePath))
+                    var tileImageElement = tileElement.Element("image");
+                    if (tileImageElement != null)
                     {
-                        texture = Texture2D.FromStream(graphicsDevice, stream);
+                        int tileId = int.Parse(tileElement.Attribute("id").Value);
+                        string imageSource = tileImageElement.Attribute("source").Value;
+                        string imagePath = Path.Combine(basePath, imageSource);
+
+                        if (File.Exists(imagePath))
+                        {
+                            using (var stream = File.OpenRead(imagePath))
+                            {
+                                tileImages[tileId] = Texture2D.FromStream(graphicsDevice, stream);
+                            }
+                            Console.WriteLine($"Loaded tile image: {Path.GetFileName(imagePath)} (tile {tileId})");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Tile image not found: {imagePath}");
+                        }
                     }
                 }
-            }
 
-            var tileset = new TiledTileset(firstGid, name, tileW, tileH, tileCount, columns, texture);
-            tilesets[firstGid] = tileset;
+                var tileset = new TiledTileset(firstGid, name, tileW, tileH, tileImages.Count, tileImages);
+                tilesets[firstGid] = tileset;
+                Console.WriteLine($"Loaded image collection tileset '{name}' with {tileImages.Count} tiles");
+            }
+            else
+            {
+                // Standard tileset with single image
+                var imageElement = tilesetElement.Element("image");
+                Texture2D texture = null;
+
+                if (imageElement != null)
+                {
+                    string imageSource = imageElement.Attribute("source").Value;
+                    string imagePath = Path.Combine(basePath, imageSource);
+
+                    // Try to load the texture
+                    if (File.Exists(imagePath))
+                    {
+                        using (var stream = File.OpenRead(imagePath))
+                        {
+                            texture = Texture2D.FromStream(graphicsDevice, stream);
+                        }
+                        Console.WriteLine($"Loaded tileset image: {Path.GetFileName(imagePath)}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Tileset image not found: {imagePath}");
+                    }
+                }
+
+                var tileset = new TiledTileset(firstGid, name, tileW, tileH, tileCount, columns, texture);
+                tilesets[firstGid] = tileset;
+            }
         }
 
         private void LoadLayer(XElement layerElement)
@@ -208,18 +253,29 @@ namespace Strays.Core
                             continue; // Empty tile
 
                         var tileset = GetTilesetForGid(gid);
-                        if (tileset?.Texture == null)
+                        if (tileset == null)
                             continue;
 
                         int localId = gid - tileset.FirstGid;
+                        Texture2D texture = tileset.GetTextureForTile(localId);
+                        if (texture == null)
+                            continue;
+
                         Rectangle sourceRect = tileset.GetSourceRectangle(localId);
 
+                        // For image collection tiles, draw at their actual size
                         Vector2 position = new Vector2(
                             x * tileWidth - cameraPosition.X,
                             y * tileHeight - cameraPosition.Y);
 
+                        if (tileset.IsImageCollection)
+                        {
+                            // Large tiles (like buildings) need to be offset so they sit on the tile
+                            position.Y -= (sourceRect.Height - tileHeight);
+                        }
+
                         spriteBatch.Draw(
-                            tileset.Texture,
+                            texture,
                             position,
                             sourceRect,
                             Color.White);
@@ -264,6 +320,10 @@ namespace Strays.Core
         public int Columns { get; }
         public Texture2D Texture { get; }
 
+        // For image collection tilesets (each tile has its own image)
+        public bool IsImageCollection { get; }
+        public Dictionary<int, Texture2D> TileImages { get; }
+
         public TiledTileset(int firstGid, string name, int tileWidth, int tileHeight,
             int tileCount, int columns, Texture2D texture)
         {
@@ -274,16 +334,47 @@ namespace Strays.Core
             TileCount = tileCount;
             Columns = columns;
             Texture = texture;
+            IsImageCollection = false;
+            TileImages = new Dictionary<int, Texture2D>();
+        }
+
+        public TiledTileset(int firstGid, string name, int tileWidth, int tileHeight,
+            int tileCount, Dictionary<int, Texture2D> tileImages)
+        {
+            FirstGid = firstGid;
+            Name = name;
+            TileWidth = tileWidth;
+            TileHeight = tileHeight;
+            TileCount = tileCount;
+            Columns = 0;
+            Texture = null;
+            IsImageCollection = true;
+            TileImages = tileImages;
         }
 
         public Rectangle GetSourceRectangle(int localId)
         {
+            if (IsImageCollection)
+            {
+                // For image collections, the entire image is the source
+                if (TileImages.TryGetValue(localId, out var tex))
+                    return new Rectangle(0, 0, tex.Width, tex.Height);
+                return Rectangle.Empty;
+            }
+
             if (Columns == 0)
                 return Rectangle.Empty;
 
             int x = (localId % Columns) * TileWidth;
             int y = (localId / Columns) * TileHeight;
             return new Rectangle(x, y, TileWidth, TileHeight);
+        }
+
+        public Texture2D GetTextureForTile(int localId)
+        {
+            if (IsImageCollection && TileImages.TryGetValue(localId, out var tex))
+                return tex;
+            return Texture;
         }
     }
 

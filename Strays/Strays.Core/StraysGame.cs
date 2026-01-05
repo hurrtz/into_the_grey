@@ -73,6 +73,10 @@ namespace Strays.Core
             else if (IsDesktop)
             {
                 storage = new DesktopSettingsStorage();
+
+                // Steam Deck native resolution: 1280x800 (16:10 aspect ratio)
+                graphicsDeviceManager.PreferredBackBufferWidth = 1280;
+                graphicsDeviceManager.PreferredBackBufferHeight = 800;
                 graphicsDeviceManager.IsFullScreen = false;
                 IsMouseVisible = true;
             }
