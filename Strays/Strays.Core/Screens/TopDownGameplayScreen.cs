@@ -136,7 +136,7 @@ namespace Strays.Screens
             // Clear to a nice green for the suburb
             ScreenManager.GraphicsDevice.Clear(Color.DarkGreen);
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null,
                 ScreenManager.GlobalTransformation);
 
             // Draw level

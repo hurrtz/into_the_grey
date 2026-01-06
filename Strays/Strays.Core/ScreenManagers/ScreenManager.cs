@@ -280,7 +280,7 @@ public class ScreenManager : DrawableGameComponent
     /// <param name="alpha">The opacity level of the fade (0 = fully transparent, 1 = fully opaque).</param>
     public void FadeBackBufferToBlack(float alpha)
     {
-        spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, globalTransformation);
+        spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, globalTransformation);
 
         spriteBatch.Draw(blankTexture,
             new Rectangle(0, 0, (int)BaseScreenSize.X, (int)BaseScreenSize.Y),

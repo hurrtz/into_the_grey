@@ -208,7 +208,7 @@ class MainMenuScreen : MenuScreen
 
         if (showTutorial)
         {
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null,
                 ScreenManager.GlobalTransformation);
 
             DrawTutorialSteps(spriteBatch);

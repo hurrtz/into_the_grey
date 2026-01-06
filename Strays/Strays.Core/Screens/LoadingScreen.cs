@@ -129,7 +129,7 @@ class LoadingScreen : GameScreen
             Color color = Color.White * TransitionAlpha;
 
             // Draw the text.
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null,
                 ScreenManager.GlobalTransformation);
             spriteBatch.DrawString(font, message, textPosition, color);
             spriteBatch.End();

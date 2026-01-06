@@ -774,14 +774,14 @@ namespace Strays.Core
             // Draw background layers (layers behind entities).
             for (int i = 0; i <= EntityLayer; ++i)
             {
-                spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
+                spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null,
                     screenManager.GlobalTransformation);
                 layers[i].Draw(gameTime, spriteBatch, cameraPosition / transformScale);
                 spriteBatch.End();
             }
 
             // Draw main game elements (tiles, gems, player, enemies) with camera transformation.
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null,
                 cameraTransform * screenManager.GlobalTransformation);
 
             DrawTiles(spriteBatch);
@@ -814,14 +814,14 @@ namespace Strays.Core
             // Draw foreground layers (layers in front of entities).
             for (int i = EntityLayer + 1; i < layers.Length; ++i)
             {
-                spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
+                spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null,
                     screenManager.GlobalTransformation);
                 layers[i].Draw(gameTime, spriteBatch, cameraPosition / transformScale);
                 spriteBatch.End();
             }
 
             // Draw the HUD (time, score, backpack, etc.).
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null,
                 screenManager.GlobalTransformation);
 
             particleManager.Draw(spriteBatch);

@@ -141,12 +141,12 @@ namespace Strays.Core
             Matrix cameraTransform = Matrix.CreateTranslation(-cameraPosition.X, -cameraPosition.Y, 0)
                                    * screenManager.GlobalTransformation;
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, cameraTransform);
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, cameraTransform);
             player.Draw(spriteBatch);
             spriteBatch.End();
 
             // Restart the regular sprite batch for any HUD drawing
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null,
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null,
                 screenManager.GlobalTransformation);
         }
 

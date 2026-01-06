@@ -273,7 +273,7 @@ abstract class MenuScreen : GameScreen
         SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
         SpriteFont font = ScreenManager.Font;
 
-        spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, ScreenManager.GlobalTransformation);
+        spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, ScreenManager.GlobalTransformation);
 
         // Draw each menu entry in turn.
         for (int i = 0; i < menuEntries.Count; i++)
