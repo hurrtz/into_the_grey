@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Strays.Core.Effects;
 using Strays.Core.Localization;
+using Strays.Core.Services;
 using Strays.Core.Settings;
 using Strays.ScreenManagers;
 using Strays.Screens;
@@ -19,7 +20,7 @@ namespace Strays.Core
     /// This class is the entry point for the game and handles initialization, content loading,
     /// and screen management.
     /// </remarks>}
-    public class StraysGame : Game
+    public class StraysGame : Microsoft.Xna.Framework.Game
     {
         // Resources for drawing.
         private GraphicsDeviceManager graphicsDeviceManager;
@@ -38,6 +39,9 @@ namespace Strays.Core
 
         // Manages particle effects in the game.
         private ParticleManager particleManager;
+
+        // Manages game state, progression, and save/load.
+        private GameStateService gameStateService;
 
         /// <summary>
         /// Indicates if the game is running on a mobile platform.
@@ -122,8 +126,12 @@ namespace Strays.Core
             var selectedLanguage = languages[settingsManager.Settings.Language].Name;
             LocalizationManager.SetCulture(selectedLanguage);
 
-            // Start directly in top-down gameplay mode with the new DefaultMale character
-            screenManager.AddScreen(new TopDownGameplayScreen(), null);
+            // Initialize game state service
+            gameStateService = new GameStateService();
+            Services.AddService(typeof(GameStateService), gameStateService);
+
+            // Start in WorldScreen (Into The Grey gameplay)
+            screenManager.AddScreen(new WorldScreen(), null);
         }
 
         /// <summary>
