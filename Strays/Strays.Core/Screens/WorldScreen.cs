@@ -44,6 +44,15 @@ public class WorldScreen : GameScreen
     private Settlement? _currentSettlement;
     private Stray? _pendingRecruitment;
 
+    // Biome transition state
+    private BiomeType _previousBiome;
+    private float _biomeTransitionAlpha;
+    private string _biomeTransitionText = "";
+
+    // Weather particles
+    private List<WeatherParticle> _weatherParticles = new();
+    private float _weatherUpdateTimer;
+
     // Input
     private KeyboardState _previousKeyboardState;
 
@@ -109,6 +118,11 @@ public class WorldScreen : GameScreen
         _world.SetViewportSize(new Vector2(ScreenManager.BaseScreenSize.X, ScreenManager.BaseScreenSize.Y));
         _world.Initialize();
 
+        // Subscribe to world events
+        _world.BiomeChanged += OnBiomeChanged;
+        _world.WeatherChanged += OnWeatherChanged;
+        _previousBiome = _world.CurrentBiome;
+
         // Create settlements
         InitializeSettlements();
 
@@ -157,6 +171,26 @@ public class WorldScreen : GameScreen
             "nimdok_terminal_loc" => new Vector2(300, 600),
             _ => new Vector2(500, 500)
         };
+    }
+
+    private void OnBiomeChanged(BiomeType oldBiome, BiomeType newBiome)
+    {
+        _previousBiome = oldBiome;
+        _biomeTransitionAlpha = 1f;
+        _biomeTransitionText = $"Entering {BiomeData.GetName(newBiome)}";
+        _gameState.CurrentBiome = newBiome;
+
+        // Notify quest system
+        _questLog.NotifyReachedLocation($"biome_{newBiome}");
+
+        System.Diagnostics.Debug.WriteLine($"Biome changed: {oldBiome} -> {newBiome}");
+    }
+
+    private void OnWeatherChanged(WeatherType newWeather)
+    {
+        // Clear existing particles
+        _weatherParticles.Clear();
+        System.Diagnostics.Debug.WriteLine($"Weather changed to: {newWeather}");
     }
 
     private void OnPlayerEnteredSettlement(object? sender, EventArgs e)
@@ -348,6 +382,114 @@ public class WorldScreen : GameScreen
         {
             CheckEncounters();
         }
+
+        // Update biome transition
+        if (_biomeTransitionAlpha > 0)
+        {
+            _biomeTransitionAlpha -= (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
+        }
+
+        // Update weather particles
+        UpdateWeatherParticles(gameTime);
+    }
+
+    /// <summary>
+    /// Updates weather particles based on current weather.
+    /// </summary>
+    private void UpdateWeatherParticles(GameTime gameTime)
+    {
+        var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        _weatherUpdateTimer += deltaTime;
+
+        var weather = _world.CurrentWeather;
+        var screenSize = ScreenManager.BaseScreenSize;
+        var random = new Random();
+
+        // Spawn new particles
+        if (_weatherUpdateTimer >= 0.05f)
+        {
+            _weatherUpdateTimer = 0f;
+
+            switch (weather)
+            {
+                case WeatherType.Rain:
+                case WeatherType.AcidRain:
+                    for (int i = 0; i < 5; i++)
+                    {
+                        _weatherParticles.Add(new WeatherParticle
+                        {
+                            Position = new Vector2(random.Next((int)screenSize.X), -10),
+                            Velocity = new Vector2(random.Next(-20, 20), 400 + random.Next(100)),
+                            Color = weather == WeatherType.AcidRain ? Color.LimeGreen * 0.5f : Color.LightBlue * 0.5f,
+                            Size = new Vector2(2, 8)
+                        });
+                    }
+                    break;
+
+                case WeatherType.Snow:
+                    for (int i = 0; i < 2; i++)
+                    {
+                        _weatherParticles.Add(new WeatherParticle
+                        {
+                            Position = new Vector2(random.Next((int)screenSize.X), -10),
+                            Velocity = new Vector2(random.Next(-30, 30), 50 + random.Next(50)),
+                            Color = Color.White * 0.7f,
+                            Size = new Vector2(3, 3)
+                        });
+                    }
+                    break;
+
+                case WeatherType.Dust:
+                    if (random.NextDouble() < 0.3f)
+                    {
+                        _weatherParticles.Add(new WeatherParticle
+                        {
+                            Position = new Vector2(-10, random.Next((int)screenSize.Y)),
+                            Velocity = new Vector2(150 + random.Next(100), random.Next(-20, 20)),
+                            Color = Color.SandyBrown * 0.3f,
+                            Size = new Vector2(4 + random.Next(4), 4 + random.Next(4))
+                        });
+                    }
+                    break;
+
+                case WeatherType.DataStorm:
+                    for (int i = 0; i < 3; i++)
+                    {
+                        _weatherParticles.Add(new WeatherParticle
+                        {
+                            Position = new Vector2(random.Next((int)screenSize.X), random.Next((int)screenSize.Y)),
+                            Velocity = new Vector2(random.Next(-50, 50), random.Next(-50, 50)),
+                            Color = Color.Cyan * 0.4f,
+                            Size = new Vector2(1, 1),
+                            Lifetime = 0.5f + (float)random.NextDouble() * 0.5f
+                        });
+                    }
+                    break;
+            }
+        }
+
+        // Update particles
+        for (int i = _weatherParticles.Count - 1; i >= 0; i--)
+        {
+            var particle = _weatherParticles[i];
+            particle.Position += particle.Velocity * deltaTime;
+            particle.Lifetime -= deltaTime;
+
+            // Remove particles off screen or expired
+            if (particle.Position.Y > screenSize.Y + 10 ||
+                particle.Position.X > screenSize.X + 10 ||
+                particle.Position.X < -10 ||
+                particle.Lifetime <= 0)
+            {
+                _weatherParticles.RemoveAt(i);
+            }
+        }
+
+        // Limit particle count
+        while (_weatherParticles.Count > 500)
+        {
+            _weatherParticles.RemoveAt(0);
+        }
     }
 
     /// <summary>
@@ -519,10 +661,114 @@ public class WorldScreen : GameScreen
         // Draw protagonist
         _protagonist.Draw(spriteBatch, _pixelTexture!, _world.CameraPosition);
 
+        // Draw weather effects
+        DrawWeather(spriteBatch);
+
+        // Draw biome transition overlay
+        DrawBiomeTransition(spriteBatch);
+
         // Draw UI overlay
         DrawUI(spriteBatch);
 
         spriteBatch.End();
+    }
+
+    /// <summary>
+    /// Draws weather effects.
+    /// </summary>
+    private void DrawWeather(SpriteBatch spriteBatch)
+    {
+        if (_pixelTexture == null)
+            return;
+
+        // Draw weather overlay tint
+        var weather = _world.CurrentWeather;
+        var screenSize = ScreenManager.BaseScreenSize;
+        var overlayColor = GetWeatherOverlayColor(weather);
+
+        if (overlayColor.A > 0)
+        {
+            var overlayRect = new Rectangle(0, 0, (int)screenSize.X, (int)screenSize.Y);
+            spriteBatch.Draw(_pixelTexture, overlayRect, overlayColor);
+        }
+
+        // Draw weather particles
+        foreach (var particle in _weatherParticles)
+        {
+            var rect = new Rectangle(
+                (int)particle.Position.X,
+                (int)particle.Position.Y,
+                (int)particle.Size.X,
+                (int)particle.Size.Y
+            );
+            spriteBatch.Draw(_pixelTexture, rect, particle.Color);
+        }
+    }
+
+    /// <summary>
+    /// Gets the overlay color for weather effects.
+    /// </summary>
+    private Color GetWeatherOverlayColor(WeatherType weather)
+    {
+        return weather switch
+        {
+            WeatherType.Fog => new Color(200, 200, 200, 60),
+            WeatherType.Rain => new Color(50, 50, 80, 30),
+            WeatherType.AcidRain => new Color(50, 100, 50, 40),
+            WeatherType.Dust => new Color(139, 119, 101, 40),
+            WeatherType.Snow => new Color(230, 240, 255, 20),
+            WeatherType.DataStorm => new Color(0, 80, 100, 30),
+            WeatherType.RadiationWind => new Color(100, 100, 50, 30),
+            _ => Color.Transparent
+        };
+    }
+
+    /// <summary>
+    /// Draws biome transition overlay.
+    /// </summary>
+    private void DrawBiomeTransition(SpriteBatch spriteBatch)
+    {
+        if (_biomeTransitionAlpha <= 0 || _pixelTexture == null || _font == null)
+            return;
+
+        var screenSize = ScreenManager.BaseScreenSize;
+
+        // Fade between biome colors
+        var fromColor = BiomeData.GetBackgroundColor(_previousBiome);
+        var toColor = BiomeData.GetBackgroundColor(_world.CurrentBiome);
+        var transitionColor = Color.Lerp(toColor, fromColor, _biomeTransitionAlpha) * (_biomeTransitionAlpha * 0.5f);
+
+        // Draw edge vignette
+        var vignetteRect = new Rectangle(0, 0, (int)screenSize.X, (int)screenSize.Y);
+        spriteBatch.Draw(_pixelTexture, vignetteRect, transitionColor);
+
+        // Draw biome name text
+        if (!string.IsNullOrEmpty(_biomeTransitionText))
+        {
+            var textSize = _font.MeasureString(_biomeTransitionText);
+            var textPos = new Vector2(
+                screenSize.X / 2 - textSize.X / 2,
+                screenSize.Y / 3
+            );
+
+            // Draw shadow
+            spriteBatch.DrawString(_font, _biomeTransitionText,
+                textPos + new Vector2(2, 2), Color.Black * _biomeTransitionAlpha);
+
+            // Draw text
+            spriteBatch.DrawString(_font, _biomeTransitionText,
+                textPos, Color.White * _biomeTransitionAlpha);
+
+            // Draw biome theme
+            var themeName = BiomeData.GetTheme(_world.CurrentBiome);
+            var themeSize = _font.MeasureString(themeName);
+            var themePos = new Vector2(
+                screenSize.X / 2 - themeSize.X / 2,
+                textPos.Y + textSize.Y + 10
+            );
+            spriteBatch.DrawString(_font, themeName,
+                themePos, Color.LightGray * _biomeTransitionAlpha);
+        }
     }
 
     /// <summary>
@@ -567,13 +813,23 @@ public class WorldScreen : GameScreen
         }
 
         // Draw current biome
-        var biomeName = BiomeData.GetName(_gameState.CurrentBiome);
+        var biomeName = BiomeData.GetName(_world.CurrentBiome);
         var biomePos = new Vector2(ScreenManager.BaseScreenSize.X - _font.MeasureString(biomeName).X - 10, 10);
         spriteBatch.DrawString(_font, biomeName, biomePos, Color.White);
 
+        // Draw weather
+        var weather = _world.CurrentWeather;
+        if (weather != WeatherType.None)
+        {
+            var weatherText = GetWeatherDisplayName(weather);
+            var weatherPos = new Vector2(ScreenManager.BaseScreenSize.X - _font.MeasureString(weatherText).X - 10, 30);
+            spriteBatch.DrawString(_font, weatherText, weatherPos, GetWeatherTextColor(weather));
+        }
+
         // Draw play time
         var playTime = _gameState.GetFormattedPlayTime();
-        var timePos = new Vector2(ScreenManager.BaseScreenSize.X - _font.MeasureString(playTime).X - 10, 30);
+        var timePos = new Vector2(ScreenManager.BaseScreenSize.X - _font.MeasureString(playTime).X - 10,
+            weather != WeatherType.None ? 50 : 30);
         spriteBatch.DrawString(_font, playTime, timePos, Color.LightGray);
 
         // Draw settlement name if inside one
@@ -604,6 +860,54 @@ public class WorldScreen : GameScreen
         var hintPos = new Vector2(10, ScreenManager.BaseScreenSize.Y - 20);
         spriteBatch.DrawString(_font, hint, hintPos, Color.Gray);
     }
+
+    /// <summary>
+    /// Gets display name for weather type.
+    /// </summary>
+    private string GetWeatherDisplayName(WeatherType weather)
+    {
+        return weather switch
+        {
+            WeatherType.Fog => "Fog",
+            WeatherType.Rain => "Rain",
+            WeatherType.AcidRain => "Acid Rain",
+            WeatherType.Dust => "Dust Storm",
+            WeatherType.Snow => "Snow",
+            WeatherType.DataStorm => "Data Storm",
+            WeatherType.RadiationWind => "Radiation Wind",
+            _ => ""
+        };
+    }
+
+    /// <summary>
+    /// Gets text color for weather display.
+    /// </summary>
+    private Color GetWeatherTextColor(WeatherType weather)
+    {
+        return weather switch
+        {
+            WeatherType.Fog => Color.LightGray,
+            WeatherType.Rain => Color.LightBlue,
+            WeatherType.AcidRain => Color.LimeGreen,
+            WeatherType.Dust => Color.SandyBrown,
+            WeatherType.Snow => Color.White,
+            WeatherType.DataStorm => Color.Cyan,
+            WeatherType.RadiationWind => Color.Yellow,
+            _ => Color.White
+        };
+    }
+}
+
+/// <summary>
+/// Simple particle for weather effects.
+/// </summary>
+public class WeatherParticle
+{
+    public Vector2 Position { get; set; }
+    public Vector2 Velocity { get; set; }
+    public Color Color { get; set; }
+    public Vector2 Size { get; set; }
+    public float Lifetime { get; set; } = 10f;
 }
 
 /// <summary>

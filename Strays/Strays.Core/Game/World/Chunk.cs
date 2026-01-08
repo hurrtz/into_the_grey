@@ -30,7 +30,7 @@ public class Chunk
     /// <summary>
     /// Size of this chunk in pixels.
     /// </summary>
-    public Vector2 Size { get; private set; }
+    public Vector2 Size { get; set; }
 
     /// <summary>
     /// Whether this chunk is currently loaded.
