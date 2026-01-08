@@ -3,3 +3,22 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+
+# Tiled editor
+*.tiled-session
+
+# MonoGame content build
+*.mgstats
