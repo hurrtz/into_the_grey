@@ -29,6 +29,11 @@ public enum CombatPhase
     SelectingAction,
 
     /// <summary>
+    /// Player is selecting an ability from the ability menu.
+    /// </summary>
+    SelectingAbility,
+
+    /// <summary>
     /// Player is selecting a target for the chosen action.
     /// </summary>
     SelectingTarget,
@@ -100,6 +105,21 @@ public class CombatState
     /// Index of the currently selected action.
     /// </summary>
     public int ActionIndex { get; set; } = 0;
+
+    /// <summary>
+    /// Index of the currently selected ability.
+    /// </summary>
+    public int AbilityIndex { get; set; } = 0;
+
+    /// <summary>
+    /// The currently selected ability.
+    /// </summary>
+    public Ability? SelectedAbility { get; set; }
+
+    /// <summary>
+    /// The combat AI for enemy actions.
+    /// </summary>
+    public CombatAI CombatAI { get; } = new();
 
     /// <summary>
     /// The encounter that triggered this combat.
@@ -262,14 +282,18 @@ public class CombatState
     {
         foreach (var enemy in Enemies.Where(e => e.IsReady && e.SelectedAction == null))
         {
-            // Simple AI: attack a random living party member
-            var targets = Party.Where(p => p.IsAlive).ToList();
-            if (targets.Count > 0)
-            {
-                var target = targets[_random.Next(targets.Count)];
-                var action = CombatAction.Attack(enemy, target);
-                ExecuteAction(action);
-            }
+            // Get AI behavior based on Stray type
+            var behavior = CombatAI.GetBehaviorForStray(enemy.Stray.Definition.Type);
+
+            // Use combat AI to select action
+            var action = CombatAI.SelectAction(
+                enemy,
+                Enemies.ToList(),
+                Party.ToList(),
+                behavior
+            );
+
+            ExecuteAction(action);
         }
     }
 
@@ -316,10 +340,16 @@ public class CombatState
         {
             case CombatActionType.Attack:
                 Phase = CombatPhase.SelectingTarget;
+                SelectedAbility = null;
                 // Default to first living enemy
                 TargetIndex = Enemies.FindIndex(e => e.IsAlive);
                 if (TargetIndex >= 0)
                     TargetedCombatant = Enemies[TargetIndex];
+                break;
+
+            case CombatActionType.Ability:
+                Phase = CombatPhase.SelectingAbility;
+                AbilityIndex = 0;
                 break;
 
             case CombatActionType.Defend:
@@ -335,12 +365,112 @@ public class CombatState
     }
 
     /// <summary>
+    /// Gets the available abilities for the active combatant.
+    /// </summary>
+    public List<Ability> GetAvailableAbilities()
+    {
+        if (ActiveCombatant == null)
+            return new List<Ability>();
+
+        return ActiveCombatant.Abilities.ToList();
+    }
+
+    /// <summary>
+    /// Selects an ability and moves to target selection.
+    /// </summary>
+    public void SelectAbility(int index)
+    {
+        if (ActiveCombatant == null)
+            return;
+
+        var abilities = GetAvailableAbilities();
+        if (index < 0 || index >= abilities.Count)
+            return;
+
+        var ability = abilities[index];
+
+        // Check if ability is usable
+        if (!ability.IsReady || ability.Definition.EnergyCost > ActiveCombatant.CurrentEnergy)
+            return;
+
+        SelectedAbility = ability;
+
+        // Determine if we need target selection
+        var targetType = ability.Definition.Target;
+        switch (targetType)
+        {
+            case AbilityTarget.Self:
+                // Execute immediately on self
+                var selfAction = CombatAction.UseAbility(ActiveCombatant, ability, ActiveCombatant);
+                ExecuteAction(selfAction);
+                break;
+
+            case AbilityTarget.SingleEnemy:
+            case AbilityTarget.RandomEnemy:
+                // Select enemy target
+                Phase = CombatPhase.SelectingTarget;
+                TargetIndex = Enemies.FindIndex(e => e.IsAlive);
+                if (TargetIndex >= 0)
+                    TargetedCombatant = Enemies[TargetIndex];
+                break;
+
+            case AbilityTarget.SingleAlly:
+                // Select ally target
+                Phase = CombatPhase.SelectingTarget;
+                TargetIndex = Party.FindIndex(p => p.IsAlive);
+                if (TargetIndex >= 0)
+                    TargetedCombatant = Party[TargetIndex];
+                break;
+
+            case AbilityTarget.AllEnemies:
+                // Execute on all enemies
+                var aoeAction = CombatAction.UseAbility(ActiveCombatant, ability, Enemies.Where(e => e.IsAlive).ToList());
+                ExecuteAction(aoeAction);
+                break;
+
+            case AbilityTarget.AllAllies:
+                // Execute on all allies
+                var healAllAction = CombatAction.UseAbility(ActiveCombatant, ability, Party.Where(p => p.IsAlive).ToList());
+                ExecuteAction(healAllAction);
+                break;
+
+            case AbilityTarget.All:
+                // Execute on everyone
+                var allAction = CombatAction.UseAbility(ActiveCombatant, ability, AllCombatants.Where(c => c.IsAlive).ToList());
+                ExecuteAction(allAction);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Cancels ability selection and returns to action menu.
+    /// </summary>
+    public void CancelAbilitySelection()
+    {
+        Phase = CombatPhase.SelectingAction;
+        SelectedAbility = null;
+    }
+
+    /// <summary>
     /// Cycles to the next valid target.
     /// </summary>
     /// <param name="direction">1 for next, -1 for previous.</param>
     public void CycleTarget(int direction)
     {
-        var targets = Enemies.Where(e => e.IsAlive).ToList();
+        // Determine valid targets based on selected ability
+        List<Combatant> targets;
+        if (SelectedAbility != null)
+        {
+            var targetType = SelectedAbility.Definition.Target;
+            targets = targetType == AbilityTarget.SingleAlly
+                ? Party.Where(p => p.IsAlive).ToList()
+                : Enemies.Where(e => e.IsAlive).ToList();
+        }
+        else
+        {
+            targets = Enemies.Where(e => e.IsAlive).ToList();
+        }
+
         if (targets.Count == 0)
             return;
 
@@ -359,7 +489,15 @@ public class CombatState
         if (ActiveCombatant == null || TargetedCombatant == null)
             return;
 
-        var action = CombatAction.Attack(ActiveCombatant, TargetedCombatant);
+        CombatAction action;
+        if (SelectedAbility != null)
+        {
+            action = CombatAction.UseAbility(ActiveCombatant, SelectedAbility, TargetedCombatant);
+        }
+        else
+        {
+            action = CombatAction.Attack(ActiveCombatant, TargetedCombatant);
+        }
         ExecuteAction(action);
     }
 
@@ -368,7 +506,16 @@ public class CombatState
     /// </summary>
     public void CancelTargetSelection()
     {
-        Phase = CombatPhase.SelectingAction;
+        if (SelectedAbility != null)
+        {
+            // Go back to ability selection
+            Phase = CombatPhase.SelectingAbility;
+            SelectedAbility = null;
+        }
+        else
+        {
+            Phase = CombatPhase.SelectingAction;
+        }
         TargetedCombatant = null;
     }
 
@@ -384,6 +531,10 @@ public class CombatState
         {
             case CombatActionType.Attack:
                 ExecuteAttack(action, result);
+                break;
+
+            case CombatActionType.Ability:
+                ExecuteAbility(action, result);
                 break;
 
             case CombatActionType.Defend:
@@ -406,6 +557,9 @@ public class CombatState
 
         // Reset the acting combatant
         action.Source?.ResetAtb();
+
+        // Clear selected ability
+        SelectedAbility = null;
 
         // Fire event
         ActionExecuted?.Invoke(this, result);
@@ -497,6 +651,207 @@ public class CombatState
         }
     }
 
+    private void ExecuteAbility(CombatAction action, CombatActionResult result)
+    {
+        if (action.Source == null || string.IsNullOrEmpty(action.AbilityId))
+            return;
+
+        var abilityDef = Abilities.Get(action.AbilityId);
+        if (abilityDef == null)
+            return;
+
+        // Find the ability instance on the source
+        var ability = action.Source.Abilities.FirstOrDefault(a => a.Definition.Id == action.AbilityId);
+        if (ability == null)
+            return;
+
+        // Use energy
+        if (!action.Source.UseEnergy(abilityDef.EnergyCost))
+        {
+            result.Success = false;
+            result.Message = $"{action.Source.Name} doesn't have enough energy!";
+            return;
+        }
+
+        // Mark ability as used
+        ability.Use();
+
+        // Execute based on category
+        switch (abilityDef.Category)
+        {
+            case AbilityCategory.Damage:
+                ExecuteDamageAbility(action, abilityDef, result);
+                break;
+
+            case AbilityCategory.Healing:
+                ExecuteHealingAbility(action, abilityDef, result);
+                break;
+
+            case AbilityCategory.Buff:
+            case AbilityCategory.Debuff:
+            case AbilityCategory.Status:
+                ExecuteStatusAbility(action, abilityDef, result);
+                break;
+
+            default:
+                result.Message = $"{action.Source.Name} uses {abilityDef.Name}!";
+                break;
+        }
+
+        // Record for AI threat tracking
+        if (result.DamageDealt > 0)
+        {
+            CombatAI.RecordDamage(action.Source, action.Target!, result.DamageDealt);
+        }
+        if (result.HealingDone > 0)
+        {
+            CombatAI.RecordHealing(action.Source, result.HealingDone);
+        }
+    }
+
+    private void ExecuteDamageAbility(CombatAction action, AbilityDefinition abilityDef, CombatActionResult result)
+    {
+        if (action.Source == null)
+            return;
+
+        int totalDamage = 0;
+        var defeatedTargets = new List<string>();
+
+        foreach (var target in action.Targets)
+        {
+            if (!target.IsAlive)
+                continue;
+
+            // Check accuracy
+            if (_random.Next(100) >= abilityDef.Accuracy)
+            {
+                result.Missed = true;
+                continue;
+            }
+
+            // Calculate damage: base power + special stat scaling
+            int baseDamage = abilityDef.Power + action.Source.Special / 2;
+
+            // Random variance (90-110%)
+            float variance = 0.9f + (float)_random.NextDouble() * 0.2f;
+            int damage = (int)(baseDamage * variance);
+
+            // Critical hit
+            int critChance = 10 + abilityDef.CritBonus;
+            if (_random.Next(100) < critChance)
+            {
+                damage = (int)(damage * 1.5f);
+                result.WasCritical = true;
+            }
+
+            // Apply damage
+            int actualDamage = target.TakeDamage(damage);
+            totalDamage += actualDamage;
+
+            // Apply status effect
+            if (abilityDef.AppliesStatus != StatusEffect.None && _random.Next(100) < abilityDef.StatusChance)
+            {
+                target.ApplyStatus(abilityDef.AppliesStatus, abilityDef.StatusDuration);
+            }
+
+            if (!target.IsAlive)
+            {
+                defeatedTargets.Add(target.Name);
+                result.CausedDefeat = true;
+                result.DefeatedCombatant = target;
+            }
+        }
+
+        result.DamageDealt = totalDamage;
+
+        if (action.Targets.Count == 1)
+        {
+            result.Message = $"{action.Source.Name} uses {abilityDef.Name} on {action.Target?.Name} for {totalDamage} damage!";
+        }
+        else
+        {
+            result.Message = $"{action.Source.Name} uses {abilityDef.Name} for {totalDamage} total damage!";
+        }
+
+        if (result.WasCritical)
+            result.Message += " Critical!";
+
+        if (defeatedTargets.Count > 0)
+            result.Message += $" {string.Join(", ", defeatedTargets)} defeated!";
+    }
+
+    private void ExecuteHealingAbility(CombatAction action, AbilityDefinition abilityDef, CombatActionResult result)
+    {
+        if (action.Source == null)
+            return;
+
+        int totalHealing = 0;
+
+        foreach (var target in action.Targets)
+        {
+            if (!target.IsAlive)
+                continue;
+
+            // Calculate healing: base power + special stat scaling
+            int healing = abilityDef.Power + action.Source.Special / 2;
+
+            int actualHealing = target.Heal(healing);
+            totalHealing += actualHealing;
+        }
+
+        result.HealingDone = totalHealing;
+
+        if (action.Targets.Count == 1)
+        {
+            result.Message = $"{action.Source.Name} uses {abilityDef.Name} on {action.Target?.Name}, restoring {totalHealing} HP!";
+        }
+        else
+        {
+            result.Message = $"{action.Source.Name} uses {abilityDef.Name}, restoring {totalHealing} total HP!";
+        }
+    }
+
+    private void ExecuteStatusAbility(CombatAction action, AbilityDefinition abilityDef, CombatActionResult result)
+    {
+        if (action.Source == null)
+            return;
+
+        int affected = 0;
+
+        foreach (var target in action.Targets)
+        {
+            if (!target.IsAlive)
+                continue;
+
+            // Check accuracy for debuffs
+            if (abilityDef.Category == AbilityCategory.Debuff && _random.Next(100) >= abilityDef.Accuracy)
+            {
+                continue;
+            }
+
+            // Apply status effect
+            if (abilityDef.AppliesStatus != StatusEffect.None && _random.Next(100) < abilityDef.StatusChance)
+            {
+                target.ApplyStatus(abilityDef.AppliesStatus, abilityDef.StatusDuration);
+                affected++;
+            }
+
+            // Apply damage if any
+            if (abilityDef.Power > 0)
+            {
+                int damage = abilityDef.Power + action.Source.Special / 4;
+                target.TakeDamage(damage);
+                result.DamageDealt += damage;
+            }
+        }
+
+        result.Message = $"{action.Source.Name} uses {abilityDef.Name}!";
+        if (affected > 0 && abilityDef.AppliesStatus != StatusEffect.None)
+        {
+            result.Message += $" {abilityDef.AppliesStatus} applied!";
+        }
+    }
+
     /// <summary>
     /// Triggers companion Gravitation intervention.
     /// </summary>
@@ -532,6 +887,17 @@ public class CombatState
     /// </summary>
     public List<string> GetAvailableActions()
     {
-        return new List<string> { "Attack", "Defend", "Flee" };
+        var actions = new List<string> { "Attack" };
+
+        // Add Abilities option if the combatant has any
+        if (ActiveCombatant != null && ActiveCombatant.Abilities.Count > 0)
+        {
+            actions.Add("Abilities");
+        }
+
+        actions.Add("Defend");
+        actions.Add("Flee");
+
+        return actions;
     }
 }

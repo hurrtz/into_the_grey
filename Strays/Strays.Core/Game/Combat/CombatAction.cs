@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Strays.Core.Game.Combat;
 
@@ -135,6 +136,55 @@ public class CombatAction
             Target = target,
             Targets = new List<Combatant> { target },
             Priority = 50 // Gravitation interrupts
+        };
+    }
+
+    /// <summary>
+    /// Creates an ability action with a single target.
+    /// </summary>
+    public static CombatAction UseAbility(Combatant source, Ability ability, Combatant target)
+    {
+        return new CombatAction
+        {
+            Type = CombatActionType.Ability,
+            Source = source,
+            Target = target,
+            Targets = new List<Combatant> { target },
+            AbilityId = ability.Definition.Id,
+            Priority = ability.Definition.Priority
+        };
+    }
+
+    /// <summary>
+    /// Creates an ability action with multiple targets.
+    /// </summary>
+    public static CombatAction UseAbility(Combatant source, Ability ability, List<Combatant> targets)
+    {
+        return new CombatAction
+        {
+            Type = CombatActionType.Ability,
+            Source = source,
+            Target = targets.FirstOrDefault(),
+            Targets = targets,
+            AbilityId = ability.Definition.Id,
+            Priority = ability.Definition.Priority
+        };
+    }
+
+    /// <summary>
+    /// Creates an ability action with multiple targets (from IEnumerable).
+    /// </summary>
+    public static CombatAction UseAbility(Combatant source, Ability ability, IEnumerable<Combatant> targets)
+    {
+        var targetList = targets.ToList();
+        return new CombatAction
+        {
+            Type = CombatActionType.Ability,
+            Source = source,
+            Target = targetList.FirstOrDefault(),
+            Targets = targetList,
+            AbilityId = ability.Definition.Id,
+            Priority = ability.Definition.Priority
         };
     }
 }

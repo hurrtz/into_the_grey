@@ -87,6 +87,10 @@ public class CombatScreen : GameScreen
                 HandleActionSelection(keyboardState);
                 break;
 
+            case CombatPhase.SelectingAbility:
+                HandleAbilitySelection(keyboardState);
+                break;
+
             case CombatPhase.SelectingTarget:
                 HandleTargetSelection(keyboardState);
                 break;
@@ -116,11 +120,44 @@ public class CombatScreen : GameScreen
             var actionType = selectedAction switch
             {
                 "Attack" => CombatActionType.Attack,
+                "Abilities" => CombatActionType.Ability,
                 "Defend" => CombatActionType.Defend,
                 "Flee" => CombatActionType.Flee,
                 _ => CombatActionType.Attack
             };
             _combatState.SelectAction(actionType);
+        }
+    }
+
+    private void HandleAbilitySelection(KeyboardState keyboardState)
+    {
+        var abilities = _combatState.GetAvailableAbilities();
+        if (abilities.Count == 0)
+        {
+            _combatState.CancelAbilitySelection();
+            return;
+        }
+
+        // Navigate abilities
+        if (IsKeyPressed(keyboardState, Keys.Up) || IsKeyPressed(keyboardState, Keys.W))
+        {
+            _combatState.AbilityIndex = (_combatState.AbilityIndex - 1 + abilities.Count) % abilities.Count;
+        }
+        if (IsKeyPressed(keyboardState, Keys.Down) || IsKeyPressed(keyboardState, Keys.S))
+        {
+            _combatState.AbilityIndex = (_combatState.AbilityIndex + 1) % abilities.Count;
+        }
+
+        // Select ability
+        if (IsKeyPressed(keyboardState, Keys.Enter) || IsKeyPressed(keyboardState, Keys.Space))
+        {
+            _combatState.SelectAbility(_combatState.AbilityIndex);
+        }
+
+        // Cancel
+        if (IsKeyPressed(keyboardState, Keys.Escape) || IsKeyPressed(keyboardState, Keys.Back))
+        {
+            _combatState.CancelAbilitySelection();
         }
     }
 
@@ -274,10 +311,18 @@ public class CombatScreen : GameScreen
             DrawActionMenu(spriteBatch);
         }
 
+        // Draw ability menu during ability selection
+        if (_combatState.Phase == CombatPhase.SelectingAbility && _combatState.ActiveCombatant != null)
+        {
+            DrawAbilityMenu(spriteBatch);
+        }
+
         // Draw target indicator during targeting
         if (_combatState.Phase == CombatPhase.SelectingTarget)
         {
-            var targetText = "Select Target (Enter to confirm, Esc to cancel)";
+            var targetText = _combatState.SelectedAbility != null
+                ? $"Select Target for {_combatState.SelectedAbility.Definition.Name} (Enter/Esc)"
+                : "Select Target (Enter to confirm, Esc to cancel)";
             var targetPos = new Vector2(
                 ScreenManager.BaseScreenSize.X / 2 - _font.MeasureString(targetText).X / 2,
                 ScreenManager.BaseScreenSize.Y - 30
@@ -362,6 +407,109 @@ public class CombatScreen : GameScreen
             var textPos = new Vector2(menuX + 5, menuY + 5 + i * 25);
             spriteBatch.DrawString(_font, prefix + action, textPos, color);
         }
+
+        // Draw energy bar
+        if (_combatState.ActiveCombatant != null)
+        {
+            var energyText = $"EP: {_combatState.ActiveCombatant.CurrentEnergy}/{_combatState.ActiveCombatant.MaxEnergy}";
+            var energyPos = new Vector2(menuX + 5, menuY + menuHeight + 5);
+            spriteBatch.DrawString(_font, energyText, energyPos, Color.Cyan);
+        }
+    }
+
+    private void DrawAbilityMenu(SpriteBatch spriteBatch)
+    {
+        if (_font == null || _pixelTexture == null || _combatState.ActiveCombatant == null)
+            return;
+
+        var abilities = _combatState.GetAvailableAbilities();
+        var menuX = 60;
+        var menuY = (int)ScreenManager.BaseScreenSize.Y - 200;
+        var menuWidth = 250;
+        var menuHeight = Math.Min(abilities.Count, 6) * 25 + 30;
+
+        // Menu background
+        var menuRect = new Rectangle(menuX, menuY, menuWidth, menuHeight);
+        spriteBatch.Draw(_pixelTexture, menuRect, new Color(40, 40, 60));
+
+        // Menu border
+        var borderRect = new Rectangle(menuX - 2, menuY - 2, menuWidth + 4, menuHeight + 4);
+        spriteBatch.Draw(_pixelTexture, new Rectangle(borderRect.X, borderRect.Y, borderRect.Width, 2), Color.White);
+        spriteBatch.Draw(_pixelTexture, new Rectangle(borderRect.X, borderRect.Y, 2, borderRect.Height), Color.White);
+        spriteBatch.Draw(_pixelTexture, new Rectangle(borderRect.X, borderRect.Bottom - 2, borderRect.Width, 2), Color.White);
+        spriteBatch.Draw(_pixelTexture, new Rectangle(borderRect.Right - 2, borderRect.Y, 2, borderRect.Height), Color.White);
+
+        // Menu title
+        var title = "Abilities (Esc to cancel)";
+        spriteBatch.DrawString(_font, title, new Vector2(menuX + 5, menuY - 20), Color.Cyan);
+
+        // Abilities list
+        var currentEnergy = _combatState.ActiveCombatant.CurrentEnergy;
+        for (int i = 0; i < Math.Min(abilities.Count, 6); i++)
+        {
+            var ability = abilities[i];
+            var def = ability.Definition;
+            var isSelected = i == _combatState.AbilityIndex;
+            var canUse = ability.IsReady && def.EnergyCost <= currentEnergy;
+
+            var color = isSelected ? Color.Yellow :
+                       !canUse ? Color.Gray : Color.White;
+            var prefix = isSelected ? "> " : "  ";
+
+            // Ability name and cost
+            var text = $"{prefix}{def.Name}";
+            var costText = $"[{def.EnergyCost} EP]";
+
+            // Add cooldown indicator
+            if (ability.CurrentCooldown > 0)
+            {
+                costText = $"[CD:{ability.CurrentCooldown}]";
+            }
+
+            var textPos = new Vector2(menuX + 5, menuY + 5 + i * 25);
+            spriteBatch.DrawString(_font, text, textPos, color);
+
+            var costPos = new Vector2(menuX + menuWidth - _font.MeasureString(costText).X - 10, textPos.Y);
+            spriteBatch.DrawString(_font, costText, costPos, canUse ? Color.Cyan : Color.Gray);
+        }
+
+        // Draw energy bar at bottom
+        var energyText = $"Energy: {currentEnergy}/{_combatState.ActiveCombatant.MaxEnergy}";
+        var energyPos = new Vector2(menuX + 5, menuY + menuHeight - 22);
+        spriteBatch.DrawString(_font, energyText, energyPos, Color.Cyan);
+
+        // Draw selected ability description
+        if (_combatState.AbilityIndex < abilities.Count)
+        {
+            var selectedAbility = abilities[_combatState.AbilityIndex];
+            var descText = selectedAbility.Definition.Description;
+            if (descText.Length > 40)
+                descText = descText.Substring(0, 37) + "...";
+
+            var descPos = new Vector2(menuX + menuWidth + 10, menuY + 5);
+            spriteBatch.DrawString(_font, descText, descPos, Color.LightGray);
+
+            // Show element and target type
+            var elementText = $"Element: {selectedAbility.Definition.Element}";
+            var targetText = $"Target: {selectedAbility.Definition.Target}";
+            spriteBatch.DrawString(_font, elementText, new Vector2(descPos.X, descPos.Y + 20), GetElementColor(selectedAbility.Definition.Element));
+            spriteBatch.DrawString(_font, targetText, new Vector2(descPos.X, descPos.Y + 40), Color.LightGray);
+        }
+    }
+
+    private Color GetElementColor(Element element)
+    {
+        return element switch
+        {
+            Element.Electric => Color.Yellow,
+            Element.Fire => Color.OrangeRed,
+            Element.Ice => Color.LightBlue,
+            Element.Toxic => Color.Purple,
+            Element.Kinetic => Color.Gray,
+            Element.Psionic => Color.Magenta,
+            Element.Corruption => Color.DarkMagenta,
+            _ => Color.White
+        };
     }
 
     private void DrawActionResult(SpriteBatch spriteBatch, CombatActionResult result)

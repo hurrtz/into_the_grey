@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Strays.Core.Game.Entities;
+using Strays.Core.Game.Items;
 
 namespace Strays.Core.Game.Combat;
 
@@ -72,6 +74,16 @@ public class Combatant
     public int MaxHp => Stray.MaxHp;
 
     /// <summary>
+    /// Current energy for abilities.
+    /// </summary>
+    public int CurrentEnergy { get; private set; }
+
+    /// <summary>
+    /// Maximum energy for abilities.
+    /// </summary>
+    public int MaxEnergy => 100 + Stray.Special / 2;
+
+    /// <summary>
     /// Speed stat (affects ATB fill rate).
     /// </summary>
     public int Speed => Stray.Speed;
@@ -87,9 +99,19 @@ public class Combatant
     public int Defense => Stray.Defense + DefenseBonus;
 
     /// <summary>
+    /// Special stat (affects ability power).
+    /// </summary>
+    public int Special => Stray.Special;
+
+    /// <summary>
     /// Combat abilities available to this combatant.
     /// </summary>
     public List<Ability> Abilities { get; } = new();
+
+    /// <summary>
+    /// Active status effects with remaining duration.
+    /// </summary>
+    public Dictionary<StatusEffect, int> StatusEffects { get; } = new();
 
     /// <summary>
     /// Creates a combatant from a Stray.
@@ -101,6 +123,166 @@ public class Combatant
         Stray = stray;
         IsEnemy = isEnemy;
         stray.IsHostile = isEnemy;
+        CurrentEnergy = MaxEnergy;
+        LoadAbilities();
+    }
+
+    /// <summary>
+    /// Loads abilities from the Stray's microchips and innate abilities.
+    /// </summary>
+    private void LoadAbilities()
+    {
+        Abilities.Clear();
+
+        // Add innate abilities based on level
+        var innateAbilityIds = new List<string>();
+
+        // All Strays get basic strike
+        innateAbilityIds.Add("strike");
+
+        // Add abilities based on level
+        if (Stray.Level >= 5)
+            innateAbilityIds.Add("power_strike");
+        if (Stray.Level >= 10)
+            innateAbilityIds.Add("fortify");
+
+        // Add abilities from equipped microchips
+        foreach (var chipId in Stray.EquippedMicrochips)
+        {
+            var chipDef = Microchips.Get(chipId);
+            if (chipDef?.GrantsAbility != null)
+            {
+                innateAbilityIds.Add(chipDef.GrantsAbility);
+            }
+        }
+
+        // Add abilities from evolution
+        foreach (var abilityId in Stray.EvolutionState.EvolvedAbilities)
+        {
+            if (!innateAbilityIds.Contains(abilityId))
+                innateAbilityIds.Add(abilityId);
+        }
+
+        // Create ability instances
+        foreach (var abilityId in innateAbilityIds.Distinct())
+        {
+            var def = Combat.Abilities.Get(abilityId);
+            if (def != null)
+            {
+                Abilities.Add(new Ability(def));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets abilities that are currently usable.
+    /// </summary>
+    public IEnumerable<Ability> GetUsableAbilities()
+    {
+        return Abilities.Where(a => a.IsReady && a.Definition.EnergyCost <= CurrentEnergy);
+    }
+
+    /// <summary>
+    /// Uses energy for an ability.
+    /// </summary>
+    public bool UseEnergy(int amount)
+    {
+        if (CurrentEnergy < amount)
+            return false;
+
+        CurrentEnergy -= amount;
+        return true;
+    }
+
+    /// <summary>
+    /// Restores energy.
+    /// </summary>
+    public void RestoreEnergy(int amount)
+    {
+        CurrentEnergy = System.Math.Min(MaxEnergy, CurrentEnergy + amount);
+    }
+
+    /// <summary>
+    /// Applies a status effect.
+    /// </summary>
+    public void ApplyStatus(StatusEffect status, int duration)
+    {
+        if (StatusEffects.ContainsKey(status))
+        {
+            // Extend duration if already present
+            StatusEffects[status] = System.Math.Max(StatusEffects[status], duration);
+        }
+        else
+        {
+            StatusEffects[status] = duration;
+        }
+    }
+
+    /// <summary>
+    /// Checks if combatant has a status effect.
+    /// </summary>
+    public bool HasStatus(StatusEffect status)
+    {
+        return StatusEffects.ContainsKey(status) && StatusEffects[status] > 0;
+    }
+
+    /// <summary>
+    /// Removes a status effect.
+    /// </summary>
+    public void RemoveStatus(StatusEffect status)
+    {
+        StatusEffects.Remove(status);
+    }
+
+    /// <summary>
+    /// Ticks all status effects and abilities at turn end.
+    /// </summary>
+    public int TickStatusEffects()
+    {
+        int damage = 0;
+
+        // Process damage-over-time effects
+        if (HasStatus(StatusEffect.Poison))
+        {
+            damage += MaxHp / 16; // 6.25% max HP
+        }
+        if (HasStatus(StatusEffect.Burn))
+        {
+            damage += MaxHp / 12; // ~8% max HP
+        }
+
+        // Process healing effects
+        if (HasStatus(StatusEffect.Regen))
+        {
+            Heal(MaxHp / 10); // 10% max HP
+        }
+
+        // Tick down durations
+        var expiredEffects = new List<StatusEffect>();
+        foreach (var kvp in StatusEffects.ToList())
+        {
+            StatusEffects[kvp.Key] = kvp.Value - 1;
+            if (StatusEffects[kvp.Key] <= 0)
+            {
+                expiredEffects.Add(kvp.Key);
+            }
+        }
+
+        foreach (var effect in expiredEffects)
+        {
+            StatusEffects.Remove(effect);
+        }
+
+        // Tick ability cooldowns
+        foreach (var ability in Abilities)
+        {
+            ability.TickCooldown();
+        }
+
+        // Restore a bit of energy each turn
+        RestoreEnergy(5);
+
+        return damage;
     }
 
     /// <summary>
