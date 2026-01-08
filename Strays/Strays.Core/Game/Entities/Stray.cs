@@ -90,6 +90,11 @@ public class Stray
     public bool IsEvolved { get; private set; } = false;
 
     /// <summary>
+    /// Evolution state tracking (stress, evolution history).
+    /// </summary>
+    public EvolutionState EvolutionState { get; } = new();
+
+    /// <summary>
     /// Bond level with the protagonist (0-100).
     /// Affects loyalty, combat bonuses, and recruitment of similar Strays.
     /// </summary>

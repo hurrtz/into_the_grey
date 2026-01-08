@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Strays.Core.Game.Entities;
@@ -84,6 +85,11 @@ public class Combatant
     /// Defense stat (including bonus from defending).
     /// </summary>
     public int Defense => Stray.Defense + DefenseBonus;
+
+    /// <summary>
+    /// Combat abilities available to this combatant.
+    /// </summary>
+    public List<Ability> Abilities { get; } = new();
 
     /// <summary>
     /// Creates a combatant from a Stray.
