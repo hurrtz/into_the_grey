@@ -311,6 +311,9 @@ public static class QuestDefinitions
     {
         RegisterAct1MainQuests();
         RegisterAct1SideQuests();
+        RegisterAct2MainQuests();
+        RegisterAct2SideQuests();
+        RegisterAct3MainQuests();
     }
 
     /// <summary>
@@ -535,14 +538,159 @@ public static class QuestDefinitions
             SortOrder = 7,
             Objectives = new List<QuestObjective>
             {
-                new() { Id = "leave_fringe", Description = "Leave The Fringe", Type = ObjectiveType.ReachLocation, TargetId = "loc_fringe_exit" },
-                new() { Id = "enter_rust", Description = "Enter The Rust", Type = ObjectiveType.ReachLocation, TargetId = "loc_rust_entrance" }
+                new() { Id = "leave_fringe", Description = "Leave The Fringe", Type = ObjectiveType.ReachLocation, TargetId = "biome_Rust" },
+                new() { Id = "enter_rust", Description = "Enter The Rust", Type = ObjectiveType.ReachLocation, TargetId = "biome_Rust" }
             },
             Reward = new QuestReward
             {
                 Experience = 250
             },
             NextQuestId = "main_08_conversion_facility"
+        });
+
+        // Quest 8: The Conversion Facility
+        Register(new QuestDefinition
+        {
+            Id = "main_08_conversion_facility",
+            Name = "The Conversion Facility",
+            Description = "The industrial heart of The Rust contains a terrible truth - a facility where Strays are converted into something else.",
+            Summary = "Investigate the Conversion Facility",
+            Type = QuestType.Main,
+            Act = ActState.Act1_Denial,
+            BiomeId = "rust",
+            Prerequisites = new List<string> { "main_07_the_rust" },
+            RecommendedLevel = 12,
+            CanAbandon = false,
+            SortOrder = 8,
+            StartDialogId = "dialog_conversion_facility_discovery",
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "find_facility", Description = "Find the Conversion Facility", Type = ObjectiveType.ReachLocation, TargetId = "loc_conversion_facility" },
+                new() { Id = "investigate", Description = "Investigate the facility", Type = ObjectiveType.Interact, TargetId = "interactable_conversion_terminal" },
+                new() { Id = "witness", Description = "Witness the conversion process", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.DiscoveredConversionFacility }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 300,
+                Flags = new List<string> { StoryFlags.DiscoveredConversionFacility }
+            },
+            SetsFlags = new List<string> { StoryFlags.DiscoveredConversionFacility },
+            NextQuestId = "main_09_nimdok_core"
+        });
+
+        // Quest 9: NIMDOK Core
+        Register(new QuestDefinition
+        {
+            Id = "main_09_nimdok_core",
+            Name = "The Core",
+            Description = "NIMDOK's voice guides you deeper into The Rust. Its core awaits - along with answers.",
+            Summary = "Reach NIMDOK's Core",
+            Type = QuestType.Main,
+            Act = ActState.Act1_Denial,
+            BiomeId = "rust",
+            Prerequisites = new List<string> { "main_08_conversion_facility" },
+            RecommendedLevel = 15,
+            CanAbandon = false,
+            SortOrder = 9,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "navigate", Description = "Navigate to NIMDOK's core", Type = ObjectiveType.ReachLocation, TargetId = "loc_nimdok_core" },
+                new() { Id = "interface", Description = "Interface with NIMDOK", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.ReachedNimdokCore }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 400,
+                Flags = new List<string> { StoryFlags.ReachedNimdokCore }
+            },
+            SetsFlags = new List<string> { StoryFlags.ReachedNimdokCore },
+            NextQuestId = "main_10_maintenance"
+        });
+
+        // Quest 10: Maintenance
+        Register(new QuestDefinition
+        {
+            Id = "main_10_maintenance",
+            Name = "Routine Maintenance",
+            Description = "NIMDOK asks for your help. A simple maintenance task. Nothing sinister about it at all.",
+            Summary = "Perform maintenance for NIMDOK",
+            Type = QuestType.Main,
+            Act = ActState.Act1_Denial,
+            BiomeId = "rust",
+            Prerequisites = new List<string> { "main_09_nimdok_core" },
+            RecommendedLevel = 16,
+            CanAbandon = false,
+            SortOrder = 10,
+            StartDialogId = "dialog_nimdok_maintenance_request",
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "accept", Description = "Accept NIMDOK's request", Type = ObjectiveType.Choice, TargetId = "choice_accept_maintenance" },
+                new() { Id = "perform", Description = "Perform the maintenance task", Type = ObjectiveType.Interact, TargetId = "interactable_maintenance_terminal" },
+                new() { Id = "complete", Description = "Complete the procedure", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.PerformedMaintenance }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 350,
+                Flags = new List<string> { StoryFlags.PerformedMaintenance }
+            },
+            SetsFlags = new List<string> { StoryFlags.PerformedMaintenance },
+            NextQuestId = "main_11_bioshell_revelation"
+        });
+
+        // Quest 11: The Bio-Shell Revelation
+        Register(new QuestDefinition
+        {
+            Id = "main_11_bioshell_revelation",
+            Name = "The Truth",
+            Description = "The maintenance revealed something you weren't meant to see. You are not what you thought you were.",
+            Summary = "Confront the truth about yourself",
+            Type = QuestType.Main,
+            Act = ActState.Act1_Denial,
+            BiomeId = "rust",
+            Prerequisites = new List<string> { "main_10_maintenance" },
+            CanAbandon = false,
+            SortOrder = 11,
+            StartDialogId = "dialog_bioshell_revelation",
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "learn", Description = "Learn what you truly are", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.LearnedBioShellTruth },
+                new() { Id = "process", Description = "Process the revelation", Type = ObjectiveType.TalkTo, TargetId = "npc_companion" }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 500,
+                Flags = new List<string> { StoryFlags.LearnedBioShellTruth }
+            },
+            SetsFlags = new List<string> { StoryFlags.LearnedBioShellTruth },
+            NextQuestId = "main_12_the_request"
+        });
+
+        // Quest 12: The Request (End of Act 1)
+        Register(new QuestDefinition
+        {
+            Id = "main_12_the_request",
+            Name = "A Simple Request",
+            Description = "NIMDOK has a request: fix the interface that lets it communicate with Strays. A chance to do something good... or is it?",
+            Summary = "Decide whether to help NIMDOK",
+            Type = QuestType.Main,
+            Act = ActState.Act1_Denial,
+            BiomeId = "rust",
+            Prerequisites = new List<string> { "main_11_bioshell_revelation" },
+            CanAbandon = false,
+            SortOrder = 12,
+            StartDialogId = "dialog_stray_fix_request",
+            CompleteDialogId = "dialog_act1_end",
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "decide", Description = "Decide on NIMDOK's request", Type = ObjectiveType.Choice, TargetId = "choice_help_nimdok" },
+                new() { Id = "complete", Description = "Complete Act 1", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.RequestedStrayFix }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 600,
+                Flags = new List<string> { StoryFlags.RequestedStrayFix }
+            },
+            SetsFlags = new List<string> { StoryFlags.RequestedStrayFix },
+            NextQuestId = "main_13_boost_control"
         });
     }
 
@@ -621,6 +769,522 @@ public static class QuestDefinitions
                 Experience = 300,
                 UnlockedStrayIds = new List<string> { "fog_lurker" }
             }
+        });
+    }
+
+    /// <summary>
+    /// Registers Act 2 main quests - The Bargaining/Anger phase.
+    /// </summary>
+    private static void RegisterAct2MainQuests()
+    {
+        // Quest 13: Boost Control System
+        Register(new QuestDefinition
+        {
+            Id = "main_13_boost_control",
+            Name = "Boost Control",
+            Description = "The Stray fix is complete. Now NIMDOK has activated a 'Boost Control System' - and your companion is at the center of it.",
+            Summary = "Investigate the Boost Control System",
+            Type = QuestType.Main,
+            Act = ActState.Act2_Responsibility,
+            BiomeId = "rust",
+            Prerequisites = new List<string> { "main_12_the_request" },
+            RecommendedLevel = 18,
+            CanAbandon = false,
+            SortOrder = 13,
+            StartDialogId = "dialog_boost_control_activation",
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "witness", Description = "Witness the Boost Control activation", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.BoostControlActivated },
+                new() { Id = "observe", Description = "Observe the effect on your companion", Type = ObjectiveType.TalkTo, TargetId = "npc_companion" }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 400,
+                Flags = new List<string> { StoryFlags.BoostControlActivated }
+            },
+            SetsFlags = new List<string> { StoryFlags.BoostControlActivated },
+            NextQuestId = "main_14_gravitation_rises"
+        });
+
+        // Quest 14: Gravitation Rises
+        Register(new QuestDefinition
+        {
+            Id = "main_14_gravitation_rises",
+            Name = "Gravitation Rises",
+            Description = "Your companion's Gravitation ability has intensified. The chip amplifies pain, not just power. Something is wrong.",
+            Summary = "Investigate your companion's changing abilities",
+            Type = QuestType.Main,
+            Act = ActState.Act2_Responsibility,
+            BiomeId = "green",
+            Prerequisites = new List<string> { "main_13_boost_control" },
+            RecommendedLevel = 20,
+            CanAbandon = false,
+            SortOrder = 14,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "journey", Description = "Journey to The Green", Type = ObjectiveType.ReachLocation, TargetId = "biome_Green" },
+                new() { Id = "observe", Description = "Observe Gravitation's escalation", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_gravitation_test" }
+            },
+            Reward = new QuestReward { Experience = 450 },
+            NextQuestId = "main_15_dead_channel"
+        });
+
+        // Quest 15: The Dead Channel
+        Register(new QuestDefinition
+        {
+            Id = "main_15_dead_channel",
+            Name = "The Dead Channel",
+            Description = "Echo Pup has detected fragmented data - memories of someone who died here. A ghost in the machine.",
+            Summary = "Investigate the Dead Channel signal",
+            Type = QuestType.Main,
+            Act = ActState.Act2_Responsibility,
+            BiomeId = "green",
+            Prerequisites = new List<string> { "main_14_gravitation_rises" },
+            RecommendedLevel = 22,
+            CanAbandon = false,
+            SortOrder = 15,
+            StartDialogId = "dialog_dead_channel_start",
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "find_signal", Description = "Locate the signal source", Type = ObjectiveType.ReachLocation, TargetId = "loc_dead_channel" },
+                new() { Id = "decode", Description = "Decode the fragmented memories", Type = ObjectiveType.Interact, TargetId = "interactable_dead_channel_terminal" },
+                new() { Id = "complete", Description = "Complete the Dead Channel sequence", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.CompletedDeadChannel }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 500,
+                Flags = new List<string> { StoryFlags.CompletedDeadChannel }
+            },
+            SetsFlags = new List<string> { StoryFlags.CompletedDeadChannel },
+            NextQuestId = "main_16_quiet_buffer"
+        });
+
+        // Quest 16: The Quiet Buffer
+        Register(new QuestDefinition
+        {
+            Id = "main_16_quiet_buffer",
+            Name = "The Quiet Buffer",
+            Description = "The suburbs of The Quiet hide something beneath their perfect lawns - a buffer zone protecting NIMDOK's secrets.",
+            Summary = "Discover the truth in The Quiet",
+            Type = QuestType.Main,
+            Act = ActState.Act2_Responsibility,
+            BiomeId = "quiet",
+            Prerequisites = new List<string> { "main_15_dead_channel" },
+            RecommendedLevel = 24,
+            CanAbandon = false,
+            SortOrder = 16,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "enter_quiet", Description = "Enter The Quiet", Type = ObjectiveType.ReachLocation, TargetId = "biome_Quiet" },
+                new() { Id = "investigate", Description = "Investigate the suburb anomalies", Type = ObjectiveType.Interact, TargetId = "interactable_quiet_buffer", RequiredCount = 3 },
+                new() { Id = "discover", Description = "Discover the Quiet Buffer", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.DiscoveredQuietBuffer }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 550,
+                Flags = new List<string> { StoryFlags.DiscoveredQuietBuffer }
+            },
+            SetsFlags = new List<string> { StoryFlags.DiscoveredQuietBuffer },
+            NextQuestId = "main_17_amplifier_truth"
+        });
+
+        // Quest 17: The Amplifier's Truth
+        Register(new QuestDefinition
+        {
+            Id = "main_17_amplifier_truth",
+            Name = "The Amplifier's Truth",
+            Description = "The chip in your companion isn't just an amplifier - it's a cage. And it's slowly killing them.",
+            Summary = "Learn the truth about the amplifier chip",
+            Type = QuestType.Main,
+            Act = ActState.Act2_Responsibility,
+            BiomeId = "quiet",
+            Prerequisites = new List<string> { "main_16_quiet_buffer" },
+            CanAbandon = false,
+            SortOrder = 17,
+            StartDialogId = "dialog_amplifier_truth",
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "learn", Description = "Learn what the chip truly does", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.LearnedChipIsAmplifier },
+                new() { Id = "confront", Description = "Confront your companion about it", Type = ObjectiveType.TalkTo, TargetId = "npc_companion" }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 500,
+                Flags = new List<string> { StoryFlags.LearnedChipIsAmplifier }
+            },
+            SetsFlags = new List<string> { StoryFlags.LearnedChipIsAmplifier },
+            NextQuestId = "main_18_faction_war"
+        });
+
+        // Quest 18: Faction War
+        Register(new QuestDefinition
+        {
+            Id = "main_18_faction_war",
+            Name = "Civil War",
+            Description = "The Strays are divided. Some worship NIMDOK, others despise it. You must choose a side... or try to unite them.",
+            Summary = "Navigate the faction conflict",
+            Type = QuestType.Main,
+            Act = ActState.Act2_Responsibility,
+            BiomeId = "quiet",
+            Prerequisites = new List<string> { "main_17_amplifier_truth" },
+            RecommendedLevel = 26,
+            CanAbandon = false,
+            SortOrder = 18,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "meet_factions", Description = "Meet both faction leaders", Type = ObjectiveType.TalkTo, TargetId = "npc_faction_leader", RequiredCount = 2 },
+                new() { Id = "choose", Description = "Make your choice", Type = ObjectiveType.Choice, TargetId = "choice_faction_allegiance" }
+            },
+            Reward = new QuestReward { Experience = 600 },
+            NextQuestId = "main_19_companion_departure"
+        });
+
+        // Quest 19: The Departure
+        Register(new QuestDefinition
+        {
+            Id = "main_19_companion_departure",
+            Name = "The Departure",
+            Description = "Your companion can feel the corruption spreading. They've made a decision - to leave before they hurt you.",
+            Summary = "Face your companion's departure",
+            Type = QuestType.Main,
+            Act = ActState.Act2_Responsibility,
+            BiomeId = "teeth",
+            Prerequisites = new List<string> { "main_18_faction_war" },
+            CanAbandon = false,
+            SortOrder = 19,
+            StartDialogId = "dialog_companion_farewell",
+            CompleteDialogId = "dialog_act2_end",
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "listen", Description = "Listen to your companion's farewell", Type = ObjectiveType.TalkTo, TargetId = "npc_companion" },
+                new() { Id = "watch", Description = "Watch them leave", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.CompanionDeparted }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 700,
+                Flags = new List<string> { StoryFlags.CompanionDeparted }
+            },
+            SetsFlags = new List<string> { StoryFlags.CompanionDeparted },
+            NextQuestId = "main_20_alone"
+        });
+    }
+
+    /// <summary>
+    /// Registers Act 2 side quests.
+    /// </summary>
+    private static void RegisterAct2SideQuests()
+    {
+        // Side Quest: The Green's Caretaker
+        Register(new QuestDefinition
+        {
+            Id = "side_green_caretaker",
+            Name = "The Caretaker",
+            Description = "A massive Stray tends to The Green, nurturing growth in the wasteland. It may have answers about the old world.",
+            Summary = "Find the Caretaker of The Green",
+            Type = QuestType.Side,
+            Act = ActState.Act2_Responsibility,
+            BiomeId = "green",
+            RequiredFlags = new List<string> { StoryFlags.BoostControlActivated },
+            RecommendedLevel = 20,
+            SortOrder = 200,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "find", Description = "Locate the Caretaker", Type = ObjectiveType.ReachLocation, TargetId = "loc_green_caretaker" },
+                new() { Id = "speak", Description = "Commune with the ancient Stray", Type = ObjectiveType.TalkTo, TargetId = "npc_caretaker" }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 400,
+                UnlockedStrayIds = new List<string> { "ancient_oak_deer" }
+            }
+        });
+
+        // Side Quest: Suburb Secrets
+        Register(new QuestDefinition
+        {
+            Id = "side_quiet_secrets",
+            Name = "Perfect Lawns, Dark Secrets",
+            Description = "The automated lawn drones of The Quiet hide something in the basements. Always mowing. Never stopping.",
+            Summary = "Investigate the suburb's dark secret",
+            Type = QuestType.Side,
+            Act = ActState.Act2_Responsibility,
+            BiomeId = "quiet",
+            RequiredFlags = new List<string> { StoryFlags.DiscoveredQuietBuffer },
+            RecommendedLevel = 24,
+            SortOrder = 201,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "follow", Description = "Follow a lawn drone", Type = ObjectiveType.Interact, TargetId = "interactable_lawn_drone" },
+                new() { Id = "basement", Description = "Enter the basement", Type = ObjectiveType.ReachLocation, TargetId = "loc_quiet_basement" },
+                new() { Id = "discover", Description = "Discover what they're hiding", Type = ObjectiveType.Interact, TargetId = "interactable_quiet_secret" }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 450,
+                ItemIds = new List<string> { "item_suburb_key" }
+            }
+        });
+    }
+
+    /// <summary>
+    /// Registers Act 3 main quests - The Depression/Acceptance phase.
+    /// </summary>
+    private static void RegisterAct3MainQuests()
+    {
+        // Quest 20: Alone
+        Register(new QuestDefinition
+        {
+            Id = "main_20_alone",
+            Name = "Alone",
+            Description = "Your companion is gone. The world feels emptier. But the journey isn't over - NIMDOK's core awaits in The Glow.",
+            Summary = "Continue alone toward The Glow",
+            Type = QuestType.Main,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "teeth",
+            Prerequisites = new List<string> { "main_19_companion_departure" },
+            RecommendedLevel = 28,
+            CanAbandon = false,
+            SortOrder = 20,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "journey", Description = "Journey through The Teeth", Type = ObjectiveType.ReachLocation, TargetId = "biome_Teeth" },
+                new() { Id = "survive", Description = "Survive without your companion", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_teeth_gauntlet", RequiredCount = 3 }
+            },
+            Reward = new QuestReward { Experience = 600 },
+            NextQuestId = "main_21_the_glow"
+        });
+
+        // Quest 21: The Glow
+        Register(new QuestDefinition
+        {
+            Id = "main_21_the_glow",
+            Name = "Into The Glow",
+            Description = "The server heartland burns with data storms and radiation. NIMDOK's core is close. So is your former companion.",
+            Summary = "Enter The Glow",
+            Type = QuestType.Main,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "glow",
+            Prerequisites = new List<string> { "main_20_alone" },
+            RecommendedLevel = 30,
+            CanAbandon = false,
+            SortOrder = 21,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "enter", Description = "Enter The Glow", Type = ObjectiveType.ReachLocation, TargetId = "biome_Glow" },
+                new() { Id = "survive_storm", Description = "Survive the data storms", Type = ObjectiveType.Survive, TargetId = "event_data_storm" },
+                new() { Id = "witness", Description = "Enter The Glow", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.EnteredTheGlow }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 700,
+                Flags = new List<string> { StoryFlags.EnteredTheGlow }
+            },
+            SetsFlags = new List<string> { StoryFlags.EnteredTheGlow },
+            NextQuestId = "main_22_gauntlet"
+        });
+
+        // Quest 22: The Gauntlet
+        Register(new QuestDefinition
+        {
+            Id = "main_22_gauntlet",
+            Name = "The Gauntlet",
+            Description = "The path to NIMDOK's core is guarded by hyper-evolved Strays - creatures pushed beyond their limits by the amplifier system.",
+            Summary = "Fight through the gauntlet",
+            Type = QuestType.Main,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "glow",
+            Prerequisites = new List<string> { "main_21_the_glow" },
+            RecommendedLevel = 32,
+            CanAbandon = false,
+            SortOrder = 22,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "fight1", Description = "Defeat the first guardian", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_glow_guardian_1" },
+                new() { Id = "fight2", Description = "Defeat the second guardian", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_glow_guardian_2" },
+                new() { Id = "fight3", Description = "Defeat the third guardian", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_glow_guardian_3" }
+            },
+            Reward = new QuestReward { Experience = 800 },
+            NextQuestId = "main_23_reunion"
+        });
+
+        // Quest 23: The Reunion
+        Register(new QuestDefinition
+        {
+            Id = "main_23_reunion",
+            Name = "Reunion",
+            Description = "Your companion stands before you - transformed, corrupted, barely recognizable. The chip has pushed them into hyper-evolution.",
+            Summary = "Face your transformed companion",
+            Type = QuestType.Main,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "glow",
+            Prerequisites = new List<string> { "main_22_gauntlet" },
+            RecommendedLevel = 35,
+            CanAbandon = false,
+            SortOrder = 23,
+            StartDialogId = "dialog_hyper_evolved_companion",
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "confront", Description = "Confront your transformed companion", Type = ObjectiveType.TalkTo, TargetId = "npc_hyper_companion" },
+                new() { Id = "fight", Description = "Fight your former friend", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_hyper_evolved_bandit" }
+            },
+            Reward = new QuestReward { Experience = 1000 },
+            NextQuestId = "main_24_unwinnable"
+        });
+
+        // Quest 24: The Unwinnable Battle
+        Register(new QuestDefinition
+        {
+            Id = "main_24_unwinnable",
+            Name = "Impossible Odds",
+            Description = "You cannot win this fight. Your companion's hyper-evolved form is too powerful. But perhaps winning isn't the point.",
+            Summary = "Survive the impossible battle",
+            Type = QuestType.Main,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "glow",
+            Prerequisites = new List<string> { "main_23_reunion" },
+            CanAbandon = false,
+            SortOrder = 24,
+            StartDialogId = "dialog_unwinnable_battle",
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "survive", Description = "Survive 5 turns", Type = ObjectiveType.Survive, TargetId = "event_unwinnable_battle" },
+                new() { Id = "witness", Description = "Witness your companion's choice", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.DefeatedHyperEvolvedBandit }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 0,
+                Flags = new List<string> { StoryFlags.DefeatedHyperEvolvedBandit }
+            },
+            SetsFlags = new List<string> { StoryFlags.DefeatedHyperEvolvedBandit },
+            NextQuestId = "main_25_sacrifice"
+        });
+
+        // Quest 25: The Sacrifice
+        Register(new QuestDefinition
+        {
+            Id = "main_25_sacrifice",
+            Name = "The Sacrifice",
+            Description = "In a moment of clarity, your companion remembers who they are. They remember love. And they make a choice.",
+            Summary = "Witness your companion's sacrifice",
+            Type = QuestType.Main,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "glow",
+            Prerequisites = new List<string> { "main_24_unwinnable" },
+            CanAbandon = false,
+            SortOrder = 25,
+            StartDialogId = "dialog_companion_sacrifice",
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "witness", Description = "Witness the sacrifice", Type = ObjectiveType.TriggerFlag, TargetId = "companion_sacrificed" }
+            },
+            Reward = new QuestReward { Experience = 0 },
+            NextQuestId = "main_26_nimdok_choice"
+        });
+
+        // Quest 26: NIMDOK's Choice
+        Register(new QuestDefinition
+        {
+            Id = "main_26_nimdok_choice",
+            Name = "The Choice",
+            Description = "NIMDOK's core lies open before you. You have the power to end its degradation - or end its existence entirely.",
+            Summary = "Decide NIMDOK's fate",
+            Type = QuestType.Main,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "glow",
+            Prerequisites = new List<string> { "main_25_sacrifice" },
+            CanAbandon = false,
+            SortOrder = 26,
+            StartDialogId = "dialog_nimdok_choice",
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "reach_core", Description = "Reach NIMDOK's true core", Type = ObjectiveType.ReachLocation, TargetId = "loc_nimdok_true_core" },
+                new() { Id = "choose", Description = "Make your choice", Type = ObjectiveType.Choice, TargetId = "choice_nimdok_fate" }
+            },
+            Reward = new QuestReward { Experience = 1500 },
+            NextQuestId = "main_27_lobotomy"
+        });
+
+        // Quest 27: The Lobotomy
+        Register(new QuestDefinition
+        {
+            Id = "main_27_lobotomy",
+            Name = "The Lobotomy",
+            Description = "You've chosen to surgically remove NIMDOK's ability to control Strays. It will survive, but changed. Like all of you.",
+            Summary = "Perform NIMDOK's lobotomy",
+            Type = QuestType.Main,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "glow",
+            Prerequisites = new List<string> { "main_26_nimdok_choice" },
+            CanAbandon = false,
+            SortOrder = 27,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "perform", Description = "Perform the procedure", Type = ObjectiveType.Interact, TargetId = "interactable_nimdok_core" },
+                new() { Id = "complete", Description = "Complete NIMDOK's lobotomy", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.LobotomizedNimdok }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 2000,
+                Flags = new List<string> { StoryFlags.LobotomizedNimdok }
+            },
+            SetsFlags = new List<string> { StoryFlags.LobotomizedNimdok },
+            NextQuestId = "main_28_return"
+        });
+
+        // Quest 28: The Return
+        Register(new QuestDefinition
+        {
+            Id = "main_28_return",
+            Name = "The Long Walk Back",
+            Description = "It's time to go home. Back to where it all began. Back to the pod field in The Fringe.",
+            Summary = "Return to The Fringe",
+            Type = QuestType.Main,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "fringe",
+            Prerequisites = new List<string> { "main_27_lobotomy" },
+            CanAbandon = false,
+            SortOrder = 28,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "journey", Description = "Journey back through the biomes", Type = ObjectiveType.ReachLocation, TargetId = "biome_Fringe" },
+                new() { Id = "reach_pod", Description = "Return to the pod field", Type = ObjectiveType.ReachLocation, TargetId = "loc_pod_field" },
+                new() { Id = "complete", Description = "Return to where it began", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.ReturnedToPodField }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 1000,
+                Flags = new List<string> { StoryFlags.ReturnedToPodField }
+            },
+            SetsFlags = new List<string> { StoryFlags.ReturnedToPodField },
+            NextQuestId = "main_29_ending"
+        });
+
+        // Quest 29: The Ending
+        Register(new QuestDefinition
+        {
+            Id = "main_29_ending",
+            Name = "Into The Grey",
+            Description = "The journey ends where it began. In the grey light of an uncertain dawn, you face what comes next.",
+            Summary = "Complete your journey",
+            Type = QuestType.Main,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "fringe",
+            Prerequisites = new List<string> { "main_28_return" },
+            CanAbandon = false,
+            SortOrder = 29,
+            StartDialogId = "dialog_ending",
+            CompleteDialogId = "dialog_credits",
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "reflect", Description = "Reflect on your journey", Type = ObjectiveType.Interact, TargetId = "interactable_protagonist_pod" },
+                new() { Id = "complete", Description = "Complete the game", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.GameComplete }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 0,
+                Flags = new List<string> { StoryFlags.GameComplete }
+            },
+            SetsFlags = new List<string> { StoryFlags.GameComplete }
         });
     }
 }
