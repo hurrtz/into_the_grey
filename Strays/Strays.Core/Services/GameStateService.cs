@@ -939,6 +939,135 @@ public class GameStateService
         return $"{(int)time.TotalHours:D2}:{time.Minutes:D2}:{time.Seconds:D2}";
     }
 
+    /// <summary>
+    /// Gets the total play time as a TimeSpan.
+    /// </summary>
+    public TimeSpan TotalPlayTime => TimeSpan.FromSeconds(_currentData.TotalPlayTimeSeconds);
+
+    #endregion
+
+    #region New Game+ Export Methods
+
+    /// <summary>
+    /// Gets the protagonist's current level.
+    /// </summary>
+    public int GetProtagonistLevel()
+    {
+        return _currentData.Counters.TryGetValue("protagonist_level", out var level) ? Math.Max(1, level) : 1;
+    }
+
+    /// <summary>
+    /// Sets the protagonist's level.
+    /// </summary>
+    public void SetProtagonistLevel(int level)
+    {
+        _currentData.Counters["protagonist_level"] = Math.Max(1, level);
+    }
+
+    /// <summary>
+    /// Gets the inventory as a dictionary of item ID to count.
+    /// </summary>
+    public System.Collections.Generic.Dictionary<string, int> Inventory
+    {
+        get
+        {
+            var result = new System.Collections.Generic.Dictionary<string, int>();
+
+            foreach (var item in _currentData.InventoryItems)
+            {
+                if (result.ContainsKey(item))
+                {
+                    result[item]++;
+                }
+                else
+                {
+                    result[item] = 1;
+                }
+            }
+
+            return result;
+        }
+    }
+
+    /// <summary>
+    /// Exports owned microchip IDs for NG+ carry-over.
+    /// </summary>
+    public System.Collections.Generic.List<string> ExportMicrochips()
+    {
+        return new System.Collections.Generic.List<string>(_currentData.OwnedMicrochips);
+    }
+
+    /// <summary>
+    /// Exports owned augmentation IDs for NG+ carry-over.
+    /// </summary>
+    public System.Collections.Generic.List<string> ExportAugmentations()
+    {
+        return new System.Collections.Generic.List<string>(_currentData.OwnedAugmentations);
+    }
+
+    /// <summary>
+    /// Exports bestiary unlock IDs for NG+ carry-over.
+    /// </summary>
+    public System.Collections.Generic.HashSet<string> ExportBestiaryUnlocks()
+    {
+        if (_currentData.Counters.TryGetValue("bestiary_unlocks", out _))
+        {
+            // Bestiary data is stored elsewhere; return discovered encounter types
+            return new System.Collections.Generic.HashSet<string>(_currentData.ClearedEncounters);
+        }
+
+        return new System.Collections.Generic.HashSet<string>();
+    }
+
+    /// <summary>
+    /// Exports achievement IDs for NG+ carry-over.
+    /// </summary>
+    public System.Collections.Generic.HashSet<string> ExportAchievements()
+    {
+        var achievements = new System.Collections.Generic.HashSet<string>();
+
+        foreach (var flag in _currentData.StoryFlags)
+        {
+            if (flag.Key.StartsWith("achievement_") && flag.Value)
+            {
+                achievements.Add(flag.Key);
+            }
+        }
+
+        return achievements;
+    }
+
+    /// <summary>
+    /// Exports recruited Stray definition IDs for NG+ carry-over.
+    /// </summary>
+    public System.Collections.Generic.List<string> ExportRecruitedStrays()
+    {
+        return new System.Collections.Generic.List<string>(_currentData.OwnedStrays.Keys);
+    }
+
+    /// <summary>
+    /// Exports Stray levels for NG+ carry-over.
+    /// </summary>
+    public System.Collections.Generic.Dictionary<string, int> ExportStrayLevels()
+    {
+        return new System.Collections.Generic.Dictionary<string, int>(_currentData.OwnedStrays);
+    }
+
+    /// <summary>
+    /// Exports faction reputation for NG+ carry-over.
+    /// </summary>
+    public System.Collections.Generic.Dictionary<string, int> ExportFactionReputation()
+    {
+        var result = new System.Collections.Generic.Dictionary<string, int>();
+
+        foreach (var kvp in _currentData.FactionReputation)
+        {
+            result[kvp.Key] = kvp.Value;
+        }
+
+        return result;
+    }
+
     #endregion
 }
 

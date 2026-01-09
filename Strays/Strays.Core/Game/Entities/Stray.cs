@@ -563,10 +563,24 @@ public class Stray
     public static Stray? Create(string definitionId, int level = 1)
     {
         var definition = StrayDefinitions.Get(definitionId);
+
         if (definition == null)
+        {
             return null;
+        }
 
         return new Stray(definition, level);
+    }
+
+    /// <summary>
+    /// Sets the level directly (for NG+ or special cases).
+    /// </summary>
+    /// <param name="newLevel">The new level to set.</param>
+    public void SetLevel(int newLevel)
+    {
+        Level = Math.Max(1, newLevel);
+        Experience = 0; // Reset experience after level change
+        CurrentHp = MaxHp; // Heal to full
     }
 
     /// <summary>
