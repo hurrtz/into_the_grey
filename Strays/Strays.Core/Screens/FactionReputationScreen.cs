@@ -537,4 +537,3 @@ public class FactionDisplayData
     public (int threshold, string name, string description)[] ReputationTiers { get; init; } = Array.Empty<(int, string, string)>();
     public Dictionary<int, string> Benefits { get; init; } = new();
 }
-
