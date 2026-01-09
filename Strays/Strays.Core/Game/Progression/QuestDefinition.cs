@@ -1024,6 +1024,233 @@ public static class QuestDefinitions
                 ItemIds = new List<string> { "item_suburb_key" }
             }
         });
+
+        // Side Quest: Unit-47's Perfect Lawn
+        Register(new QuestDefinition
+        {
+            Id = "side_quiet_perfect_lawn",
+            Name = "A Perfect Lawn",
+            Description = "Unit-47 wants to complete its eternal task: the perfect lawn. But the weeds keep coming back...",
+            Summary = "Help Unit-47 achieve lawn perfection",
+            Type = QuestType.Side,
+            Act = ActState.Act2_Responsibility,
+            BiomeId = "quiet",
+            RequiredFlags = new List<string> { "reached_quiet" },
+            RecommendedLevel = 22,
+            SortOrder = 202,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "talk", Description = "Speak with Unit-47", Type = ObjectiveType.TalkTo, TargetId = "quiet_lawnbot" },
+                new() { Id = "clear", Description = "Clear the invasive weeds (0/5)", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_weed_strays", RequiredCount = 5 },
+                new() { Id = "return", Description = "Return to Unit-47", Type = ObjectiveType.TalkTo, TargetId = "quiet_lawnbot" }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 300,
+                Currency = 250,
+                ItemIds = new List<string> { "calm_serum" }
+            }
+        });
+
+        // Side Quest: The Teeth - Last Mission
+        Register(new QuestDefinition
+        {
+            Id = "side_teeth_last_mission",
+            Name = "The Last Mission",
+            Description = "Ghost has unfinished business from Operation Absolute. The military bunker holds answers... and dangers.",
+            Summary = "Complete Ghost's final mission",
+            Type = QuestType.Side,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "teeth",
+            RequiredFlags = new List<string> { "teeth_veteran_trust" },
+            RecommendedLevel = 28,
+            SortOrder = 300,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "accept", Description = "Accept Ghost's mission", Type = ObjectiveType.TalkTo, TargetId = "teeth_veteran" },
+                new() { Id = "infiltrate", Description = "Infiltrate the military bunker", Type = ObjectiveType.ReachLocation, TargetId = "loc_military_bunker" },
+                new() { Id = "retrieve", Description = "Retrieve the data core", Type = ObjectiveType.Collect, TargetId = "item_operation_data" },
+                new() { Id = "survive", Description = "Survive the guardian", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_bunker_guardian" },
+                new() { Id = "deliver", Description = "Deliver the data to Ghost", Type = ObjectiveType.TalkTo, TargetId = "teeth_veteran" }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 600,
+                Currency = 500,
+                ItemIds = new List<string> { "daemon_attack_drone" },
+                Flags = new List<string> { "operation_absolute_revealed" }
+            }
+        });
+
+        // Side Quest: The Teeth - Fortify the Outpost
+        Register(new QuestDefinition
+        {
+            Id = "side_teeth_fortify",
+            Name = "Hold the Line",
+            Description = "The outpost is under constant threat. Help the Sergeant fortify its defenses.",
+            Summary = "Strengthen the outpost's defenses",
+            Type = QuestType.Side,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "teeth",
+            RequiredFlags = new List<string> { "reached_teeth" },
+            RecommendedLevel = 26,
+            SortOrder = 301,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "speak", Description = "Speak with the Sergeant", Type = ObjectiveType.TalkTo, TargetId = "teeth_sergeant" },
+                new() { Id = "salvage", Description = "Salvage defense materials (0/3)", Type = ObjectiveType.Collect, TargetId = "item_defense_parts", RequiredCount = 3 },
+                new() { Id = "defend", Description = "Defend against the raid", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_teeth_raid" }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 450,
+                Currency = 350,
+                ItemIds = new List<string> { "aug_piercing" }
+            }
+        });
+
+        // Side Quest: The Glow - Data Ghost's Request
+        Register(new QuestDefinition
+        {
+            Id = "side_glow_echo7",
+            Name = "Echo's Memory",
+            Description = "Echo-7 remembers fragments of who it was. Help it reconstruct its identity... if you can find the pieces.",
+            Summary = "Help Echo-7 recover its memories",
+            Type = QuestType.Side,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "glow",
+            RequiredFlags = new List<string> { "dead_channel_complete" },
+            RecommendedLevel = 30,
+            SortOrder = 302,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "listen", Description = "Listen to Echo-7's story", Type = ObjectiveType.TalkTo, TargetId = "glow_data_ghost" },
+                new() { Id = "find1", Description = "Find Memory Fragment Alpha", Type = ObjectiveType.Collect, TargetId = "item_memory_alpha" },
+                new() { Id = "find2", Description = "Find Memory Fragment Beta", Type = ObjectiveType.Collect, TargetId = "item_memory_beta" },
+                new() { Id = "find3", Description = "Find Memory Fragment Gamma", Type = ObjectiveType.Collect, TargetId = "item_memory_gamma" },
+                new() { Id = "restore", Description = "Restore Echo-7's memory", Type = ObjectiveType.TalkTo, TargetId = "glow_data_ghost" }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 700,
+                Currency = 400,
+                ItemIds = new List<string> { "elem_signal_jam" },
+                Flags = new List<string> { "echo7_restored" }
+            }
+        });
+
+        // Side Quest: The Glow - Root Access
+        Register(new QuestDefinition
+        {
+            Id = "side_glow_root_access",
+            Name = "Root Access",
+            Description = "Root knows secrets about NIMDOK's architecture. Earn his trust, and he might share them.",
+            Summary = "Gain Root's trust",
+            Type = QuestType.Side,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "glow",
+            RequiredFlags = new List<string> { "reached_glow" },
+            RecommendedLevel = 32,
+            SortOrder = 303,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "speak", Description = "Speak with Root", Type = ObjectiveType.TalkTo, TargetId = "glow_admin" },
+                new() { Id = "clear", Description = "Clear the corrupted subroutines", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_corrupted_subroutines" },
+                new() { Id = "retrieve", Description = "Retrieve the access token", Type = ObjectiveType.Collect, TargetId = "item_access_token" },
+                new() { Id = "return", Description = "Return to Root", Type = ObjectiveType.TalkTo, TargetId = "glow_admin" }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 600,
+                Flags = new List<string> { "root_access_granted" },
+                ItemIds = new List<string> { "drv_first_strike" }
+            }
+        });
+
+        // Side Quest: Archive Scar - The Keeper's Test
+        Register(new QuestDefinition
+        {
+            Id = "side_archive_memories",
+            Name = "The Keeper's Test",
+            Description = "The Keeper guards memories of the old world. To see them, you must prove you understand what was lost.",
+            Summary = "Prove yourself worthy to the Keeper",
+            Type = QuestType.Side,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "archive_scar",
+            RequiredFlags = new List<string> { "reached_archive" },
+            RecommendedLevel = 33,
+            SortOrder = 304,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "speak", Description = "Speak with the Keeper", Type = ObjectiveType.TalkTo, TargetId = "archive_keeper" },
+                new() { Id = "test1", Description = "Pass the Trial of Memory", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_trial_memory" },
+                new() { Id = "test2", Description = "Pass the Trial of Loss", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_trial_loss" },
+                new() { Id = "test3", Description = "Pass the Trial of Acceptance", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_trial_acceptance" },
+                new() { Id = "witness", Description = "Witness the memories of the old world", Type = ObjectiveType.TriggerFlag, TargetId = "archive_worthy" }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 1000,
+                Flags = new List<string> { "archive_worthy", "witnessed_old_world" },
+                ItemIds = new List<string> { "ancient_core" }
+            }
+        });
+
+        // Side Quest: Archive Scar - Null's Paths
+        Register(new QuestDefinition
+        {
+            Id = "side_archive_null_paths",
+            Name = "Paths That Don't Exist",
+            Description = "Null knows ways through the deleted spaces. Follow it, if you dare.",
+            Summary = "Follow Null through the void",
+            Type = QuestType.Discovery,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "archive_scar",
+            RequiredFlags = new List<string> { "reached_archive" },
+            RecommendedLevel = 35,
+            SortOrder = 305,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "find", Description = "Find Null in the Archive Scar", Type = ObjectiveType.ReachLocation, TargetId = "loc_null_spawn" },
+                new() { Id = "follow", Description = "Follow Null into the void", Type = ObjectiveType.ReachLocation, TargetId = "loc_void_entrance" },
+                new() { Id = "survive", Description = "Survive the void passage", Type = ObjectiveType.Survive, TargetId = "event_void_passage" },
+                new() { Id = "discover", Description = "Discover the hidden archive", Type = ObjectiveType.ReachLocation, TargetId = "loc_hidden_archive" }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 800,
+                Flags = new List<string> { "void_walker" },
+                UnlockedStrayIds = new List<string> { "original_instance" }
+            }
+        });
+
+        // Side Quest: Ancient Hunt - Optional super boss
+        Register(new QuestDefinition
+        {
+            Id = "side_ancient_hunt",
+            Name = "The Ancient Hunt",
+            Description = "Legends speak of Ancients - beings that predate even NIMDOK. Are you strong enough to face them?",
+            Summary = "Hunt the Ancient bosses",
+            Type = QuestType.Side,
+            Act = ActState.Act3_Irreversibility,
+            BiomeId = "archive_scar",
+            RequiredFlags = new List<string> { "archive_worthy" },
+            RecommendedLevel = 40,
+            SortOrder = 400,
+            Objectives = new List<QuestObjective>
+            {
+                new() { Id = "hydra", Description = "Defeat the Ancient Hydra", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_ancient_hydra" },
+                new() { Id = "phoenix", Description = "Defeat the Ancient Phoenix", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_ancient_phoenix" },
+                new() { Id = "leviathan", Description = "Defeat the Ancient Leviathan", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_ancient_leviathan" }
+            },
+            Reward = new QuestReward
+            {
+                Experience = 3000,
+                Currency = 5000,
+                Flags = new List<string> { "ancient_hunter", "ancient_boss_defeated" },
+                ItemIds = new List<string> { "ancient_core" }
+            }
+        });
     }
 
     /// <summary>

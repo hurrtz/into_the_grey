@@ -323,6 +323,336 @@ public static class NPCDefinitions
             PlaceholderColor = Color.CornflowerBlue,
             RequiresFlag = "act2_started"
         });
+
+        // Healer - Fringe Rest House
+        Register(new NPCDefinition
+        {
+            Id = "healer_patch",
+            Name = "Patch",
+            Type = NPCType.Healer,
+            Faction = Faction.Salvagers,
+            Description = "A medic who patches up travelers passing through the Fringe.",
+            DefaultDialogId = "patch_greeting",
+            ShopId = "healer_supplies_shop",
+            SettlementId = "fringe_camp",
+            PlaceholderColor = Color.LightPink
+        });
+
+        // Rust Market - Parts Vendor
+        Register(new NPCDefinition
+        {
+            Id = "market_parts_vendor",
+            Name = "Gears",
+            Type = NPCType.Merchant,
+            Faction = Faction.Machinists,
+            Description = "A rugged trader specializing in mechanical parts and augmentations.",
+            DefaultDialogId = "gears_greeting",
+            ShopId = "rust_parts_shop",
+            SettlementId = "rust_haven",
+            PlaceholderColor = Color.DarkOrange,
+            RequiresFlag = "reached_rust_belt"
+        });
+
+        // Rust Market - Chips Vendor
+        Register(new NPCDefinition
+        {
+            Id = "market_chips_vendor",
+            Name = "Spark",
+            Type = NPCType.Merchant,
+            Faction = Faction.Machinists,
+            Description = "A twitchy tech dealer who trades in rare microchips.",
+            DefaultDialogId = "spark_greeting",
+            ShopId = "rust_chips_shop",
+            SettlementId = "rust_haven",
+            PlaceholderColor = Color.Cyan,
+            RequiresFlag = "reached_rust_belt"
+        });
+
+        // ============================================
+        // THE QUIET - Uncanny suburb NPCs
+        // ============================================
+
+        // The Corner Store Owner
+        Register(new NPCDefinition
+        {
+            Id = "quiet_shopkeeper",
+            Name = "Mr. Henderson",
+            Type = NPCType.Merchant,
+            Faction = Faction.None,
+            Description = "A perfectly normal shopkeeper. His smile never wavers. His eyes never blink.",
+            DefaultDialogId = "henderson_greeting",
+            ConditionalDialogs = new Dictionary<string, string>
+            {
+                { "quiet_truth_revealed", "henderson_revealed" }
+            },
+            ShopId = "quiet_general_store",
+            SettlementId = "quiet_suburb",
+            PlaceholderColor = Color.Beige,
+            RequiresFlag = "reached_quiet"
+        });
+
+        // Memory Collector
+        Register(new NPCDefinition
+        {
+            Id = "quiet_archivist",
+            Name = "The Archivist",
+            Type = NPCType.Merchant,
+            Faction = Faction.None,
+            Description = "Collects fragments of deleted memories. Speaks in whispers about things that no longer exist.",
+            DefaultDialogId = "archivist_greeting",
+            ConditionalDialogs = new Dictionary<string, string>
+            {
+                { "dead_channel_complete", "archivist_knows" }
+            },
+            ShopId = "quiet_memory_collector",
+            SettlementId = "quiet_suburb",
+            PlaceholderColor = Color.LightSlateGray,
+            RequiresFlag = "reached_quiet"
+        });
+
+        // Lawn Maintenance Bot (Quest Giver)
+        Register(new NPCDefinition
+        {
+            Id = "quiet_lawnbot",
+            Name = "Unit-47",
+            Type = NPCType.QuestGiver,
+            Faction = Faction.NIMDOK,
+            Description = "A lawn maintenance drone that has achieved a kind of sentience. Still mows. Always mows.",
+            DefaultDialogId = "lawnbot_greeting",
+            QuestIds = new List<string> { "side_quiet_perfect_lawn" },
+            SettlementId = "quiet_suburb",
+            PlaceholderColor = Color.LawnGreen,
+            RequiresFlag = "reached_quiet"
+        });
+
+        // The Neighbor
+        Register(new NPCDefinition
+        {
+            Id = "quiet_neighbor",
+            Name = "Mrs. Patterson",
+            Type = NPCType.Citizen,
+            Faction = Faction.None,
+            Description = "Watches from her window. Always waves. Has been waving for a very long time.",
+            DefaultDialogId = "patterson_greeting",
+            ConditionalDialogs = new Dictionary<string, string>
+            {
+                { "quiet_buffer_discovered", "patterson_warning" }
+            },
+            PlaceholderColor = Color.Lavender,
+            RequiresFlag = "reached_quiet"
+        });
+
+        // ============================================
+        // THE TEETH - Military zone NPCs
+        // ============================================
+
+        // Armory Sergeant
+        Register(new NPCDefinition
+        {
+            Id = "teeth_sergeant",
+            Name = "Sergeant",
+            Type = NPCType.Merchant,
+            Faction = Faction.Machinists,
+            Description = "A battle-scarred veteran who runs the armory. Doesn't talk about what happened to the rest of the unit.",
+            DefaultDialogId = "sergeant_greeting",
+            ShopId = "teeth_armory",
+            SettlementId = "teeth_outpost",
+            PlaceholderColor = Color.OliveDrab,
+            RequiresFlag = "reached_teeth"
+        });
+
+        // Field Medic
+        Register(new NPCDefinition
+        {
+            Id = "teeth_medic",
+            Name = "Doc",
+            Type = NPCType.Healer,
+            Faction = Faction.Salvagers,
+            Description = "Field medic. Patches wounds without asking questions. Has seen too much to ask anymore.",
+            DefaultDialogId = "doc_greeting",
+            ShopId = "teeth_medic",
+            SettlementId = "teeth_outpost",
+            PlaceholderColor = Color.White,
+            RequiresFlag = "reached_teeth"
+        });
+
+        // War Veteran (Quest Giver)
+        Register(new NPCDefinition
+        {
+            Id = "teeth_veteran",
+            Name = "Ghost",
+            Type = NPCType.QuestGiver,
+            Faction = Faction.None,
+            Description = "The last survivor of something called 'Operation Absolute.' Won't say what it was.",
+            DefaultDialogId = "ghost_veteran_greeting",
+            ConditionalDialogs = new Dictionary<string, string>
+            {
+                { "teeth_veteran_trust", "ghost_veteran_mission" }
+            },
+            QuestIds = new List<string> { "side_teeth_last_mission" },
+            SettlementId = "teeth_outpost",
+            PlaceholderColor = Color.DarkGray,
+            RequiresFlag = "reached_teeth"
+        });
+
+        // Weapons Crafter
+        Register(new NPCDefinition
+        {
+            Id = "teeth_crafter",
+            Name = "Forge",
+            Type = NPCType.Crafter,
+            Faction = Faction.Machinists,
+            Description = "Crafts weapons from battlefield salvage. Each piece tells a story he'd rather forget.",
+            DefaultDialogId = "forge_greeting",
+            SettlementId = "teeth_outpost",
+            PlaceholderColor = Color.DarkOrange,
+            RequiresFlag = "reached_teeth"
+        });
+
+        // ============================================
+        // THE GLOW - Data center NPCs
+        // ============================================
+
+        // Data Exchange Broker
+        Register(new NPCDefinition
+        {
+            Id = "glow_cipher",
+            Name = "Cipher",
+            Type = NPCType.Merchant,
+            Faction = Faction.Machinists,
+            Description = "Information broker. Knows things that shouldn't be knowable. Sells them anyway.",
+            DefaultDialogId = "cipher_greeting",
+            ShopId = "glow_data_exchange",
+            SettlementId = "glow_hub",
+            PlaceholderColor = Color.Cyan,
+            RequiresFlag = "reached_glow"
+        });
+
+        // System Administrator
+        Register(new NPCDefinition
+        {
+            Id = "glow_admin",
+            Name = "Root",
+            Type = NPCType.Merchant,
+            Faction = Faction.NIMDOK,
+            Description = "Has admin access to NIMDOK's outer systems. Uses it to help travelers... for a price.",
+            DefaultDialogId = "root_greeting",
+            ConditionalDialogs = new Dictionary<string, string>
+            {
+                { "nimdok_core_reached", "root_knows" }
+            },
+            ShopId = "glow_admin_shop",
+            SettlementId = "glow_hub",
+            PlaceholderColor = Color.Yellow,
+            RequiresFlag = "reached_glow"
+        });
+
+        // NIMDOK Interface (Story Critical)
+        Register(new NPCDefinition
+        {
+            Id = "glow_nimdok_interface",
+            Name = "NIMDOK Interface",
+            Type = NPCType.QuestGiver,
+            Faction = Faction.NIMDOK,
+            Description = "A direct connection to NIMDOK. It watches you. It always watches.",
+            DefaultDialogId = "nimdok_glow_greeting",
+            ConditionalDialogs = new Dictionary<string, string>
+            {
+                { "act3_started", "nimdok_final_greeting" }
+            },
+            QuestIds = new List<string> { "main_26_nimdok_choice" },
+            PlaceholderColor = Color.Magenta,
+            IsEssential = true,
+            RequiresFlag = "reached_glow"
+        });
+
+        // Data Ghost (Mysterious NPC)
+        Register(new NPCDefinition
+        {
+            Id = "glow_data_ghost",
+            Name = "Echo-7",
+            Type = NPCType.Citizen,
+            Faction = Faction.None,
+            Description = "A fragmented consciousness that exists only in the data streams. Was human once. Maybe.",
+            DefaultDialogId = "echo7_greeting",
+            ConditionalDialogs = new Dictionary<string, string>
+            {
+                { "dead_channel_complete", "echo7_remembers" }
+            },
+            PlaceholderColor = Color.LightCyan,
+            RequiresFlag = "reached_glow"
+        });
+
+        // ============================================
+        // ARCHIVE SCAR - End-game NPCs
+        // ============================================
+
+        // Remnant Dealer
+        Register(new NPCDefinition
+        {
+            Id = "archive_fragment",
+            Name = "Fragment",
+            Type = NPCType.Merchant,
+            Faction = Faction.None,
+            Description = "Sells pieces of what was lost. Doesn't remember what most of it was.",
+            DefaultDialogId = "fragment_greeting",
+            ShopId = "archive_remnant_dealer",
+            SettlementId = "archive_outpost",
+            PlaceholderColor = Color.DarkGray,
+            RequiresFlag = "reached_archive"
+        });
+
+        // The Original Instance
+        Register(new NPCDefinition
+        {
+            Id = "archive_original",
+            Name = "Original",
+            Type = NPCType.Merchant,
+            Faction = Faction.None,
+            Description = "Claims to be the first backup ever made. Sells authentic pre-collapse data.",
+            DefaultDialogId = "original_greeting",
+            ShopId = "archive_last_backup",
+            SettlementId = "archive_outpost",
+            PlaceholderColor = Color.Gold,
+            RequiresFlag = "reached_archive"
+        });
+
+        // Memory Keeper (Lore NPC)
+        Register(new NPCDefinition
+        {
+            Id = "archive_keeper",
+            Name = "The Keeper",
+            Type = NPCType.QuestGiver,
+            Faction = Faction.Shepherds,
+            Description = "Guards the last complete memories of what came before. Will share them... if you're worthy.",
+            DefaultDialogId = "keeper_greeting",
+            ConditionalDialogs = new Dictionary<string, string>
+            {
+                { "archive_worthy", "keeper_shares" }
+            },
+            QuestIds = new List<string> { "side_archive_memories" },
+            SettlementId = "archive_outpost",
+            PlaceholderColor = Color.Silver,
+            IsEssential = true,
+            RequiresFlag = "reached_archive"
+        });
+
+        // Void Walker (Mysterious Guide)
+        Register(new NPCDefinition
+        {
+            Id = "archive_void_walker",
+            Name = "Null",
+            Type = NPCType.Wanderer,
+            Faction = Faction.None,
+            Description = "Walks through the deleted spaces. Knows paths that don't exist anymore.",
+            DefaultDialogId = "null_greeting",
+            ConditionalDialogs = new Dictionary<string, string>
+            {
+                { "ancient_boss_defeated", "null_respects" }
+            },
+            PlaceholderColor = Color.Black,
+            RequiresFlag = "reached_archive"
+        });
     }
 
     private static void Register(NPCDefinition definition)

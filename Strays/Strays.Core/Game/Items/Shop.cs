@@ -166,6 +166,10 @@ public static class Shops
         RegisterFringeShops();
         RegisterRustShops();
         RegisterGreenShops();
+        RegisterQuietShops();
+        RegisterTeethShops();
+        RegisterGlowShops();
+        RegisterArchiveShops();
     }
 
     private static void RegisterFringeShops()
@@ -187,11 +191,34 @@ public static class Shops
                 new() { ItemId = "energy_cell", Category = ShopCategory.Consumables, BasePrice = 75 },
                 new() { ItemId = "antivirus_patch", Category = ShopCategory.Consumables, BasePrice = 100 },
                 // Microchips
-                new() { ItemId = "chip_power_1", Category = ShopCategory.Microchips, BasePrice = 300 },
-                new() { ItemId = "chip_defense_1", Category = ShopCategory.Microchips, BasePrice = 300 },
-                new() { ItemId = "chip_speed_1", Category = ShopCategory.Microchips, BasePrice = 300 },
+                new() { ItemId = "drv_attack_1", Category = ShopCategory.Microchips, BasePrice = 300 },
+                new() { ItemId = "drv_defense_1", Category = ShopCategory.Microchips, BasePrice = 300 },
+                new() { ItemId = "drv_speed_1", Category = ShopCategory.Microchips, BasePrice = 300 },
                 // Limited items
-                new() { ItemId = "chip_strike", Category = ShopCategory.Microchips, BasePrice = 500, Stock = 1 },
+                new() { ItemId = "proto_lunge", Category = ShopCategory.Microchips, BasePrice = 500, Stock = 1 },
+            }
+        });
+
+        // Healer supplies at the Rest House
+        Register(new ShopDefinition
+        {
+            Id = "healer_supplies_shop",
+            Name = "Patch's Medical Supplies",
+            OwnerName = "Patch",
+            Greeting = "Need patching up? I've got what you need to keep your Strays running.",
+            Faction = FactionType.Independents,
+            Biome = BiomeType.Fringe,
+            BuysItems = true,
+            BuyCategories = new List<ShopCategory> { ShopCategory.Consumables, ShopCategory.Materials },
+            Inventory = new List<ShopItem>
+            {
+                // Healing focused inventory
+                new() { ItemId = "repair_kit_small", Category = ShopCategory.Consumables, BasePrice = 45 },
+                new() { ItemId = "repair_kit_medium", Category = ShopCategory.Consumables, BasePrice = 140 },
+                new() { ItemId = "antivirus_patch", Category = ShopCategory.Consumables, BasePrice = 90 },
+                new() { ItemId = "calm_serum", Category = ShopCategory.Consumables, BasePrice = 140 },
+                new() { ItemId = "revival_core", Category = ShopCategory.Consumables, BasePrice = 450, Stock = 2 },
+                new() { ItemId = "energy_cell", Category = ShopCategory.Consumables, BasePrice = 70 },
             }
         });
     }
@@ -215,12 +242,63 @@ public static class Shops
                 new() { ItemId = "repair_kit_large", Category = ShopCategory.Consumables, BasePrice = 350 },
                 new() { ItemId = "overclock_stim", Category = ShopCategory.Consumables, BasePrice = 200 },
                 // Microchips
-                new() { ItemId = "chip_power_2", Category = ShopCategory.Microchips, BasePrice = 600 },
-                new() { ItemId = "chip_defense_2", Category = ShopCategory.Microchips, BasePrice = 600 },
-                new() { ItemId = "chip_overclock", Category = ShopCategory.Microchips, BasePrice = 800 },
+                new() { ItemId = "drv_attack_2", Category = ShopCategory.Microchips, BasePrice = 600 },
+                new() { ItemId = "drv_defense_2", Category = ShopCategory.Microchips, BasePrice = 600 },
+                new() { ItemId = "sup_overclock", Category = ShopCategory.Microchips, BasePrice = 800 },
                 // Augmentations
                 new() { ItemId = "aug_steel_claws", Category = ShopCategory.Augmentations, BasePrice = 1000 },
                 new() { ItemId = "aug_reinforced_plating", Category = ShopCategory.Augmentations, BasePrice = 1200 },
+            }
+        });
+
+        // Rust Market - Parts vendor (Gears)
+        Register(new ShopDefinition
+        {
+            Id = "rust_parts_shop",
+            Name = "Gears' Parts Emporium",
+            OwnerName = "Gears",
+            Greeting = "Parts and augments, fresh from the scrap heaps. Best prices in the Belt!",
+            Faction = FactionType.Harvesters,
+            Biome = BiomeType.Rust,
+            BuysItems = true,
+            BuyCategories = new List<ShopCategory> { ShopCategory.Augmentations, ShopCategory.Materials },
+            Inventory = new List<ShopItem>
+            {
+                // Augmentations - mechanical focus
+                new() { ItemId = "aug_steel_claws", Category = ShopCategory.Augmentations, BasePrice = 950 },
+                new() { ItemId = "aug_reinforced_plating", Category = ShopCategory.Augmentations, BasePrice = 1100 },
+                new() { ItemId = "aug_hydraulic_legs", Category = ShopCategory.Augmentations, BasePrice = 1300 },
+                new() { ItemId = "aug_sensor_array", Category = ShopCategory.Augmentations, BasePrice = 900 },
+                // Some consumables
+                new() { ItemId = "repair_kit_medium", Category = ShopCategory.Consumables, BasePrice = 130 },
+                new() { ItemId = "repair_kit_large", Category = ShopCategory.Consumables, BasePrice = 340 },
+            }
+        });
+
+        // Rust Market - Chips vendor (Spark)
+        Register(new ShopDefinition
+        {
+            Id = "rust_chips_shop",
+            Name = "Spark's Silicon",
+            OwnerName = "Spark",
+            Greeting = "Chips! Rare chips! Fresh off the assembly line... well, sort of fresh.",
+            Faction = FactionType.Harvesters,
+            Biome = BiomeType.Rust,
+            BuysItems = true,
+            BuyCategories = new List<ShopCategory> { ShopCategory.Microchips, ShopCategory.Materials },
+            Inventory = new List<ShopItem>
+            {
+                // Microchips - varied selection
+                new() { ItemId = "drv_attack_1", Category = ShopCategory.Microchips, BasePrice = 280 },
+                new() { ItemId = "drv_attack_2", Category = ShopCategory.Microchips, BasePrice = 550 },
+                new() { ItemId = "drv_defense_1", Category = ShopCategory.Microchips, BasePrice = 280 },
+                new() { ItemId = "drv_defense_2", Category = ShopCategory.Microchips, BasePrice = 550 },
+                new() { ItemId = "drv_speed_1", Category = ShopCategory.Microchips, BasePrice = 280 },
+                new() { ItemId = "sup_overclock", Category = ShopCategory.Microchips, BasePrice = 750 },
+                new() { ItemId = "sup_regen_field", Category = ShopCategory.Microchips, BasePrice = 650 },
+                // Rare limited stock
+                new() { ItemId = "proto_lunge", Category = ShopCategory.Microchips, BasePrice = 480, Stock = 2 },
+                new() { ItemId = "proto_guard_stance", Category = ShopCategory.Microchips, BasePrice = 580, Stock = 1 },
             }
         });
     }
@@ -244,11 +322,226 @@ public static class Shops
                 new() { ItemId = "revival_core", Category = ShopCategory.Consumables, BasePrice = 500 },
                 new() { ItemId = "calm_serum", Category = ShopCategory.Consumables, BasePrice = 150 },
                 // Microchips - support focused
-                new() { ItemId = "chip_regen", Category = ShopCategory.Microchips, BasePrice = 700 },
-                new() { ItemId = "chip_fortify", Category = ShopCategory.Microchips, BasePrice = 600 },
-                new() { ItemId = "chip_bond", Category = ShopCategory.Microchips, BasePrice = 800 },
+                new() { ItemId = "sup_regen_field", Category = ShopCategory.Microchips, BasePrice = 700 },
+                new() { ItemId = "proto_guard_stance", Category = ShopCategory.Microchips, BasePrice = 600 },
+                new() { ItemId = "sup_rally_pulse", Category = ShopCategory.Microchips, BasePrice = 800 },
                 // Augmentations
                 new() { ItemId = "aug_bio_filter", Category = ShopCategory.Augmentations, BasePrice = 900 },
+            }
+        });
+    }
+
+    private static void RegisterQuietShops()
+    {
+        // The Quiet - Uncanny suburb merchants
+        Register(new ShopDefinition
+        {
+            Id = "quiet_general_store",
+            Name = "The Corner Store",
+            OwnerName = "Mr. Henderson",
+            Greeting = "Welcome to our little store. Everything is perfectly normal here.",
+            Faction = FactionType.Independents,
+            Biome = BiomeType.Quiet,
+            BuysItems = true,
+            Inventory = new List<ShopItem>
+            {
+                // Standard supplies at slightly unsettling prices
+                new() { ItemId = "repair_kit_small", Category = ShopCategory.Consumables, BasePrice = 55 },
+                new() { ItemId = "repair_kit_medium", Category = ShopCategory.Consumables, BasePrice = 160 },
+                new() { ItemId = "repair_kit_large", Category = ShopCategory.Consumables, BasePrice = 380 },
+                new() { ItemId = "energy_cell", Category = ShopCategory.Consumables, BasePrice = 80 },
+                new() { ItemId = "antivirus_patch", Category = ShopCategory.Consumables, BasePrice = 110 },
+                // Peculiar chips
+                new() { ItemId = "drv_speed_2", Category = ShopCategory.Microchips, BasePrice = 650 },
+                new() { ItemId = "proto_evasive_stance", Category = ShopCategory.Microchips, BasePrice = 550 },
+                new() { ItemId = "sup_shield_coat", Category = ShopCategory.Microchips, BasePrice = 480 },
+            }
+        });
+
+        // Memory Collector - specialized rare items
+        Register(new ShopDefinition
+        {
+            Id = "quiet_memory_collector",
+            Name = "Memory Collector's Cabinet",
+            OwnerName = "The Archivist",
+            Greeting = "I collect things that were... forgotten. Perhaps you'll find something familiar.",
+            Faction = FactionType.Independents,
+            Biome = BiomeType.Quiet,
+            BuysItems = true,
+            BuyCategories = new List<ShopCategory> { ShopCategory.Microchips, ShopCategory.Materials },
+            Inventory = new List<ShopItem>
+            {
+                // Rare data/memory-related chips
+                new() { ItemId = "elem_data_spike", Category = ShopCategory.Microchips, BasePrice = 700 },
+                new() { ItemId = "elem_signal_jam", Category = ShopCategory.Microchips, BasePrice = 950 },
+                new() { ItemId = "sup_system_wipe", Category = ShopCategory.Microchips, BasePrice = 1100 },
+                new() { ItemId = "daemon_holo_decoy", Category = ShopCategory.Microchips, BasePrice = 850 },
+                // Limited unique items
+                new() { ItemId = "proto_scan", Category = ShopCategory.Microchips, BasePrice = 400, Stock = 2 },
+            }
+        });
+    }
+
+    private static void RegisterTeethShops()
+    {
+        // The Teeth - Military surplus and combat gear
+        Register(new ShopDefinition
+        {
+            Id = "teeth_armory",
+            Name = "The Armory",
+            OwnerName = "Sergeant",
+            Greeting = "You need firepower? I've got firepower. Just don't ask where it came from.",
+            Faction = FactionType.Harvesters,
+            Biome = BiomeType.Teeth,
+            BuysItems = true,
+            Inventory = new List<ShopItem>
+            {
+                // Heavy consumables
+                new() { ItemId = "repair_kit_large", Category = ShopCategory.Consumables, BasePrice = 320 },
+                new() { ItemId = "emergency_repair", Category = ShopCategory.Consumables, BasePrice = 750 },
+                new() { ItemId = "attack_boost", Category = ShopCategory.Consumables, BasePrice = 130 },
+                new() { ItemId = "defense_boost", Category = ShopCategory.Consumables, BasePrice = 130 },
+                // Combat-focused chips
+                new() { ItemId = "drv_attack_2", Category = ShopCategory.Microchips, BasePrice = 580 },
+                new() { ItemId = "drv_crit_chance", Category = ShopCategory.Microchips, BasePrice = 700 },
+                new() { ItemId = "proto_taunt", Category = ShopCategory.Microchips, BasePrice = 650 },
+                new() { ItemId = "aug_piercing", Category = ShopCategory.Microchips, BasePrice = 900 },
+                new() { ItemId = "aug_counter", Category = ShopCategory.Microchips, BasePrice = 1200 },
+                // Rare military gear
+                new() { ItemId = "daemon_attack_drone", Category = ShopCategory.Microchips, BasePrice = 1400, Stock = 1 },
+                new() { ItemId = "daemon_laser_turret", Category = ShopCategory.Microchips, BasePrice = 1600, Stock = 1 },
+            }
+        });
+
+        // Field Medic - survival supplies
+        Register(new ShopDefinition
+        {
+            Id = "teeth_medic",
+            Name = "Field Hospital",
+            OwnerName = "Doc",
+            Greeting = "Patch you up, send you back out. That's the deal.",
+            Faction = FactionType.Independents,
+            Biome = BiomeType.Teeth,
+            BuysItems = true,
+            BuyCategories = new List<ShopCategory> { ShopCategory.Consumables },
+            Inventory = new List<ShopItem>
+            {
+                new() { ItemId = "repair_kit_medium", Category = ShopCategory.Consumables, BasePrice = 125 },
+                new() { ItemId = "repair_kit_large", Category = ShopCategory.Consumables, BasePrice = 300 },
+                new() { ItemId = "revival_core", Category = ShopCategory.Consumables, BasePrice = 450 },
+                new() { ItemId = "antivirus_patch", Category = ShopCategory.Consumables, BasePrice = 95 },
+                new() { ItemId = "calm_serum", Category = ShopCategory.Consumables, BasePrice = 160 },
+                // Support chips
+                new() { ItemId = "sup_repair_pulse", Category = ShopCategory.Microchips, BasePrice = 450 },
+                new() { ItemId = "sup_mass_repair", Category = ShopCategory.Microchips, BasePrice = 1100 },
+                new() { ItemId = "sup_emergency_reboot", Category = ShopCategory.Microchips, BasePrice = 1300 },
+            }
+        });
+    }
+
+    private static void RegisterGlowShops()
+    {
+        // The Glow - High-tech data merchants
+        Register(new ShopDefinition
+        {
+            Id = "glow_data_exchange",
+            Name = "The Data Exchange",
+            OwnerName = "Cipher",
+            Greeting = "Information is currency. What are you buying? What are you selling?",
+            Faction = FactionType.Harvesters,
+            Biome = BiomeType.Glow,
+            BuysItems = true,
+            Inventory = new List<ShopItem>
+            {
+                // High-end consumables
+                new() { ItemId = "repair_kit_large", Category = ShopCategory.Consumables, BasePrice = 280 },
+                new() { ItemId = "emergency_repair", Category = ShopCategory.Consumables, BasePrice = 700 },
+                new() { ItemId = "overclock_stim", Category = ShopCategory.Consumables, BasePrice = 180 },
+                // Advanced chips
+                new() { ItemId = "elem_emp_pulse", Category = ShopCategory.Microchips, BasePrice = 850 },
+                new() { ItemId = "elem_thunderbolt", Category = ShopCategory.Microchips, BasePrice = 1200 },
+                new() { ItemId = "daemon_shock_turret", Category = ShopCategory.Microchips, BasePrice = 1500 },
+                new() { ItemId = "daemon_stun_field", Category = ShopCategory.Microchips, BasePrice = 1800 },
+                new() { ItemId = "drv_first_strike", Category = ShopCategory.Microchips, BasePrice = 1400 },
+                // Rare data chips
+                new() { ItemId = "aug_chain", Category = ShopCategory.Microchips, BasePrice = 1100, Stock = 1 },
+            }
+        });
+
+        // System Administrator - rare unique items
+        Register(new ShopDefinition
+        {
+            Id = "glow_admin_shop",
+            Name = "Admin Access",
+            OwnerName = "Root",
+            Greeting = "sudo access granted. What do you need?",
+            Faction = FactionType.NIMDOK,
+            Biome = BiomeType.Glow,
+            BuysItems = false, // Doesn't buy, only sells
+            Inventory = new List<ShopItem>
+            {
+                // Legendary/Epic tier items - expensive but powerful
+                new() { ItemId = "drv_en_max_2", Category = ShopCategory.Microchips, BasePrice = 800 },
+                new() { ItemId = "drv_en_regen_2", Category = ShopCategory.Microchips, BasePrice = 900 },
+                new() { ItemId = "sup_rally_pulse", Category = ShopCategory.Microchips, BasePrice = 1000 },
+                new() { ItemId = "aug_drain", Category = ShopCategory.Microchips, BasePrice = 1400 },
+                new() { ItemId = "aug_battery_leech", Category = ShopCategory.Microchips, BasePrice = 1300 },
+                // Very rare, limited stock
+                new() { ItemId = "daemon_shield_drone", Category = ShopCategory.Microchips, BasePrice = 1600, Stock = 1 },
+                new() { ItemId = "daemon_healing_field", Category = ShopCategory.Microchips, BasePrice = 1700, Stock = 1 },
+            }
+        });
+    }
+
+    private static void RegisterArchiveShops()
+    {
+        // Archive Scar - remnants and memories
+        Register(new ShopDefinition
+        {
+            Id = "archive_remnant_dealer",
+            Name = "The Remnant Dealer",
+            OwnerName = "Fragment",
+            Greeting = "What's lost can sometimes be found. If you know where to look...",
+            Faction = FactionType.Independents,
+            Biome = BiomeType.ArchiveScar,
+            BuysItems = true,
+            Inventory = new List<ShopItem>
+            {
+                // Survival essentials at premium prices (dangerous area)
+                new() { ItemId = "repair_kit_large", Category = ShopCategory.Consumables, BasePrice = 350 },
+                new() { ItemId = "emergency_repair", Category = ShopCategory.Consumables, BasePrice = 850 },
+                new() { ItemId = "revival_core", Category = ShopCategory.Consumables, BasePrice = 550 },
+                // Unique void/data chips
+                new() { ItemId = "elem_data_spike", Category = ShopCategory.Microchips, BasePrice = 750 },
+                new() { ItemId = "elem_signal_jam", Category = ShopCategory.Microchips, BasePrice = 1000 },
+                new() { ItemId = "sup_signal_screen", Category = ShopCategory.Microchips, BasePrice = 800 },
+                // Very rare recovery items
+                new() { ItemId = "sup_emergency_reboot", Category = ShopCategory.Microchips, BasePrice = 1400, Stock = 2 },
+                new() { ItemId = "sup_system_wipe", Category = ShopCategory.Microchips, BasePrice = 1200, Stock = 2 },
+            }
+        });
+
+        // The Last Backup - end-game shop
+        Register(new ShopDefinition
+        {
+            Id = "archive_last_backup",
+            Name = "The Last Backup",
+            OwnerName = "Original",
+            Greeting = "I am what remains of the first archive. My wares are... authentic.",
+            Faction = FactionType.None,
+            Biome = BiomeType.ArchiveScar,
+            BuysItems = false,
+            Inventory = new List<ShopItem>
+            {
+                // End-game premium items
+                new() { ItemId = "emergency_repair", Category = ShopCategory.Consumables, BasePrice = 650 },
+                // Best chips available
+                new() { ItemId = "elem_inferno", Category = ShopCategory.Microchips, BasePrice = 1500 },
+                new() { ItemId = "elem_flash_freeze", Category = ShopCategory.Microchips, BasePrice = 1400 },
+                new() { ItemId = "aug_multi_target", Category = ShopCategory.Microchips, BasePrice = 1600 },
+                new() { ItemId = "proto_brace", Category = ShopCategory.Microchips, BasePrice = 1000 },
+                // Ultra-rare limited items
+                new() { ItemId = "drv_first_strike", Category = ShopCategory.Microchips, BasePrice = 1600, Stock = 1 },
             }
         });
     }
