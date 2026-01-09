@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using Strays.Core.Game.Data;
 using Strays.Core.Game.Dialog;
 using Strays.Core.Game.Entities;
+using Strays.Core.Game.Items;
 using Strays.Core.Game.Progression;
 using Strays.Core.Game.World;
 using Strays.Core.Inputs;
@@ -48,6 +49,9 @@ public class WorldScreen : GameScreen
     private BiomeType _previousBiome;
     private float _biomeTransitionAlpha;
     private string _biomeTransitionText = "";
+
+    // Portal interaction
+    private BiomePortal? _nearbyPortal;
 
     // Weather particles
     private List<WeatherParticle> _weatherParticles = new();
@@ -235,8 +239,9 @@ public class WorldScreen : GameScreen
         // Check for pause
         if (input.IsPauseGame(ControllingPlayer))
         {
-            // Add pause screen
-            ScreenManager.AddScreen(new PauseScreen(), ControllingPlayer);
+            // Add game pause screen with access to game data
+            var pauseScreen = new GamePauseScreen(_roster, _gameState, _gameState.FactionReputation);
+            ScreenManager.AddScreen(pauseScreen, ControllingPlayer);
             _previousKeyboardState = keyboardState;
             return;
         }
@@ -252,6 +257,12 @@ public class WorldScreen : GameScreen
         {
             // Future: Open quest log screen
             System.Diagnostics.Debug.WriteLine(_questLog.GetProgressSummary());
+        }
+
+        // Check for world map (M key)
+        if (IsKeyPressed(keyboardState, Keys.M))
+        {
+            OpenBiomeMap();
         }
 
         // Get movement input
@@ -298,6 +309,13 @@ public class WorldScreen : GameScreen
     /// </summary>
     private void TryInteract()
     {
+        // Check for nearby portal first
+        if (_nearbyPortal != null && _world.IsPortalUnlocked(_nearbyPortal))
+        {
+            UsePortal(_nearbyPortal);
+            return;
+        }
+
         // Check for nearby NPC
         if (_nearbyNPC != null)
         {
@@ -318,10 +336,78 @@ public class WorldScreen : GameScreen
     }
 
     /// <summary>
+    /// Uses a portal to travel to another biome.
+    /// </summary>
+    private void UsePortal(BiomePortal portal)
+    {
+        var targetPosition = _world.UsePortal(portal);
+        _protagonist.Position = targetPosition;
+        _companion.Position = targetPosition + new Vector2(-40, 0);
+
+        // Set visited flag
+        var targetBiome = portal.ToBiome.ToString().ToLowerInvariant();
+        _gameState.SetFlag($"visited_{targetBiome}");
+
+        // Show transition effect
+        _biomeTransitionAlpha = 1f;
+        _biomeTransitionText = $"Entering {BiomeData.GetName(portal.ToBiome)}";
+    }
+
+    /// <summary>
+    /// Opens the biome world map screen.
+    /// </summary>
+    private void OpenBiomeMap()
+    {
+        var mapScreen = new BiomeMapScreen(_world, _gameState);
+        mapScreen.BiomeSelected += OnBiomeSelectedFromMap;
+        ScreenManager.AddScreen(mapScreen, ControllingPlayer);
+    }
+
+    /// <summary>
+    /// Called when player selects a biome from the map screen.
+    /// </summary>
+    private void OnBiomeSelectedFromMap(BiomeType targetBiome)
+    {
+        var portal = _world.GetPortalTo(targetBiome);
+        if (portal != null)
+        {
+            UsePortal(portal);
+        }
+        else
+        {
+            // Direct travel (fast travel)
+            var spawnPoint = _world.GetBiomeSpawnPoint(targetBiome);
+            _protagonist.Position = spawnPoint;
+            _companion.Position = spawnPoint + new Vector2(-40, 0);
+
+            // Update world camera and chunk tracking
+            _world.TeleportTo(spawnPoint);
+
+            var targetBiomeName = targetBiome.ToString().ToLowerInvariant();
+            _gameState.SetFlag($"visited_{targetBiomeName}");
+
+            _biomeTransitionAlpha = 1f;
+            _biomeTransitionText = $"Traveling to {BiomeData.GetName(targetBiome)}...";
+        }
+    }
+
+    /// <summary>
     /// Initiates interaction with an NPC.
     /// </summary>
     private void InteractWithNPC(NPC npc)
     {
+        // Check if merchant with shop
+        if (npc.Type == NPCType.Merchant && !string.IsNullOrEmpty(npc.Definition.ShopId))
+        {
+            var shop = Shops.Get(npc.Definition.ShopId);
+            if (shop != null)
+            {
+                OpenShop(npc, shop);
+                return;
+            }
+        }
+
+        // Default: open dialog
         var dialogId = npc.GetCurrentDialogId();
         if (!string.IsNullOrEmpty(dialogId))
         {
@@ -336,6 +422,24 @@ public class WorldScreen : GameScreen
                 };
             }
         }
+    }
+
+    /// <summary>
+    /// Opens a shop for trading.
+    /// </summary>
+    private void OpenShop(NPC npc, ShopDefinition shop)
+    {
+        npc.InConversation = true;
+
+        var tradingScreen = new TradingScreen(shop, _gameState, _gameState.FactionReputation);
+        ScreenManager.AddScreen(tradingScreen, ControllingPlayer);
+
+        // When trading screen closes, end conversation
+        tradingScreen.Closed += (_, _) =>
+        {
+            npc.InConversation = false;
+            _questLog.NotifyTalkedTo(npc.Id);
+        };
     }
 
     /// <summary>
@@ -358,6 +462,10 @@ public class WorldScreen : GameScreen
 
         // Update world
         _world.Update(gameTime, _protagonist.Position);
+
+        // Update portals and check for nearby portal
+        _world.UpdatePortals(gameTime, _protagonist.BoundingBox);
+        UpdateNearbyPortal();
 
         // Update settlements
         foreach (var settlement in _settlements)
@@ -518,6 +626,18 @@ public class WorldScreen : GameScreen
     }
 
     /// <summary>
+    /// Updates the nearby portal reference for interaction prompts.
+    /// </summary>
+    private void UpdateNearbyPortal()
+    {
+        _nearbyPortal = null;
+
+        // Check all portals that player is colliding with
+        var collidingPortals = _world.GetCollidingPortals(_protagonist.BoundingBox);
+        _nearbyPortal = collidingPortals.FirstOrDefault(p => p.IsActive);
+    }
+
+    /// <summary>
     /// Checks if the protagonist has collided with any encounters.
     /// </summary>
     private void CheckEncounters()
@@ -642,6 +762,9 @@ public class WorldScreen : GameScreen
 
         // Draw world (map, encounters)
         _world.Draw(spriteBatch, _pixelTexture!, _font);
+
+        // Draw portals
+        _world.DrawPortals(spriteBatch, _pixelTexture!, _font);
 
         // Draw settlements
         foreach (var settlement in _settlements)
@@ -841,10 +964,26 @@ public class WorldScreen : GameScreen
             spriteBatch.DrawString(_font, settlementText, settlementPos, Color.LimeGreen);
         }
 
-        // Draw interaction prompt if near NPC
-        bool canInteract = _nearbyNPC != null ||
+        // Draw interaction prompt if near NPC or portal
+        bool canInteractNPC = _nearbyNPC != null ||
             (_currentSettlement?.GetNearestInteractableNPC(_protagonist.Position) != null);
-        if (canInteract)
+        bool canInteractPortal = _nearbyPortal != null;
+
+        if (canInteractPortal)
+        {
+            var portalText = _world.IsPortalUnlocked(_nearbyPortal!)
+                ? $"[E] Travel to {BiomeData.GetName(_nearbyPortal!.ToBiome)}"
+                : $"[LOCKED] {_nearbyPortal!.RequiresFlag}";
+            var portalColor = _world.IsPortalUnlocked(_nearbyPortal!) ? Color.Cyan : Color.Red;
+            var portalSize = _font.MeasureString(portalText);
+            var portalPos = new Vector2(
+                ScreenManager.BaseScreenSize.X / 2 - portalSize.X / 2,
+                ScreenManager.BaseScreenSize.Y - 80
+            );
+            spriteBatch.DrawString(_font, portalText, portalPos, portalColor);
+        }
+
+        if (canInteractNPC)
         {
             var interactText = "[E] Interact";
             var interactSize = _font.MeasureString(interactText);
@@ -856,7 +995,7 @@ public class WorldScreen : GameScreen
         }
 
         // Draw controls hint
-        var hint = "WASD: Move | E: Interact | Q: Quests | ESC: Pause";
+        var hint = "WASD: Move | E: Interact | M: Map | Q: Quests | ESC: Pause";
         var hintPos = new Vector2(10, ScreenManager.BaseScreenSize.Y - 20);
         spriteBatch.DrawString(_font, hint, hintPos, Color.Gray);
     }

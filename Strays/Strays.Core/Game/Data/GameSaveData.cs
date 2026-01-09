@@ -115,6 +115,52 @@ public class GameSaveData
     /// Save slot this data belongs to.
     /// </summary>
     public int SaveSlot { get; set; } = 0;
+
+    /// <summary>
+    /// Faction reputation values.
+    /// Key is faction name, value is reputation (-1000 to 1000).
+    /// </summary>
+    public Dictionary<string, int> FactionReputation { get; set; } = new();
+
+    /// <summary>
+    /// IDs of items in the player's inventory.
+    /// </summary>
+    public List<string> InventoryItems { get; set; } = new();
+
+    /// <summary>
+    /// IDs of microchips owned but not equipped.
+    /// </summary>
+    public List<string> OwnedMicrochips { get; set; } = new();
+
+    /// <summary>
+    /// IDs of augmentations owned but not equipped.
+    /// </summary>
+    public List<string> OwnedAugmentations { get; set; } = new();
+
+    /// <summary>
+    /// Discovered settlement IDs.
+    /// </summary>
+    public HashSet<string> DiscoveredSettlements { get; set; } = new();
+
+    /// <summary>
+    /// Last save timestamp.
+    /// </summary>
+    public string SaveTimestamp { get; set; } = "";
+
+    /// <summary>
+    /// Number of Strays recruited total.
+    /// </summary>
+    public int TotalStraysRecruited { get; set; } = 0;
+
+    /// <summary>
+    /// Number of battles won.
+    /// </summary>
+    public int BattlesWon { get; set; } = 0;
+
+    /// <summary>
+    /// Number of battles fled from.
+    /// </summary>
+    public int BattlesFled { get; set; } = 0;
 }
 
 /// <summary>

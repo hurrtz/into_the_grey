@@ -93,7 +93,8 @@ public class Chunk
             {
                 Map = new TiledMap(graphicsDevice);
                 Map.Load(MapPath);
-                Size = new Vector2(Map.PixelWidth, Map.PixelHeight);
+                // Don't overwrite Size - it's set from biome definition
+                // The map is just a visual that renders within the chunk bounds
             }
             else
             {

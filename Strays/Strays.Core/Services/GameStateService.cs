@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using Microsoft.Xna.Framework;
 using Strays.Core.Game.Data;
+using Strays.Core.Game.Progression;
 using Strays.Core.Game.World;
 
 namespace Strays.Core.Services;
@@ -15,9 +16,19 @@ public class GameStateService
 {
     private const string SaveDirectory = "Saves";
     private const string SaveFilePattern = "save_{0}.json";
+    private const string AutoSaveSlotName = "autosave";
+    private const int MaxSaveSlots = 3;
+    private const int AutoSaveSlot = 99;
 
     private GameSaveData _currentData;
     private readonly JsonSerializerOptions _jsonOptions;
+    private FactionReputation? _factionReputation;
+
+    // Auto-save configuration
+    private double _autoSaveIntervalSeconds = 300; // 5 minutes
+    private double _timeSinceLastAutoSave = 0;
+    private bool _autoSaveEnabled = true;
+    private bool _autoSavePending = false;
 
     /// <summary>
     /// Event fired when game state is loaded.
@@ -39,6 +50,11 @@ public class GameStateService
     /// </summary>
     public event EventHandler<ActState>? ActChanged;
 
+    /// <summary>
+    /// Event fired when an auto-save is triggered.
+    /// </summary>
+    public event EventHandler? AutoSaveTriggered;
+
     public GameStateService()
     {
         _currentData = new GameSaveData();
@@ -47,6 +63,52 @@ public class GameStateService
             WriteIndented = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
+    }
+
+    /// <summary>
+    /// Maximum number of manual save slots.
+    /// </summary>
+    public int MaxSlots => MaxSaveSlots;
+
+    /// <summary>
+    /// Whether auto-save is enabled.
+    /// </summary>
+    public bool AutoSaveEnabled
+    {
+        get => _autoSaveEnabled;
+        set => _autoSaveEnabled = value;
+    }
+
+    /// <summary>
+    /// Auto-save interval in seconds.
+    /// </summary>
+    public double AutoSaveInterval
+    {
+        get => _autoSaveIntervalSeconds;
+        set => _autoSaveIntervalSeconds = Math.Max(60, value); // Minimum 1 minute
+    }
+
+    /// <summary>
+    /// Gets the faction reputation tracker for this save.
+    /// </summary>
+    public FactionReputation FactionReputation
+    {
+        get
+        {
+            if (_factionReputation == null)
+            {
+                _factionReputation = new FactionReputation();
+                // Restore from save data
+                foreach (var kvp in _currentData.FactionReputation)
+                {
+                    if (Enum.TryParse<FactionType>(kvp.Key, out var faction))
+                    {
+                        _factionReputation.SetReputation(faction, kvp.Value);
+                    }
+                }
+            }
+            return _factionReputation;
+        }
     }
 
     #region Current State Properties
@@ -272,10 +334,40 @@ public class GameStateService
             HasExoskeleton = false,
             ExoskeletonPowered = false,
             CompanionPresent = true,
-            GravitationStage = GravitationStage.Normal
+            GravitationStage = GravitationStage.Normal,
+            SaveTimestamp = DateTime.UtcNow.ToString("O")
         };
 
+        // Reset faction reputation
+        _factionReputation = new FactionReputation();
+
+        // Reset auto-save timer
+        _timeSinceLastAutoSave = 0;
+        _autoSavePending = false;
+
         StateLoaded?.Invoke(this, _currentData);
+    }
+
+    /// <summary>
+    /// Prepares save data by syncing transient state.
+    /// </summary>
+    private void PrepareSaveData()
+    {
+        // Update timestamp
+        _currentData.SaveTimestamp = DateTime.UtcNow.ToString("O");
+
+        // Sync faction reputation to save data
+        if (_factionReputation != null)
+        {
+            _currentData.FactionReputation.Clear();
+            foreach (FactionType faction in Enum.GetValues<FactionType>())
+            {
+                if (faction != FactionType.None)
+                {
+                    _currentData.FactionReputation[faction.ToString()] = _factionReputation.GetReputation(faction);
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -286,6 +378,7 @@ public class GameStateService
         try
         {
             _currentData.SaveSlot = slot;
+            PrepareSaveData();
 
             var savePath = GetSavePath(slot);
             var directory = Path.GetDirectoryName(savePath);
@@ -297,6 +390,7 @@ public class GameStateService
             var json = JsonSerializer.Serialize(_currentData, _jsonOptions);
             File.WriteAllText(savePath, json);
 
+            _autoSavePending = false;
             StateSaved?.Invoke(this, _currentData);
             return true;
         }
@@ -304,6 +398,52 @@ public class GameStateService
         {
             System.Diagnostics.Debug.WriteLine($"Failed to save game: {ex.Message}");
             return false;
+        }
+    }
+
+    /// <summary>
+    /// Performs an auto-save.
+    /// </summary>
+    public bool AutoSave()
+    {
+        if (!_autoSaveEnabled) return false;
+
+        var result = Save(AutoSaveSlot);
+        if (result)
+        {
+            AutoSaveTriggered?.Invoke(this, EventArgs.Empty);
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Triggers an auto-save on next opportunity (e.g., after combat, entering settlement).
+    /// </summary>
+    public void TriggerAutoSave()
+    {
+        _autoSavePending = true;
+    }
+
+    /// <summary>
+    /// Called each frame to check if auto-save should occur.
+    /// </summary>
+    public void UpdateAutoSave(GameTime gameTime)
+    {
+        if (!_autoSaveEnabled) return;
+
+        _timeSinceLastAutoSave += gameTime.ElapsedGameTime.TotalSeconds;
+
+        // Time-based auto-save
+        if (_timeSinceLastAutoSave >= _autoSaveIntervalSeconds)
+        {
+            AutoSave();
+            _timeSinceLastAutoSave = 0;
+        }
+        // Event-triggered auto-save
+        else if (_autoSavePending)
+        {
+            AutoSave();
+            _timeSinceLastAutoSave = 0;
         }
     }
 
@@ -326,6 +466,14 @@ public class GameStateService
             if (data != null)
             {
                 _currentData = data;
+
+                // Reload faction reputation from save data
+                _factionReputation = null; // Will be lazily reloaded
+
+                // Reset auto-save timer
+                _timeSinceLastAutoSave = 0;
+                _autoSavePending = false;
+
                 StateLoaded?.Invoke(this, _currentData);
                 return true;
             }
@@ -340,11 +488,97 @@ public class GameStateService
     }
 
     /// <summary>
+    /// Loads the auto-save if one exists.
+    /// </summary>
+    public bool LoadAutoSave()
+    {
+        return Load(AutoSaveSlot);
+    }
+
+    /// <summary>
     /// Checks if a save exists in a slot.
     /// </summary>
     public bool SaveExists(int slot = 0)
     {
         return File.Exists(GetSavePath(slot));
+    }
+
+    /// <summary>
+    /// Checks if an auto-save exists.
+    /// </summary>
+    public bool AutoSaveExists()
+    {
+        return SaveExists(AutoSaveSlot);
+    }
+
+    /// <summary>
+    /// Gets information about a save slot without loading the full state.
+    /// </summary>
+    public SaveSlotInfo? GetSaveInfo(int slot)
+    {
+        try
+        {
+            var savePath = GetSavePath(slot);
+            if (!File.Exists(savePath))
+            {
+                return null;
+            }
+
+            var json = File.ReadAllText(savePath);
+            var data = JsonSerializer.Deserialize<GameSaveData>(json, _jsonOptions);
+
+            if (data == null) return null;
+
+            return new SaveSlotInfo
+            {
+                Slot = slot,
+                IsAutoSave = slot == AutoSaveSlot,
+                Timestamp = DateTime.TryParse(data.SaveTimestamp, out var ts) ? ts : DateTime.MinValue,
+                PlayTime = TimeSpan.FromSeconds(data.TotalPlayTimeSeconds),
+                CurrentAct = data.CurrentAct,
+                CurrentBiome = data.CurrentBiome,
+                PartyCount = data.PartyStrayIds.Count,
+                TotalStrays = data.OwnedStrays.Count,
+                CompletedQuests = data.CompletedQuests.Count
+            };
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Gets info for the auto-save slot.
+    /// </summary>
+    public SaveSlotInfo? GetAutoSaveInfo()
+    {
+        return GetSaveInfo(AutoSaveSlot);
+    }
+
+    /// <summary>
+    /// Gets all available save slot infos.
+    /// </summary>
+    public SaveSlotInfo[] GetAllSaveInfos()
+    {
+        var infos = new System.Collections.Generic.List<SaveSlotInfo>();
+
+        for (int i = 0; i < MaxSaveSlots; i++)
+        {
+            var info = GetSaveInfo(i);
+            if (info != null)
+            {
+                infos.Add(info);
+            }
+        }
+
+        var autoInfo = GetAutoSaveInfo();
+        if (autoInfo != null)
+        {
+            infos.Add(autoInfo);
+        }
+
+        return infos.ToArray();
     }
 
     /// <summary>
@@ -368,10 +602,167 @@ public class GameStateService
         }
     }
 
+    /// <summary>
+    /// Deletes the auto-save.
+    /// </summary>
+    public bool DeleteAutoSave()
+    {
+        return DeleteSave(AutoSaveSlot);
+    }
+
     private static string GetSavePath(int slot)
     {
         var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        return Path.Combine(baseDir, SaveDirectory, string.Format(SaveFilePattern, slot));
+        var fileName = slot == AutoSaveSlot ? $"{AutoSaveSlotName}.json" : string.Format(SaveFilePattern, slot);
+        return Path.Combine(baseDir, SaveDirectory, fileName);
+    }
+
+    #endregion
+
+    #region Inventory Management
+
+    /// <summary>
+    /// Adds an item to the player's inventory.
+    /// </summary>
+    public void AddItem(string itemId)
+    {
+        _currentData.InventoryItems.Add(itemId);
+    }
+
+    /// <summary>
+    /// Removes an item from the player's inventory.
+    /// </summary>
+    public bool RemoveItem(string itemId)
+    {
+        return _currentData.InventoryItems.Remove(itemId);
+    }
+
+    /// <summary>
+    /// Checks if the player has an item.
+    /// </summary>
+    public bool HasItem(string itemId)
+    {
+        return _currentData.InventoryItems.Contains(itemId);
+    }
+
+    /// <summary>
+    /// Gets the count of a specific item.
+    /// </summary>
+    public int GetItemCount(string itemId)
+    {
+        int count = 0;
+        foreach (var item in _currentData.InventoryItems)
+        {
+            if (item == itemId) count++;
+        }
+        return count;
+    }
+
+    /// <summary>
+    /// Adds a microchip to the player's owned chips.
+    /// </summary>
+    public void AddMicrochip(string chipId)
+    {
+        _currentData.OwnedMicrochips.Add(chipId);
+    }
+
+    /// <summary>
+    /// Removes a microchip from the player's owned chips.
+    /// </summary>
+    public bool RemoveMicrochip(string chipId)
+    {
+        return _currentData.OwnedMicrochips.Remove(chipId);
+    }
+
+    /// <summary>
+    /// Adds an augmentation to the player's owned augmentations.
+    /// </summary>
+    public void AddAugmentation(string augId)
+    {
+        _currentData.OwnedAugmentations.Add(augId);
+    }
+
+    /// <summary>
+    /// Removes an augmentation from the player's owned augmentations.
+    /// </summary>
+    public bool RemoveAugmentation(string augId)
+    {
+        return _currentData.OwnedAugmentations.Remove(augId);
+    }
+
+    #endregion
+
+    #region Currency Management
+
+    /// <summary>
+    /// Gets the player's current currency amount.
+    /// </summary>
+    public int Currency => _currentData.Currency;
+
+    /// <summary>
+    /// Adds currency to the player.
+    /// </summary>
+    public void AddCurrency(int amount)
+    {
+        _currentData.Currency = Math.Max(0, _currentData.Currency + amount);
+    }
+
+    /// <summary>
+    /// Spends currency if the player has enough.
+    /// </summary>
+    /// <returns>True if successful, false if insufficient funds.</returns>
+    public bool SpendCurrency(int amount)
+    {
+        if (_currentData.Currency >= amount)
+        {
+            _currentData.Currency -= amount;
+            return true;
+        }
+        return false;
+    }
+
+    #endregion
+
+    #region Statistics
+
+    /// <summary>
+    /// Records a battle victory.
+    /// </summary>
+    public void RecordBattleWon()
+    {
+        _currentData.BattlesWon++;
+    }
+
+    /// <summary>
+    /// Records fleeing from battle.
+    /// </summary>
+    public void RecordBattleFled()
+    {
+        _currentData.BattlesFled++;
+    }
+
+    /// <summary>
+    /// Records recruiting a Stray.
+    /// </summary>
+    public void RecordStrayRecruited()
+    {
+        _currentData.TotalStraysRecruited++;
+    }
+
+    /// <summary>
+    /// Marks a settlement as discovered.
+    /// </summary>
+    public void DiscoverSettlement(string settlementId)
+    {
+        _currentData.DiscoveredSettlements.Add(settlementId);
+    }
+
+    /// <summary>
+    /// Checks if a settlement has been discovered.
+    /// </summary>
+    public bool IsSettlementDiscovered(string settlementId)
+    {
+        return _currentData.DiscoveredSettlements.Contains(settlementId);
     }
 
     #endregion
@@ -440,4 +831,83 @@ public static class StoryFlags
     public const string FoundDiadem = "found_diadem";
     public const string FoundMarble = "found_marble";
     public const string AchievedAbsoluteSynchrony = "achieved_absolute_synchrony";
+}
+
+/// <summary>
+/// Preview information about a save slot (displayed in save/load screens).
+/// </summary>
+public class SaveSlotInfo
+{
+    /// <summary>
+    /// The save slot number.
+    /// </summary>
+    public int Slot { get; init; }
+
+    /// <summary>
+    /// Whether this is the auto-save slot.
+    /// </summary>
+    public bool IsAutoSave { get; init; }
+
+    /// <summary>
+    /// When the save was created/updated.
+    /// </summary>
+    public DateTime Timestamp { get; init; }
+
+    /// <summary>
+    /// Total play time.
+    /// </summary>
+    public TimeSpan PlayTime { get; init; }
+
+    /// <summary>
+    /// Current story act.
+    /// </summary>
+    public ActState CurrentAct { get; init; }
+
+    /// <summary>
+    /// Current biome location.
+    /// </summary>
+    public BiomeType CurrentBiome { get; init; }
+
+    /// <summary>
+    /// Number of Strays in the party.
+    /// </summary>
+    public int PartyCount { get; init; }
+
+    /// <summary>
+    /// Total number of owned Strays.
+    /// </summary>
+    public int TotalStrays { get; init; }
+
+    /// <summary>
+    /// Number of completed quests.
+    /// </summary>
+    public int CompletedQuests { get; init; }
+
+    /// <summary>
+    /// Gets a display name for the slot.
+    /// </summary>
+    public string DisplayName => IsAutoSave ? "Auto Save" : $"Slot {Slot + 1}";
+
+    /// <summary>
+    /// Gets formatted play time as HH:MM:SS.
+    /// </summary>
+    public string FormattedPlayTime => $"{(int)PlayTime.TotalHours:D2}:{PlayTime.Minutes:D2}:{PlayTime.Seconds:D2}";
+
+    /// <summary>
+    /// Gets formatted timestamp.
+    /// </summary>
+    public string FormattedTimestamp => Timestamp == DateTime.MinValue ? "Unknown" : Timestamp.ToLocalTime().ToString("g");
+
+    /// <summary>
+    /// Gets a summary description for the save.
+    /// </summary>
+    public string Summary => $"{GetActDisplayName(CurrentAct)} - {CurrentBiome} | {PartyCount} Strays | {FormattedPlayTime}";
+
+    private static string GetActDisplayName(ActState act) => act switch
+    {
+        ActState.Act1_Denial => "Act 1: Denial",
+        ActState.Act2_Responsibility => "Act 2: Responsibility",
+        ActState.Act3_Irreversibility => "Act 3: Irreversibility",
+        _ => "Unknown"
+    };
 }

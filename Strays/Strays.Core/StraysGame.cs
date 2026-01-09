@@ -130,8 +130,8 @@ namespace Strays.Core
             gameStateService = new GameStateService();
             Services.AddService(typeof(GameStateService), gameStateService);
 
-            // Start in WorldScreen (Into The Grey gameplay)
-            screenManager.AddScreen(new WorldScreen(), null);
+            // Start with main menu
+            screenManager.AddScreen(new StraysMainMenuScreen(), null);
         }
 
         /// <summary>

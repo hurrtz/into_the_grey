@@ -45,6 +45,7 @@ public class GameWorld
     private readonly Dictionary<string, Chunk> _chunks = new();
     private readonly HashSet<string> _loadedChunkIds = new();
     private readonly Dictionary<string, ChunkSimulationTier> _chunkTiers = new();
+    private readonly List<BiomePortal> _portals = new();
     private readonly Random _random = new();
 
     // World streaming settings (in pixels)
@@ -120,6 +121,11 @@ public class GameWorld
     public string TiledBasePath { get; set; } = "Tiled/biomes/";
 
     /// <summary>
+    /// All portals in the world.
+    /// </summary>
+    public IReadOnlyList<BiomePortal> Portals => _portals;
+
+    /// <summary>
     /// Event fired when biome changes.
     /// </summary>
     public event Action<BiomeType, BiomeType>? BiomeChanged;
@@ -128,6 +134,11 @@ public class GameWorld
     /// Event fired when weather changes.
     /// </summary>
     public event Action<WeatherType>? WeatherChanged;
+
+    /// <summary>
+    /// Event fired when player enters a portal.
+    /// </summary>
+    public event Action<BiomePortal>? PortalEntered;
 
     /// <summary>
     /// Creates a new game world.
@@ -207,6 +218,9 @@ public class GameWorld
             _chunkTiers[chunk.Id] = ChunkSimulationTier.Unloaded;
         }
 
+        // Create portals between connected biomes
+        CreateBiomePortals();
+
         // Load the starting chunk (Fringe)
         if (_chunks.TryGetValue("fringe_main", out var startChunk))
         {
@@ -214,6 +228,319 @@ public class GameWorld
             _loadedChunkIds.Add(startChunk.Id);
             _chunkTiers[startChunk.Id] = ChunkSimulationTier.Active;
             _currentChunk = startChunk;
+        }
+    }
+
+    /// <summary>
+    /// Creates portals at the edges of biome chunks for transitions.
+    /// </summary>
+    private void CreateBiomePortals()
+    {
+        // Get chunk positions
+        var fringe = _chunks.GetValueOrDefault("fringe_main");
+        var rust = _chunks.GetValueOrDefault("rust_main");
+        var green = _chunks.GetValueOrDefault("green_main");
+        var quiet = _chunks.GetValueOrDefault("quiet_main");
+        var teeth = _chunks.GetValueOrDefault("teeth_main");
+        var glow = _chunks.GetValueOrDefault("glow_main");
+        var archive = _chunks.GetValueOrDefault("archive_main");
+
+        if (fringe == null) return;
+
+        // Fringe <-> Rust (West edge of Fringe, East edge of Rust)
+        if (rust != null)
+        {
+            var fringeToRust = new BiomePortal
+            {
+                Id = "portal_fringe_rust",
+                FromBiome = BiomeType.Fringe,
+                ToBiome = BiomeType.Rust,
+                Direction = PortalDirection.West,
+                Position = new Vector2(fringe.WorldPosition.X + 50, fringe.WorldPosition.Y + fringe.Size.Y / 2),
+                Size = new Vector2(80, 150),
+                TargetChunkId = "rust_main",
+                TargetSpawnOffset = new Vector2(rust.Size.X - 100, rust.Size.Y / 2),
+                RecommendedLevel = BiomeData.GetLevelRange(BiomeType.Rust).Min
+            };
+            _portals.Add(fringeToRust);
+
+            var rustToFringe = new BiomePortal
+            {
+                Id = "portal_rust_fringe",
+                FromBiome = BiomeType.Rust,
+                ToBiome = BiomeType.Fringe,
+                Direction = PortalDirection.East,
+                Position = new Vector2(rust.WorldPosition.X + rust.Size.X - 50, rust.WorldPosition.Y + rust.Size.Y / 2),
+                Size = new Vector2(80, 150),
+                TargetChunkId = "fringe_main",
+                TargetSpawnOffset = new Vector2(100, fringe.Size.Y / 2),
+                RecommendedLevel = 1
+            };
+            _portals.Add(rustToFringe);
+        }
+
+        // Fringe <-> Green (East edge of Fringe, West edge of Green)
+        if (green != null)
+        {
+            var fringeToGreen = new BiomePortal
+            {
+                Id = "portal_fringe_green",
+                FromBiome = BiomeType.Fringe,
+                ToBiome = BiomeType.Green,
+                Direction = PortalDirection.East,
+                Position = new Vector2(fringe.WorldPosition.X + fringe.Size.X - 50, fringe.WorldPosition.Y + fringe.Size.Y / 2),
+                Size = new Vector2(80, 150),
+                TargetChunkId = "green_main",
+                TargetSpawnOffset = new Vector2(100, green.Size.Y / 2),
+                RecommendedLevel = BiomeData.GetLevelRange(BiomeType.Green).Min
+            };
+            _portals.Add(fringeToGreen);
+
+            var greenToFringe = new BiomePortal
+            {
+                Id = "portal_green_fringe",
+                FromBiome = BiomeType.Green,
+                ToBiome = BiomeType.Fringe,
+                Direction = PortalDirection.West,
+                Position = new Vector2(green.WorldPosition.X + 50, green.WorldPosition.Y + green.Size.Y / 2),
+                Size = new Vector2(80, 150),
+                TargetChunkId = "fringe_main",
+                TargetSpawnOffset = new Vector2(fringe.Size.X - 100, fringe.Size.Y / 2),
+                RecommendedLevel = 1
+            };
+            _portals.Add(greenToFringe);
+        }
+
+        // Fringe <-> Quiet (South edge of Fringe, North edge of Quiet)
+        if (quiet != null)
+        {
+            var fringeToQuiet = new BiomePortal
+            {
+                Id = "portal_fringe_quiet",
+                FromBiome = BiomeType.Fringe,
+                ToBiome = BiomeType.Quiet,
+                Direction = PortalDirection.South,
+                Position = new Vector2(fringe.WorldPosition.X + fringe.Size.X / 2, fringe.WorldPosition.Y + fringe.Size.Y - 50),
+                Size = new Vector2(150, 80),
+                TargetChunkId = "quiet_main",
+                TargetSpawnOffset = new Vector2(quiet.Size.X / 2, 100),
+                RequiresFlag = "reached_quiet", // Unlock after story progression
+                RecommendedLevel = BiomeData.GetLevelRange(BiomeType.Quiet).Min
+            };
+            _portals.Add(fringeToQuiet);
+
+            var quietToFringe = new BiomePortal
+            {
+                Id = "portal_quiet_fringe",
+                FromBiome = BiomeType.Quiet,
+                ToBiome = BiomeType.Fringe,
+                Direction = PortalDirection.North,
+                Position = new Vector2(quiet.WorldPosition.X + quiet.Size.X / 2, quiet.WorldPosition.Y + 50),
+                Size = new Vector2(150, 80),
+                TargetChunkId = "fringe_main",
+                TargetSpawnOffset = new Vector2(fringe.Size.X / 2, fringe.Size.Y - 100),
+                RecommendedLevel = 1
+            };
+            _portals.Add(quietToFringe);
+        }
+
+        // Rust <-> Teeth (South edge of Rust, North edge of Teeth)
+        if (rust != null && teeth != null)
+        {
+            var rustToTeeth = new BiomePortal
+            {
+                Id = "portal_rust_teeth",
+                FromBiome = BiomeType.Rust,
+                ToBiome = BiomeType.Teeth,
+                Direction = PortalDirection.South,
+                Position = new Vector2(rust.WorldPosition.X + rust.Size.X / 2, rust.WorldPosition.Y + rust.Size.Y - 50),
+                Size = new Vector2(150, 80),
+                TargetChunkId = "teeth_main",
+                TargetSpawnOffset = new Vector2(teeth.Size.X / 2, 100),
+                RequiresFlag = "reached_teeth",
+                RecommendedLevel = BiomeData.GetLevelRange(BiomeType.Teeth).Min
+            };
+            _portals.Add(rustToTeeth);
+
+            var teethToRust = new BiomePortal
+            {
+                Id = "portal_teeth_rust",
+                FromBiome = BiomeType.Teeth,
+                ToBiome = BiomeType.Rust,
+                Direction = PortalDirection.North,
+                Position = new Vector2(teeth.WorldPosition.X + teeth.Size.X / 2, teeth.WorldPosition.Y + 50),
+                Size = new Vector2(150, 80),
+                TargetChunkId = "rust_main",
+                TargetSpawnOffset = new Vector2(rust.Size.X / 2, rust.Size.Y - 100),
+                RecommendedLevel = BiomeData.GetLevelRange(BiomeType.Rust).Min
+            };
+            _portals.Add(teethToRust);
+        }
+
+        // Teeth <-> Glow (South edge of Teeth, North edge of Glow)
+        if (teeth != null && glow != null)
+        {
+            var teethToGlow = new BiomePortal
+            {
+                Id = "portal_teeth_glow",
+                FromBiome = BiomeType.Teeth,
+                ToBiome = BiomeType.Glow,
+                Direction = PortalDirection.South,
+                Position = new Vector2(teeth.WorldPosition.X + teeth.Size.X / 2, teeth.WorldPosition.Y + teeth.Size.Y - 50),
+                Size = new Vector2(150, 80),
+                TargetChunkId = "glow_main",
+                TargetSpawnOffset = new Vector2(glow.Size.X / 2, 100),
+                RequiresFlag = "reached_glow",
+                RecommendedLevel = BiomeData.GetLevelRange(BiomeType.Glow).Min
+            };
+            _portals.Add(teethToGlow);
+
+            var glowToTeeth = new BiomePortal
+            {
+                Id = "portal_glow_teeth",
+                FromBiome = BiomeType.Glow,
+                ToBiome = BiomeType.Teeth,
+                Direction = PortalDirection.North,
+                Position = new Vector2(glow.WorldPosition.X + glow.Size.X / 2, glow.WorldPosition.Y + 50),
+                Size = new Vector2(150, 80),
+                TargetChunkId = "teeth_main",
+                TargetSpawnOffset = new Vector2(teeth.Size.X / 2, teeth.Size.Y - 100),
+                RecommendedLevel = BiomeData.GetLevelRange(BiomeType.Teeth).Min
+            };
+            _portals.Add(glowToTeeth);
+        }
+
+        // Green <-> Archive Scar (North edge of Green, South edge of Archive)
+        if (green != null && archive != null)
+        {
+            var greenToArchive = new BiomePortal
+            {
+                Id = "portal_green_archive",
+                FromBiome = BiomeType.Green,
+                ToBiome = BiomeType.ArchiveScar,
+                Direction = PortalDirection.North,
+                Position = new Vector2(green.WorldPosition.X + green.Size.X / 2, green.WorldPosition.Y + 50),
+                Size = new Vector2(150, 80),
+                TargetChunkId = "archive_main",
+                TargetSpawnOffset = new Vector2(archive.Size.X / 2, archive.Size.Y - 100),
+                RequiresFlag = "found_archive_scar", // Secret area
+                RecommendedLevel = BiomeData.GetLevelRange(BiomeType.ArchiveScar).Min
+            };
+            _portals.Add(greenToArchive);
+
+            var archiveToGreen = new BiomePortal
+            {
+                Id = "portal_archive_green",
+                FromBiome = BiomeType.ArchiveScar,
+                ToBiome = BiomeType.Green,
+                Direction = PortalDirection.South,
+                Position = new Vector2(archive.WorldPosition.X + archive.Size.X / 2, archive.WorldPosition.Y + archive.Size.Y - 50),
+                Size = new Vector2(150, 80),
+                TargetChunkId = "green_main",
+                TargetSpawnOffset = new Vector2(green.Size.X / 2, 100),
+                RecommendedLevel = BiomeData.GetLevelRange(BiomeType.Green).Min
+            };
+            _portals.Add(archiveToGreen);
+        }
+
+        // Quiet <-> Green (East edge of Quiet, additional connection)
+        if (quiet != null && green != null)
+        {
+            var quietToGreen = new BiomePortal
+            {
+                Id = "portal_quiet_green",
+                FromBiome = BiomeType.Quiet,
+                ToBiome = BiomeType.Green,
+                Direction = PortalDirection.East,
+                Position = new Vector2(quiet.WorldPosition.X + quiet.Size.X - 50, quiet.WorldPosition.Y + quiet.Size.Y / 3),
+                Size = new Vector2(80, 150),
+                TargetChunkId = "green_main",
+                TargetSpawnOffset = new Vector2(100, green.Size.Y * 2 / 3),
+                RecommendedLevel = BiomeData.GetLevelRange(BiomeType.Green).Min
+            };
+            _portals.Add(quietToGreen);
+
+            var greenToQuiet = new BiomePortal
+            {
+                Id = "portal_green_quiet",
+                FromBiome = BiomeType.Green,
+                ToBiome = BiomeType.Quiet,
+                Direction = PortalDirection.West,
+                Position = new Vector2(green.WorldPosition.X + 50, green.WorldPosition.Y + green.Size.Y * 2 / 3),
+                Size = new Vector2(80, 150),
+                TargetChunkId = "quiet_main",
+                TargetSpawnOffset = new Vector2(quiet.Size.X - 100, quiet.Size.Y / 3),
+                RequiresFlag = "reached_quiet",
+                RecommendedLevel = BiomeData.GetLevelRange(BiomeType.Quiet).Min
+            };
+            _portals.Add(greenToQuiet);
+        }
+
+        // Quiet <-> Teeth (West edge of Quiet to connect the route)
+        if (quiet != null && teeth != null)
+        {
+            var quietToTeeth = new BiomePortal
+            {
+                Id = "portal_quiet_teeth",
+                FromBiome = BiomeType.Quiet,
+                ToBiome = BiomeType.Teeth,
+                Direction = PortalDirection.West,
+                Position = new Vector2(quiet.WorldPosition.X + 50, quiet.WorldPosition.Y + quiet.Size.Y * 2 / 3),
+                Size = new Vector2(80, 150),
+                TargetChunkId = "teeth_main",
+                TargetSpawnOffset = new Vector2(teeth.Size.X - 100, teeth.Size.Y / 3),
+                RequiresFlag = "reached_teeth",
+                RecommendedLevel = BiomeData.GetLevelRange(BiomeType.Teeth).Min
+            };
+            _portals.Add(quietToTeeth);
+
+            var teethToQuiet = new BiomePortal
+            {
+                Id = "portal_teeth_quiet",
+                FromBiome = BiomeType.Teeth,
+                ToBiome = BiomeType.Quiet,
+                Direction = PortalDirection.East,
+                Position = new Vector2(teeth.WorldPosition.X + teeth.Size.X - 50, teeth.WorldPosition.Y + teeth.Size.Y / 3),
+                Size = new Vector2(80, 150),
+                TargetChunkId = "quiet_main",
+                TargetSpawnOffset = new Vector2(100, quiet.Size.Y * 2 / 3),
+                RequiresFlag = "reached_quiet",
+                RecommendedLevel = BiomeData.GetLevelRange(BiomeType.Quiet).Min
+            };
+            _portals.Add(teethToQuiet);
+        }
+
+        // Rust <-> Quiet (additional diagonal connection)
+        if (rust != null && quiet != null)
+        {
+            var rustToQuiet = new BiomePortal
+            {
+                Id = "portal_rust_quiet",
+                FromBiome = BiomeType.Rust,
+                ToBiome = BiomeType.Quiet,
+                Direction = PortalDirection.East,
+                Position = new Vector2(rust.WorldPosition.X + rust.Size.X - 50, rust.WorldPosition.Y + rust.Size.Y * 2 / 3),
+                Size = new Vector2(80, 150),
+                TargetChunkId = "quiet_main",
+                TargetSpawnOffset = new Vector2(100, quiet.Size.Y / 3),
+                RequiresFlag = "reached_quiet",
+                RecommendedLevel = BiomeData.GetLevelRange(BiomeType.Quiet).Min
+            };
+            _portals.Add(rustToQuiet);
+
+            var quietToRust = new BiomePortal
+            {
+                Id = "portal_quiet_rust",
+                FromBiome = BiomeType.Quiet,
+                ToBiome = BiomeType.Rust,
+                Direction = PortalDirection.West,
+                Position = new Vector2(quiet.WorldPosition.X + 50, quiet.WorldPosition.Y + quiet.Size.Y / 3),
+                Size = new Vector2(80, 150),
+                TargetChunkId = "rust_main",
+                TargetSpawnOffset = new Vector2(rust.Size.X - 100, rust.Size.Y * 2 / 3),
+                RecommendedLevel = BiomeData.GetLevelRange(BiomeType.Rust).Min
+            };
+            _portals.Add(quietToRust);
         }
     }
 
@@ -779,4 +1106,365 @@ public class GameWorld
                $"Weather: {_currentWeather} | " +
                $"Chunks: {activeCount}A/{adjacentCount}Adj/{loadedCount}L";
     }
+
+    #region Portal Methods
+
+    /// <summary>
+    /// Gets the portal at a specific world position.
+    /// </summary>
+    public BiomePortal? GetPortalAt(Vector2 worldPosition)
+    {
+        foreach (var portal in _portals)
+        {
+            if (portal.Contains(worldPosition))
+                return portal;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Gets all portals that collide with a bounding rectangle.
+    /// </summary>
+    public IEnumerable<BiomePortal> GetCollidingPortals(Rectangle bounds)
+    {
+        foreach (var portal in _portals)
+        {
+            if (portal.CheckCollision(bounds))
+                yield return portal;
+        }
+    }
+
+    /// <summary>
+    /// Gets all portals in the current biome.
+    /// </summary>
+    public IEnumerable<BiomePortal> GetPortalsInCurrentBiome()
+    {
+        return _portals.Where(p => p.FromBiome == _currentBiome);
+    }
+
+    /// <summary>
+    /// Gets all available (unlocked) portals from the current biome.
+    /// </summary>
+    public IEnumerable<BiomePortal> GetAvailablePortals()
+    {
+        return _portals.Where(p => p.FromBiome == _currentBiome && IsPortalUnlocked(p));
+    }
+
+    /// <summary>
+    /// Checks if a portal is unlocked based on story flags.
+    /// </summary>
+    public bool IsPortalUnlocked(BiomePortal portal)
+    {
+        if (string.IsNullOrEmpty(portal.RequiresFlag))
+            return true;
+
+        return _gameState.HasFlag(portal.RequiresFlag);
+    }
+
+    /// <summary>
+    /// Updates portal states (player in range detection).
+    /// </summary>
+    public void UpdatePortals(GameTime gameTime, Rectangle playerBounds)
+    {
+        foreach (var portal in _portals)
+        {
+            portal.Update(gameTime);
+            portal.IsPlayerInRange = portal.IsActive &&
+                                     IsPortalUnlocked(portal) &&
+                                     portal.CheckCollision(playerBounds);
+        }
+    }
+
+    /// <summary>
+    /// Attempts to use a portal at the player's position.
+    /// </summary>
+    /// <param name="playerBounds">Player's collision bounds.</param>
+    /// <returns>The target position if successful, null if no valid portal.</returns>
+    public Vector2? TryUsePortal(Rectangle playerBounds)
+    {
+        var portal = GetCollidingPortals(playerBounds)
+            .FirstOrDefault(p => IsPortalUnlocked(p) && p.IsActive);
+
+        if (portal == null)
+            return null;
+
+        return UsePortal(portal);
+    }
+
+    /// <summary>
+    /// Uses a specific portal and returns the target spawn position.
+    /// </summary>
+    /// <param name="portal">The portal to use.</param>
+    /// <returns>The spawn position in the target biome.</returns>
+    public Vector2 UsePortal(BiomePortal portal)
+    {
+        // Find target chunk
+        var targetChunk = _chunks.GetValueOrDefault(portal.TargetChunkId);
+        if (targetChunk == null)
+        {
+            // Fallback to biome spawn point
+            return GetBiomeSpawnPoint(portal.ToBiome);
+        }
+
+        // Ensure target chunk is loaded
+        if (!targetChunk.IsLoaded)
+        {
+            targetChunk.Load(_graphicsDevice);
+            _loadedChunkIds.Add(targetChunk.Id);
+            _chunkTiers[targetChunk.Id] = ChunkSimulationTier.Active;
+        }
+
+        // Calculate spawn position
+        var spawnPosition = targetChunk.WorldPosition + portal.TargetSpawnOffset;
+
+        // Fire portal entered event
+        PortalEntered?.Invoke(portal);
+
+        // Update current chunk and biome
+        var oldBiome = _currentBiome;
+        _currentChunk = targetChunk;
+        _currentBiome = targetChunk.Biome;
+
+        // Immediately update camera to new position
+        SetCameraPosition(spawnPosition);
+
+        if (oldBiome != _currentBiome)
+        {
+            BiomeChanged?.Invoke(oldBiome, _currentBiome);
+            UpdateWeatherForBiome(_currentBiome);
+        }
+
+        return spawnPosition;
+    }
+
+    /// <summary>
+    /// Sets the camera position to center on a specific world position.
+    /// </summary>
+    public void SetCameraPosition(Vector2 worldPosition)
+    {
+        _cameraPosition = worldPosition - _viewportSize / 2;
+
+        // Clamp to current chunk bounds if we have one
+        if (_currentChunk != null)
+        {
+            var chunkBounds = _currentChunk.Bounds;
+            _cameraPosition.X = Math.Max(chunkBounds.X, Math.Min(_cameraPosition.X, chunkBounds.Right - _viewportSize.X));
+            _cameraPosition.Y = Math.Max(chunkBounds.Y, Math.Min(_cameraPosition.Y, chunkBounds.Bottom - _viewportSize.Y));
+        }
+    }
+
+    /// <summary>
+    /// Teleports to a position, updating camera and current chunk.
+    /// </summary>
+    public void TeleportTo(Vector2 worldPosition)
+    {
+        // Find and set the chunk at the position
+        var chunk = GetChunkAt(worldPosition);
+        if (chunk != null)
+        {
+            // Ensure chunk is loaded
+            if (!chunk.IsLoaded)
+            {
+                chunk.Load(_graphicsDevice);
+                _loadedChunkIds.Add(chunk.Id);
+            }
+            _chunkTiers[chunk.Id] = ChunkSimulationTier.Active;
+
+            var oldBiome = _currentBiome;
+            _currentChunk = chunk;
+            _currentBiome = chunk.Biome;
+
+            if (oldBiome != _currentBiome)
+            {
+                BiomeChanged?.Invoke(oldBiome, _currentBiome);
+                UpdateWeatherForBiome(_currentBiome);
+            }
+        }
+
+        // Update camera
+        SetCameraPosition(worldPosition);
+    }
+
+    /// <summary>
+    /// Gets the portal leading to a specific biome from the current biome.
+    /// </summary>
+    public BiomePortal? GetPortalTo(BiomeType targetBiome)
+    {
+        return _portals.FirstOrDefault(p =>
+            p.FromBiome == _currentBiome &&
+            p.ToBiome == targetBiome &&
+            IsPortalUnlocked(p));
+    }
+
+    /// <summary>
+    /// Draws all visible portals.
+    /// </summary>
+    public void DrawPortals(SpriteBatch spriteBatch, Texture2D pixelTexture, SpriteFont? font)
+    {
+        foreach (var portal in _portals)
+        {
+            // Only draw portals in currently loaded chunks
+            var chunk = _chunks.GetValueOrDefault(GetChunkIdForPortal(portal));
+            if (chunk == null || !chunk.IsLoaded)
+                continue;
+
+            // Only draw active/unlocked portals
+            if (!portal.IsActive)
+                continue;
+
+            // Dim locked portals
+            if (!IsPortalUnlocked(portal))
+            {
+                // Draw locked portal indicator
+                DrawLockedPortal(spriteBatch, pixelTexture, font, portal);
+            }
+            else
+            {
+                portal.Draw(spriteBatch, pixelTexture, font, _cameraPosition);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Draws a locked portal indicator.
+    /// </summary>
+    private void DrawLockedPortal(SpriteBatch spriteBatch, Texture2D pixelTexture, SpriteFont? font, BiomePortal portal)
+    {
+        var screenPos = portal.Position - _cameraPosition;
+        var bounds = new Rectangle(
+            (int)(screenPos.X - portal.Size.X / 2),
+            (int)(screenPos.Y - portal.Size.Y / 2),
+            (int)portal.Size.X,
+            (int)portal.Size.Y
+        );
+
+        // Draw dimmed portal
+        var lockedColor = Color.DarkGray * 0.5f;
+        spriteBatch.Draw(pixelTexture, bounds, lockedColor);
+
+        // Draw lock icon (X pattern)
+        var borderColor = Color.Red * 0.7f;
+        int borderWidth = 2;
+
+        // Border
+        spriteBatch.Draw(pixelTexture, new Rectangle(bounds.X, bounds.Y, bounds.Width, borderWidth), borderColor);
+        spriteBatch.Draw(pixelTexture, new Rectangle(bounds.X, bounds.Bottom - borderWidth, bounds.Width, borderWidth), borderColor);
+        spriteBatch.Draw(pixelTexture, new Rectangle(bounds.X, bounds.Y, borderWidth, bounds.Height), borderColor);
+        spriteBatch.Draw(pixelTexture, new Rectangle(bounds.Right - borderWidth, bounds.Y, borderWidth, bounds.Height), borderColor);
+
+        // X pattern
+        for (int i = 0; i < Math.Min(bounds.Width, bounds.Height) / 2; i++)
+        {
+            spriteBatch.Draw(pixelTexture, new Rectangle(bounds.Center.X - i, bounds.Center.Y - i, 2, 2), borderColor);
+            spriteBatch.Draw(pixelTexture, new Rectangle(bounds.Center.X + i, bounds.Center.Y - i, 2, 2), borderColor);
+            spriteBatch.Draw(pixelTexture, new Rectangle(bounds.Center.X - i, bounds.Center.Y + i, 2, 2), borderColor);
+            spriteBatch.Draw(pixelTexture, new Rectangle(bounds.Center.X + i, bounds.Center.Y + i, 2, 2), borderColor);
+        }
+
+        // Draw locked label
+        if (font != null)
+        {
+            var label = "LOCKED";
+            var labelSize = font.MeasureString(label);
+            var labelPos = new Vector2(screenPos.X - labelSize.X / 2, bounds.Y - labelSize.Y - 5);
+            spriteBatch.DrawString(font, label, labelPos, Color.Red);
+
+            // Show required flag hint
+            if (!string.IsNullOrEmpty(portal.RequiresFlag))
+            {
+                var hint = $"Requires: {portal.RequiresFlag}";
+                var hintSize = font.MeasureString(hint);
+                var hintPos = new Vector2(screenPos.X - hintSize.X / 2, bounds.Bottom + 5);
+                spriteBatch.DrawString(font, hint, hintPos, Color.Gray);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets the chunk ID that contains a portal (based on its FromBiome).
+    /// </summary>
+    private string GetChunkIdForPortal(BiomePortal portal)
+    {
+        // Map biome to main chunk ID
+        return portal.FromBiome switch
+        {
+            BiomeType.Fringe => "fringe_main",
+            BiomeType.Rust => "rust_main",
+            BiomeType.Green => "green_main",
+            BiomeType.Quiet => "quiet_main",
+            BiomeType.Teeth => "teeth_main",
+            BiomeType.Glow => "glow_main",
+            BiomeType.ArchiveScar => "archive_main",
+            _ => "fringe_main"
+        };
+    }
+
+    /// <summary>
+    /// Unlocks a portal by setting its required story flag.
+    /// </summary>
+    public void UnlockPortal(string portalId)
+    {
+        var portal = _portals.FirstOrDefault(p => p.Id == portalId);
+        if (portal != null && !string.IsNullOrEmpty(portal.RequiresFlag))
+        {
+            _gameState.SetFlag(portal.RequiresFlag);
+        }
+    }
+
+    /// <summary>
+    /// Gets all biomes that are currently accessible from the current biome.
+    /// </summary>
+    public IEnumerable<BiomeType> GetAccessibleBiomes()
+    {
+        return GetAvailablePortals().Select(p => p.ToBiome).Distinct();
+    }
+
+    /// <summary>
+    /// Gets the complete travel path between two biomes.
+    /// </summary>
+    public List<BiomeType>? GetTravelPath(BiomeType from, BiomeType to)
+    {
+        if (from == to)
+            return new List<BiomeType> { from };
+
+        // Simple BFS pathfinding
+        var visited = new HashSet<BiomeType>();
+        var queue = new Queue<(BiomeType biome, List<BiomeType> path)>();
+        queue.Enqueue((from, new List<BiomeType> { from }));
+
+        while (queue.Count > 0)
+        {
+            var (current, path) = queue.Dequeue();
+
+            if (visited.Contains(current))
+                continue;
+
+            visited.Add(current);
+
+            // Get accessible biomes from current
+            var accessibleFromCurrent = _portals
+                .Where(p => p.FromBiome == current && IsPortalUnlocked(p))
+                .Select(p => p.ToBiome)
+                .Distinct();
+
+            foreach (var next in accessibleFromCurrent)
+            {
+                if (next == to)
+                {
+                    var finalPath = new List<BiomeType>(path) { next };
+                    return finalPath;
+                }
+
+                if (!visited.Contains(next))
+                {
+                    var newPath = new List<BiomeType>(path) { next };
+                    queue.Enqueue((next, newPath));
+                }
+            }
+        }
+
+        return null; // No path found
+    }
+
+    #endregion
 }

@@ -92,6 +92,16 @@ public class DialogChoice
     /// Whether this choice ends the dialog.
     /// </summary>
     public bool EndsDialog { get; init; }
+
+    /// <summary>
+    /// Quest to start when this choice is selected.
+    /// </summary>
+    public string? StartsQuest { get; init; }
+
+    /// <summary>
+    /// Quest to complete when this choice is selected.
+    /// </summary>
+    public string? CompletesQuest { get; init; }
 }
 
 /// <summary>

@@ -132,6 +132,11 @@ public class NPCDefinition
     public List<string> ShopItems { get; init; } = new();
 
     /// <summary>
+    /// Shop ID for merchants (links to Shops registry).
+    /// </summary>
+    public string? ShopId { get; init; }
+
+    /// <summary>
     /// Settlement ID where this NPC is found.
     /// </summary>
     public string? SettlementId { get; init; }
@@ -220,12 +225,12 @@ public static class NPCDefinitions
         Register(new NPCDefinition
         {
             Id = "trader_rust",
-            Name = "Rusty",
+            Name = "Rust",
             Type = NPCType.Merchant,
             Faction = Faction.Salvagers,
             Description = "A gruff trader dealing in scavenged parts and augmentations.",
             DefaultDialogId = "rusty_greeting",
-            ShopItems = new List<string> { "basic_augment", "repair_kit", "stim_pack" },
+            ShopId = "salvager_shop",
             SettlementId = "fringe_camp",
             PlaceholderColor = Color.Brown
         });
@@ -248,10 +253,11 @@ public static class NPCDefinitions
         {
             Id = "machinist_volt",
             Name = "Volt",
-            Type = NPCType.Crafter,
+            Type = NPCType.Merchant,
             Faction = Faction.Machinists,
-            Description = "An eccentric tinkerer who can modify augmentations.",
+            Description = "An eccentric tinkerer who can modify augmentations and sell equipment.",
             DefaultDialogId = "volt_greeting",
+            ShopId = "machinist_workshop",
             SettlementId = "rust_haven",
             PlaceholderColor = Color.Yellow,
             RequiresFlag = "reached_rust_belt"
@@ -274,6 +280,21 @@ public static class NPCDefinitions
             SettlementId = "green_sanctuary",
             PlaceholderColor = Color.ForestGreen,
             IsEssential = true,
+            RequiresFlag = "reached_green_zone"
+        });
+
+        // Shepherd Healer/Merchant
+        Register(new NPCDefinition
+        {
+            Id = "shepherd_trader",
+            Name = "Willow",
+            Type = NPCType.Merchant,
+            Faction = Faction.Shepherds,
+            Description = "A gentle Shepherd who provides healing supplies and Stray care items.",
+            DefaultDialogId = "willow_greeting",
+            ShopId = "shepherd_sanctuary_shop",
+            SettlementId = "green_sanctuary",
+            PlaceholderColor = Color.LightGreen,
             RequiresFlag = "reached_green_zone"
         });
 
