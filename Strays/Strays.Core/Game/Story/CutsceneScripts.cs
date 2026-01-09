@@ -1918,4 +1918,3 @@ public static class CutsceneScripts
         });
     }
 }
-
