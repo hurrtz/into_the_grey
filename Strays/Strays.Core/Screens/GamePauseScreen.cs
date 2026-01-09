@@ -61,7 +61,7 @@ class GamePauseScreen : MenuScreen
 
     private void PartyEntrySelected(object? sender, PlayerIndexEventArgs e)
     {
-        var partyScreen = new PartyScreen(_roster);
+        var partyScreen = new PartyScreen(_roster, _gameState);
         ScreenManager.AddScreen(partyScreen, ControllingPlayer);
     }
 

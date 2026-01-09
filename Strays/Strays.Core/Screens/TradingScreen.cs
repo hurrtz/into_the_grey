@@ -511,8 +511,20 @@ public class TradingScreen : GameScreen
             var chip = Microchips.Get(itemId);
             if (chip != null)
             {
-                spriteBatch.DrawString(_smallFont!, $"Slot Cost: {chip.SlotCost}", new Vector2(detailX + 15, detailY + yOffset), Color.Cyan);
+                spriteBatch.DrawString(_smallFont!, $"Category: {chip.Category}", new Vector2(detailX + 15, detailY + yOffset), Color.Cyan);
                 yOffset += 20;
+
+                if (chip.EnergyCost > 0)
+                {
+                    spriteBatch.DrawString(_smallFont!, $"Energy: {chip.EnergyCost}", new Vector2(detailX + 15, detailY + yOffset), Color.DeepSkyBlue);
+                    yOffset += 20;
+                }
+
+                if (chip.HeatGenerated > 0)
+                {
+                    spriteBatch.DrawString(_smallFont!, $"Heat: {chip.HeatGenerated}/{chip.HeatMax}", new Vector2(detailX + 15, detailY + yOffset), Color.OrangeRed);
+                    yOffset += 20;
+                }
 
                 if (chip.GrantsAbility != null)
                 {

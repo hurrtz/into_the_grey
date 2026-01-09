@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Strays.Core.Game.Data;
 using Strays.Core.Game.Entities;
 using Strays.Core.Inputs;
+using Strays.Core.Services;
 using Strays.ScreenManagers;
 
 namespace Strays.Screens;
@@ -16,6 +18,7 @@ namespace Strays.Screens;
 public class PartyScreen : GameScreen
 {
     private readonly StrayRoster _roster;
+    private readonly GameStateService _gameState;
     private SpriteFont _font;
     private SpriteFont _smallFont;
     private Texture2D _pixelTexture;
@@ -29,9 +32,10 @@ public class PartyScreen : GameScreen
     private const int MaxVisibleRoster = 8;
     private const int PartySlots = 5;
 
-    public PartyScreen(StrayRoster roster)
+    public PartyScreen(StrayRoster roster, GameStateService gameState)
     {
         _roster = roster;
+        _gameState = gameState;
         TransitionOnTime = TimeSpan.FromSeconds(0.3);
         TransitionOffTime = TimeSpan.FromSeconds(0.2);
     }
@@ -81,12 +85,12 @@ public class PartyScreen : GameScreen
             _selectedIndex = Math.Min(maxIndex, _selectedIndex + 1);
             UpdateScrollOffset();
         }
-        else if (input.IsNewKeyPress(Microsoft.Xna.Framework.Input.Keys.Left, ControllingPlayer, out _) && _inRosterView)
+        else if (input.IsNewKeyPress(Keys.Left, ControllingPlayer, out _) && _inRosterView)
         {
             _inRosterView = false;
             _selectedIndex = 0;
         }
-        else if (input.IsNewKeyPress(Microsoft.Xna.Framework.Input.Keys.Right, ControllingPlayer, out _) && !_inRosterView)
+        else if (input.IsNewKeyPress(Keys.Right, ControllingPlayer, out _) && !_inRosterView)
         {
             _inRosterView = true;
             _selectedIndex = 0;
@@ -99,7 +103,7 @@ public class PartyScreen : GameScreen
         }
 
         // Tab to switch views
-        if (input.IsNewKeyPress(Microsoft.Xna.Framework.Input.Keys.Tab, ControllingPlayer, out _))
+        if (input.IsNewKeyPress(Keys.Tab, ControllingPlayer, out _))
         {
             _inRosterView = !_inRosterView;
             _selectedIndex = 0;
@@ -108,6 +112,75 @@ public class PartyScreen : GameScreen
                 _swapMode = false;
                 _swapSourceIndex = -1;
             }
+        }
+
+        // E key to open equipment screen for selected Stray
+        if (input.IsNewKeyPress(Keys.E, ControllingPlayer, out _) && !_swapMode)
+        {
+            OpenEquipmentScreen();
+        }
+
+        // P key to toggle combat position (Front/Back)
+        if (input.IsNewKeyPress(Keys.P, ControllingPlayer, out _) && !_swapMode)
+        {
+            TogglePosition();
+        }
+    }
+
+    private void TogglePosition()
+    {
+        Stray? selectedStray = null;
+
+        if (_inRosterView)
+        {
+            var storedStrays = _roster.Storage.ToList();
+            if (_selectedIndex >= 0 && _selectedIndex < storedStrays.Count)
+            {
+                selectedStray = storedStrays[_selectedIndex];
+            }
+        }
+        else
+        {
+            var partyList = _roster.Party.ToList();
+            if (_selectedIndex >= 0 && _selectedIndex < partyList.Count)
+            {
+                selectedStray = partyList[_selectedIndex];
+            }
+        }
+
+        if (selectedStray != null)
+        {
+            selectedStray.CombatRow = selectedStray.CombatRow == CombatRow.Front
+                ? CombatRow.Back
+                : CombatRow.Front;
+        }
+    }
+
+    private void OpenEquipmentScreen()
+    {
+        Stray? selectedStray = null;
+
+        if (_inRosterView)
+        {
+            var storedStrays = _roster.Storage.ToList();
+            if (_selectedIndex >= 0 && _selectedIndex < storedStrays.Count)
+            {
+                selectedStray = storedStrays[_selectedIndex];
+            }
+        }
+        else
+        {
+            var partyList = _roster.Party.ToList();
+            if (_selectedIndex >= 0 && _selectedIndex < partyList.Count)
+            {
+                selectedStray = partyList[_selectedIndex];
+            }
+        }
+
+        if (selectedStray != null)
+        {
+            var equipmentScreen = new EquipmentScreen(selectedStray, _gameState);
+            ScreenManager.AddScreen(equipmentScreen, ControllingPlayer);
         }
     }
 
@@ -208,7 +281,7 @@ public class PartyScreen : GameScreen
         // Draw instructions
         string instructions = _swapMode
             ? "Select target to swap | [ESC] Cancel"
-            : "[Arrow Keys] Navigate | [Enter] Select/Swap | [Tab] Switch Panel | [ESC] Back";
+            : "[Arrows] Navigate | [Enter] Swap | [E] Equip | [P] Position | [Tab] Panel | [ESC] Back";
         var instrSize = _smallFont.MeasureString(instructions);
         spriteBatch.DrawString(_smallFont, instructions, new Vector2((viewport.Width - instrSize.X) / 2, viewport.Height - 30), Color.Gray);
 
@@ -230,14 +303,18 @@ public class PartyScreen : GameScreen
         // Draw party members
         var partyList = _roster.Party.ToList();
         int yOffset = 35;
+        int backRowIndent = 25; // Indent for back row position
 
         for (int i = 0; i < PartySlots; i++)
         {
-            var slotBounds = new Rectangle(bounds.X + 5, bounds.Y + yOffset + i * 70, bounds.Width - 10, 65);
-
             if (i < partyList.Count)
             {
                 var stray = partyList[i];
+                bool isBackRow = stray.CombatRow == CombatRow.Back;
+                int indent = isBackRow ? backRowIndent : 0;
+
+                var slotBounds = new Rectangle(bounds.X + 5 + indent, bounds.Y + yOffset + i * 70, bounds.Width - 10 - indent, 65);
+
                 bool isSelected = !_inRosterView && i == _selectedIndex;
                 bool isSwapSource = _swapMode && i == _swapSourceIndex;
 
@@ -246,6 +323,7 @@ public class PartyScreen : GameScreen
             else
             {
                 // Empty slot
+                var slotBounds = new Rectangle(bounds.X + 5, bounds.Y + yOffset + i * 70, bounds.Width - 10, 65);
                 bool isSelected = !_inRosterView && i == _selectedIndex;
                 spriteBatch.Draw(_pixelTexture, slotBounds, (isSelected ? Color.DarkGray : Color.DimGray) * 0.3f);
                 DrawBorder(spriteBatch, slotBounds, isSelected ? Color.Yellow : Color.DimGray);
@@ -315,6 +393,12 @@ public class PartyScreen : GameScreen
         Color borderColor = isSwapSource ? Color.Orange : (isSelected ? Color.Yellow : Color.Gray);
         DrawBorder(spriteBatch, bounds, borderColor);
 
+        // Position indicator (Front/Back)
+        bool isBackRow = stray.CombatRow == CombatRow.Back;
+        string posIndicator = isBackRow ? "BACK" : "FRONT";
+        Color posColor = isBackRow ? Color.CornflowerBlue : Color.OrangeRed;
+        spriteBatch.DrawString(_smallFont, posIndicator, new Vector2(bounds.X + bounds.Width - 45, bounds.Y + 5), posColor);
+
         // Stray placeholder color
         var colorRect = new Rectangle(bounds.X + 5, bounds.Y + 5, 30, 30);
         spriteBatch.Draw(_pixelTexture, colorRect, stray.Definition.PlaceholderColor);
@@ -323,8 +407,8 @@ public class PartyScreen : GameScreen
         string nameText = $"{stray.DisplayName} Lv.{stray.Level}";
         spriteBatch.DrawString(_smallFont, nameText, new Vector2(bounds.X + 45, bounds.Y + 5), Color.White);
 
-        // Type and role
-        string typeText = $"{stray.Definition.Type} / {stray.Definition.Role}";
+        // Category and role
+        string typeText = $"{stray.Definition.Category} / {stray.Definition.Role}";
         spriteBatch.DrawString(_smallFont, typeText, new Vector2(bounds.X + 45, bounds.Y + 22), Color.LightGray);
 
         // HP bar
@@ -355,8 +439,8 @@ public class PartyScreen : GameScreen
         // HP bar
         DrawHpBar(spriteBatch, new Rectangle(bounds.X + 30, bounds.Y + 25, 80, 8), stray.CurrentHp, stray.MaxHp);
 
-        // Type
-        string typeText = stray.Definition.Type.ToString();
+        // Creature type
+        string typeText = stray.Definition.CreatureType.ToString();
         spriteBatch.DrawString(_smallFont, typeText, new Vector2(bounds.X + 120, bounds.Y + 5), Color.Gray);
     }
 

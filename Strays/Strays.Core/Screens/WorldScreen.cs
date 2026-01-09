@@ -4,12 +4,14 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Strays.Core;
 using Strays.Core.Game.Data;
 using Strays.Core.Game.Dialog;
 using Strays.Core.Game.Entities;
 using Strays.Core.Game.Items;
 using Strays.Core.Game.Progression;
 using Strays.Core.Game.World;
+using Strays.Core.Game.Dungeons;
 using Strays.Core.Inputs;
 using Strays.Core.Services;
 using Strays.ScreenManagers;
@@ -52,6 +54,16 @@ public class WorldScreen : GameScreen
 
     // Portal interaction
     private BiomePortal? _nearbyPortal;
+
+    // Dungeon portals
+    private List<DungeonPortal> _dungeonPortals = new();
+    private DungeonPortal? _nearbyDungeonPortal;
+
+    // Building portals and interiors
+    private List<BuildingPortal> _buildingPortals = new();
+    private BuildingPortal? _nearbyBuildingPortal;
+    private InteriorInstance? _currentInterior;
+    private bool _isInInterior = false;
 
     // Weather particles
     private List<WeatherParticle> _weatherParticles = new();
@@ -130,6 +142,15 @@ public class WorldScreen : GameScreen
         // Create settlements
         InitializeSettlements();
 
+        // Initialize dungeons
+        InitializeDungeons();
+
+        // Initialize building portals
+        InitializeBuildingPortals();
+
+        // Initialize interior definitions
+        InteriorDefinitions.Initialize();
+
         // Create pixel texture for placeholder graphics
         _pixelTexture = new Texture2D(ScreenManager.GraphicsDevice, 1, 1);
         _pixelTexture.SetData(new[] { Color.White });
@@ -175,6 +196,186 @@ public class WorldScreen : GameScreen
             "nimdok_terminal_loc" => new Vector2(300, 600),
             _ => new Vector2(500, 500)
         };
+    }
+
+    /// <summary>
+    /// Initializes dungeon system and portals.
+    /// </summary>
+    private void InitializeDungeons()
+    {
+        // Initialize dungeon definitions
+        Dungeons.Initialize();
+
+        // Create dungeon portals for the current biome
+        _dungeonPortals.Clear();
+
+        foreach (var dungeon in Dungeons.GetByBiome(_gameState.CurrentBiome))
+        {
+            // Place dungeon portals at specific locations
+            var position = GetDungeonPortalPosition(dungeon.Id);
+            var portal = DungeonPortal.Create(dungeon.Id, dungeon.Biome, position, dungeon.RequiredFlag);
+            _dungeonPortals.Add(portal);
+        }
+
+        // Add portals for all biomes (they'll be filtered by current biome during update)
+        foreach (var biome in Enum.GetValues<BiomeType>())
+        {
+            if (biome == _gameState.CurrentBiome) continue;
+
+            foreach (var dungeon in Dungeons.GetByBiome(biome))
+            {
+                var position = GetDungeonPortalPosition(dungeon.Id);
+                var portal = DungeonPortal.Create(dungeon.Id, dungeon.Biome, position, dungeon.RequiredFlag);
+                _dungeonPortals.Add(portal);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets position for a dungeon portal based on its ID.
+    /// </summary>
+    private Vector2 GetDungeonPortalPosition(string dungeonId)
+    {
+        // Spread dungeons out in different areas of each biome
+        return dungeonId switch
+        {
+            // Fringe dungeons
+            "fringe_sewers" => new Vector2(200, 300),
+            "fringe_warehouse" => new Vector2(700, 200),
+
+            // Rust dungeons
+            "rust_refinery" => new Vector2(-1800, 400),
+            "rust_scrapyard" => new Vector2(-2100, 700),
+
+            // Green dungeons
+            "green_greenhouse" => new Vector2(800, -600),
+            "green_laboratory" => new Vector2(1100, -900),
+
+            // Quiet dungeons
+            "quiet_bunker" => new Vector2(1600, 200),
+            "quiet_cathedral" => new Vector2(2000, 500),
+
+            // Teeth dungeons
+            "teeth_ossuary" => new Vector2(400, 1200),
+            "teeth_maw" => new Vector2(700, 1500),
+
+            // Glow dungeons
+            "glow_reactor" => new Vector2(2400, -200),
+            "glow_nimdok_gate" => new Vector2(2700, -500),
+
+            // Archive dungeons
+            "archive_memory_banks" => new Vector2(-800, -800),
+            "archive_core" => new Vector2(-1100, -1100),
+
+            _ => new Vector2(500, 500)
+        };
+    }
+
+    /// <summary>
+    /// Initializes building portals for the current biome.
+    /// </summary>
+    private void InitializeBuildingPortals()
+    {
+        // Initialize static portal registry
+        BuildingPortals.Initialize();
+
+        // Get portals for current biome
+        _buildingPortals.Clear();
+        foreach (var portal in BuildingPortals.GetByBiome(_gameState.CurrentBiome))
+        {
+            _buildingPortals.Add(portal);
+        }
+    }
+
+    /// <summary>
+    /// Enters a building interior.
+    /// </summary>
+    private void EnterBuilding(BuildingPortal portal)
+    {
+        var interiorDef = InteriorDefinitions.Get(portal.InteriorId);
+        if (interiorDef == null)
+        {
+            System.Diagnostics.Debug.WriteLine($"Interior not found: {portal.InteriorId}");
+            return;
+        }
+
+        // Use transition screen for smooth entry
+        TransitionScreen.ShowBuildingEntry(
+            ScreenManager,
+            portal.DisplayName,
+            () => CompleteEnterBuilding(portal, interiorDef),
+            ControllingPlayer
+        );
+    }
+
+    /// <summary>
+    /// Completes entering a building (called during transition midpoint).
+    /// </summary>
+    private void CompleteEnterBuilding(BuildingPortal portal, InteriorDefinition interiorDef)
+    {
+        // Create interior instance
+        _currentInterior = new InteriorInstance(interiorDef, _gameState);
+        _currentInterior.EntryPortal = portal;
+
+        // Load the interior
+        _currentInterior.Load(ScreenManager.GraphicsDevice);
+
+        // Subscribe to exit events
+        _currentInterior.ExitTriggered += OnInteriorExitTriggered;
+
+        // Enter the interior
+        _currentInterior.OnEnter();
+        _isInInterior = true;
+
+        System.Diagnostics.Debug.WriteLine($"Entered building: {portal.DisplayName}");
+    }
+
+    /// <summary>
+    /// Exits the current interior.
+    /// </summary>
+    private void ExitInterior(InteriorExit exit)
+    {
+        if (_currentInterior == null) return;
+
+        // Store data needed for transition
+        var worldPos = _currentInterior.GetWorldExitPosition(exit);
+        var interior = _currentInterior;
+
+        // Use transition screen for smooth exit
+        TransitionScreen.ShowBuildingExit(
+            ScreenManager,
+            () => CompleteExitInterior(interior, worldPos),
+            ControllingPlayer
+        );
+    }
+
+    /// <summary>
+    /// Completes exiting an interior (called during transition midpoint).
+    /// </summary>
+    private void CompleteExitInterior(InteriorInstance interior, Vector2 worldPos)
+    {
+        // Clean up interior
+        interior.ExitTriggered -= OnInteriorExitTriggered;
+        interior.Unload();
+        _currentInterior = null;
+        _isInInterior = false;
+
+        // Move protagonist to exit position
+        _protagonist.Position = worldPos;
+        _companion.Position = worldPos + new Vector2(-40, 0);
+
+        // Update camera
+        _world.TeleportTo(worldPos);
+
+        System.Diagnostics.Debug.WriteLine($"Exited interior to position: {worldPos}");
+    }
+
+    /// <summary>
+    /// Called when player triggers an interior exit.
+    /// </summary>
+    private void OnInteriorExitTriggered(InteriorExit exit)
+    {
+        ExitInterior(exit);
     }
 
     private void OnBiomeChanged(BiomeType oldBiome, BiomeType newBiome)
@@ -293,8 +494,17 @@ public class WorldScreen : GameScreen
             }
         }
 
-        // Update protagonist
-        _protagonist.Update(gameTime, movement);
+        // Handle movement based on current mode
+        if (_isInInterior && _currentInterior != null)
+        {
+            // Interior movement
+            UpdateInteriorMovement(gameTime, movement);
+        }
+        else
+        {
+            // World movement
+            _protagonist.Update(gameTime, movement);
+        }
 
         _previousKeyboardState = keyboardState;
     }
@@ -309,10 +519,31 @@ public class WorldScreen : GameScreen
     /// </summary>
     private void TryInteract()
     {
-        // Check for nearby portal first
+        // If in interior, check for interior interactions
+        if (_isInInterior && _currentInterior != null)
+        {
+            TryInteractInterior();
+            return;
+        }
+
+        // Check for nearby building portal first
+        if (_nearbyBuildingPortal != null && _nearbyBuildingPortal.CanUse(_gameState))
+        {
+            EnterBuilding(_nearbyBuildingPortal);
+            return;
+        }
+
+        // Check for nearby biome portal
         if (_nearbyPortal != null && _world.IsPortalUnlocked(_nearbyPortal))
         {
             UsePortal(_nearbyPortal);
+            return;
+        }
+
+        // Check for nearby dungeon portal
+        if (_nearbyDungeonPortal != null && IsDungeonPortalUnlocked(_nearbyDungeonPortal))
+        {
+            EnterDungeon(_nearbyDungeonPortal);
             return;
         }
 
@@ -332,6 +563,85 @@ public class WorldScreen : GameScreen
                 InteractWithNPC(npc);
                 return;
             }
+        }
+    }
+
+    /// <summary>
+    /// Attempts to interact with objects inside an interior.
+    /// </summary>
+    private void TryInteractInterior()
+    {
+        if (_currentInterior == null) return;
+
+        // Check for exit collision
+        var playerBounds = new Rectangle(
+            (int)_currentInterior.PlayerPosition.X - 16,
+            (int)_currentInterior.PlayerPosition.Y - 16,
+            32, 32
+        );
+
+        var exit = _currentInterior.GetCollidingExit(playerBounds);
+        if (exit != null)
+        {
+            _currentInterior.TriggerExit(exit);
+            return;
+        }
+
+        // Check for NPC interaction
+        var npc = _currentInterior.GetInteractableNpc(
+            _currentInterior.PlayerPosition,
+            _currentInterior.PlayerFacing
+        );
+
+        if (npc != null)
+        {
+            InteractWithNPC(npc);
+        }
+    }
+
+    /// <summary>
+    /// Checks if a dungeon portal is unlocked.
+    /// </summary>
+    private bool IsDungeonPortalUnlocked(DungeonPortal portal)
+    {
+        if (string.IsNullOrEmpty(portal.RequiredFlag)) return true;
+        return _gameState.HasFlag(portal.RequiredFlag);
+    }
+
+    /// <summary>
+    /// Enters a dungeon via its portal.
+    /// </summary>
+    private void EnterDungeon(DungeonPortal portal)
+    {
+        var dungeon = portal.GetDungeon();
+        if (dungeon == null) return;
+
+        var dungeonScreen = new DungeonScreen(dungeon, _roster, _gameState);
+        dungeonScreen.OnDungeonExit += OnDungeonExit;
+        ScreenManager.AddScreen(dungeonScreen, ControllingPlayer);
+    }
+
+    /// <summary>
+    /// Called when exiting a dungeon.
+    /// </summary>
+    private void OnDungeonExit(DungeonReward? rewards)
+    {
+        if (rewards != null)
+        {
+            // Apply rewards
+            // Experience would be applied to party Strays
+            foreach (var stray in _roster.Party)
+            {
+                stray.AddExperience(rewards.Experience / Math.Max(1, _roster.Party.Count));
+            }
+
+            // Add currency (would need a currency system)
+            // _gameState.Currency += rewards.Currency;
+
+            // Set completion flag
+            // _gameState.SetFlag($"{dungeonId}_cleared");
+
+            System.Diagnostics.Debug.WriteLine($"Dungeon rewards: {rewards.Experience} EXP, {rewards.Currency} Scrap, {rewards.TotalItemCount} items");
         }
     }
 
@@ -407,6 +717,32 @@ public class WorldScreen : GameScreen
             }
         }
 
+        // Check if healer - heal party and show confirmation
+        if (npc.Type == NPCType.Healer)
+        {
+            // Heal the entire party
+            _roster.HealParty();
+            _roster.ReviveParty();
+
+            // Show healing dialog
+            npc.InConversation = true;
+            var dialogScreen = ShowDialog("healer_service");
+            if (dialogScreen != null)
+            {
+                dialogScreen.DialogEnded += (_, _) =>
+                {
+                    npc.InConversation = false;
+                    _questLog.NotifyTalkedTo(npc.Id);
+                };
+            }
+            else
+            {
+                // Fallback if no dialog exists - just end conversation
+                npc.InConversation = false;
+            }
+            return;
+        }
+
         // Default: open dialog
         var dialogId = npc.GetCurrentDialogId();
         if (!string.IsNullOrEmpty(dialogId))
@@ -457,6 +793,13 @@ public class WorldScreen : GameScreen
         if (coveredByOtherScreen || otherScreenHasFocus)
             return;
 
+        // Handle interior mode separately
+        if (_isInInterior && _currentInterior != null)
+        {
+            UpdateInterior(gameTime);
+            return;
+        }
+
         // Update companion
         _companion.Update(gameTime, _protagonist.Position, _protagonist.Facing);
 
@@ -466,6 +809,14 @@ public class WorldScreen : GameScreen
         // Update portals and check for nearby portal
         _world.UpdatePortals(gameTime, _protagonist.BoundingBox);
         UpdateNearbyPortal();
+        UpdateNearbyDungeonPortal();
+        UpdateNearbyBuildingPortal();
+
+        // Update building portals
+        foreach (var portal in _buildingPortals)
+        {
+            portal.Update(gameTime, _protagonist.BoundingBox);
+        }
 
         // Update settlements
         foreach (var settlement in _settlements)
@@ -499,6 +850,106 @@ public class WorldScreen : GameScreen
 
         // Update weather particles
         UpdateWeatherParticles(gameTime);
+    }
+
+    /// <summary>
+    /// Updates state when inside an interior.
+    /// </summary>
+    private void UpdateInterior(GameTime gameTime)
+    {
+        if (_currentInterior == null) return;
+
+        // Update interior
+        _currentInterior.Update(gameTime);
+
+        // Update play time
+        _gameState.UpdatePlayTime(gameTime);
+
+        // Update biome transition
+        if (_biomeTransitionAlpha > 0)
+        {
+            _biomeTransitionAlpha -= (float)gameTime.ElapsedGameTime.TotalSeconds * 0.5f;
+        }
+    }
+
+    /// <summary>
+    /// Updates interior player movement.
+    /// </summary>
+    private void UpdateInteriorMovement(GameTime gameTime, Vector2 movement)
+    {
+        if (_currentInterior == null) return;
+
+        if (movement.LengthSquared() > 0)
+        {
+            movement.Normalize();
+
+            // Apply movement speed
+            float speed = 150f; // Walk speed
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            // Move player in interior
+            var newPos = _currentInterior.PlayerPosition + movement * speed * deltaTime;
+
+            // Clamp to interior bounds
+            var interiorSize = _currentInterior.Definition.Size;
+            newPos.X = MathHelper.Clamp(newPos.X, 20, interiorSize.X - 20);
+            newPos.Y = MathHelper.Clamp(newPos.Y, 20, interiorSize.Y - 20);
+
+            _currentInterior.PlayerPosition = newPos;
+
+            // Update facing direction
+            _currentInterior.PlayerFacing = GetDirectionFromMovement(movement);
+        }
+    }
+
+    /// <summary>
+    /// Gets a Direction from a movement vector.
+    /// </summary>
+    private static Direction GetDirectionFromMovement(Vector2 movement)
+    {
+        if (movement.LengthSquared() < 0.01f)
+            return Direction.South;
+
+        float angle = MathF.Atan2(movement.Y, movement.X);
+        float degrees = MathHelper.ToDegrees(angle);
+
+        // Convert angle to 8-direction
+        if (degrees >= -22.5f && degrees < 22.5f)
+            return Direction.East;
+        else if (degrees >= 22.5f && degrees < 67.5f)
+            return Direction.SouthEast;
+        else if (degrees >= 67.5f && degrees < 112.5f)
+            return Direction.South;
+        else if (degrees >= 112.5f && degrees < 157.5f)
+            return Direction.SouthWest;
+        else if (degrees >= 157.5f || degrees < -157.5f)
+            return Direction.West;
+        else if (degrees >= -157.5f && degrees < -112.5f)
+            return Direction.NorthWest;
+        else if (degrees >= -112.5f && degrees < -67.5f)
+            return Direction.North;
+        else
+            return Direction.NorthEast;
+    }
+
+    /// <summary>
+    /// Updates the nearby building portal reference.
+    /// </summary>
+    private void UpdateNearbyBuildingPortal()
+    {
+        _nearbyBuildingPortal = null;
+
+        foreach (var portal in _buildingPortals)
+        {
+            if (!portal.IsActive) continue;
+            if (portal.Biome != _world.CurrentBiome) continue;
+
+            if (portal.IsPlayerOverlapping)
+            {
+                _nearbyBuildingPortal = portal;
+                return;
+            }
+        }
     }
 
     /// <summary>
@@ -638,6 +1089,28 @@ public class WorldScreen : GameScreen
     }
 
     /// <summary>
+    /// Updates the nearby dungeon portal reference for interaction prompts.
+    /// </summary>
+    private void UpdateNearbyDungeonPortal()
+    {
+        _nearbyDungeonPortal = null;
+
+        // Check all dungeon portals in current biome
+        foreach (var portal in _dungeonPortals)
+        {
+            if (portal.Biome != _world.CurrentBiome) continue;
+            if (!portal.IsActive) continue;
+
+            // Check collision
+            if (_protagonist.BoundingBox.Intersects(portal.Bounds))
+            {
+                _nearbyDungeonPortal = portal;
+                return;
+            }
+        }
+    }
+
+    /// <summary>
     /// Checks if the protagonist has collided with any encounters.
     /// </summary>
     private void CheckEncounters()
@@ -682,7 +1155,7 @@ public class WorldScreen : GameScreen
         }
 
         // Create and add combat screen
-        var combatScreen = new CombatScreen(_roster.Party.ToList(), enemies, encounter, _companion);
+        var combatScreen = new CombatScreen(_roster.Party.ToList(), enemies, encounter, _companion, _gameState);
         combatScreen.CombatEnded += OnCombatEnded;
         ScreenManager.AddScreen(combatScreen, ControllingPlayer);
     }
@@ -702,6 +1175,12 @@ public class WorldScreen : GameScreen
 
             // Award experience
             var leveledUp = _roster.AwardExperience(e.ExperienceEarned);
+
+            // Award currency
+            _gameState.AddCurrency(e.CurrencyEarned);
+
+            // Track battle won
+            _gameState.RecordBattleWon();
 
             // Check for recruitment opportunity
             if (e.RecruitedStray != null && e.RecruitedStray.Definition.CanRecruit)
@@ -749,6 +1228,13 @@ public class WorldScreen : GameScreen
         var spriteBatch = ScreenManager.SpriteBatch;
         var graphicsDevice = ScreenManager.GraphicsDevice;
 
+        // Handle interior drawing separately
+        if (_isInInterior && _currentInterior != null)
+        {
+            DrawInterior(spriteBatch, graphicsDevice);
+            return;
+        }
+
         // Clear with biome background color
         graphicsDevice.Clear(BiomeData.GetBackgroundColor(_gameState.CurrentBiome));
 
@@ -765,6 +1251,12 @@ public class WorldScreen : GameScreen
 
         // Draw portals
         _world.DrawPortals(spriteBatch, _pixelTexture!, _font);
+
+        // Draw dungeon portals
+        DrawDungeonPortals(spriteBatch);
+
+        // Draw building portals
+        DrawBuildingPortals(spriteBatch);
 
         // Draw settlements
         foreach (var settlement in _settlements)
@@ -794,6 +1286,172 @@ public class WorldScreen : GameScreen
         DrawUI(spriteBatch);
 
         spriteBatch.End();
+    }
+
+    /// <summary>
+    /// Draws the current interior.
+    /// </summary>
+    private void DrawInterior(SpriteBatch spriteBatch, GraphicsDevice graphicsDevice)
+    {
+        if (_currentInterior == null || _pixelTexture == null) return;
+
+        // Clear with interior background color
+        var interiorDef = _currentInterior.Definition;
+        graphicsDevice.Clear(interiorDef.PlaceholderColor * 0.3f);
+
+        spriteBatch.Begin(
+            SpriteSortMode.Deferred,
+            BlendState.AlphaBlend,
+            SamplerState.PointClamp,
+            null, null, null,
+            ScreenManager.GlobalTransformation
+        );
+
+        // Calculate camera offset (center on player)
+        var viewportSize = ScreenManager.BaseScreenSize;
+        var cameraOffset = _currentInterior.PlayerPosition - viewportSize / 2;
+
+        // Draw interior
+        _currentInterior.Draw(spriteBatch, _pixelTexture, _font, cameraOffset, viewportSize);
+
+        // Draw protagonist in interior
+        var screenPos = _currentInterior.PlayerPosition - cameraOffset;
+        var playerRect = new Rectangle(
+            (int)(screenPos.X - 16),
+            (int)(screenPos.Y - 24),
+            32, 48
+        );
+        spriteBatch.Draw(_pixelTexture, playerRect, Color.Blue);
+
+        // Draw biome transition overlay
+        DrawBiomeTransition(spriteBatch);
+
+        // Draw interior UI
+        DrawInteriorUI(spriteBatch);
+
+        spriteBatch.End();
+    }
+
+    /// <summary>
+    /// Draws UI when inside an interior.
+    /// </summary>
+    private void DrawInteriorUI(SpriteBatch spriteBatch)
+    {
+        if (_font == null || _pixelTexture == null || _currentInterior == null) return;
+
+        // Draw interior name at top
+        var interiorName = _currentInterior.Definition.Name;
+        var nameSize = _font.MeasureString(interiorName);
+        var namePos = new Vector2(
+            (ScreenManager.BaseScreenSize.X - nameSize.X) / 2,
+            10
+        );
+
+        // Background
+        var bgRect = new Rectangle(
+            (int)namePos.X - 10,
+            (int)namePos.Y - 5,
+            (int)nameSize.X + 20,
+            (int)nameSize.Y + 10
+        );
+        spriteBatch.Draw(_pixelTexture, bgRect, Color.Black * 0.7f);
+        spriteBatch.DrawString(_font, interiorName, namePos, Color.White);
+
+        // Draw hint
+        var hint = "WASD: Move | E: Interact/Exit | ESC: Pause";
+        var hintPos = new Vector2(10, ScreenManager.BaseScreenSize.Y - 20);
+        spriteBatch.DrawString(_font, hint, hintPos, Color.Gray);
+    }
+
+    /// <summary>
+    /// Draws building portals in the world.
+    /// </summary>
+    private void DrawBuildingPortals(SpriteBatch spriteBatch)
+    {
+        if (_pixelTexture == null || _font == null) return;
+
+        foreach (var portal in _buildingPortals)
+        {
+            // Only draw portals in current biome
+            if (portal.Biome != _world.CurrentBiome) continue;
+            if (!portal.IsActive) continue;
+
+            // Draw the portal
+            portal.Draw(spriteBatch, _pixelTexture, _world.CameraPosition, _font);
+        }
+    }
+
+    /// <summary>
+    /// Draws dungeon portals in the world.
+    /// </summary>
+    private void DrawDungeonPortals(SpriteBatch spriteBatch)
+    {
+        if (_pixelTexture == null || _font == null) return;
+
+        foreach (var portal in _dungeonPortals)
+        {
+            // Only draw portals in current biome
+            if (portal.Biome != _world.CurrentBiome) continue;
+            if (!portal.IsActive) continue;
+
+            // Get screen position
+            var screenPos = portal.Position - _world.CameraPosition;
+
+            // Skip if off screen
+            if (screenPos.X < -50 || screenPos.X > ScreenManager.BaseScreenSize.X + 50 ||
+                screenPos.Y < -50 || screenPos.Y > ScreenManager.BaseScreenSize.Y + 50)
+                continue;
+
+            // Draw portal base (dark purple circle)
+            var portalRect = new Rectangle(
+                (int)(screenPos.X - 20),
+                (int)(screenPos.Y - 20),
+                40, 40
+            );
+            spriteBatch.Draw(_pixelTexture, portalRect, new Color(80, 40, 120) * 0.8f);
+
+            // Draw inner glow
+            var innerRect = new Rectangle(
+                (int)(screenPos.X - 12),
+                (int)(screenPos.Y - 12),
+                24, 24
+            );
+            var isUnlocked = IsDungeonPortalUnlocked(portal);
+            var glowColor = isUnlocked ? new Color(150, 100, 200) : new Color(100, 50, 50);
+            spriteBatch.Draw(_pixelTexture, innerRect, glowColor);
+
+            // Draw dungeon icon (D)
+            var iconText = "D";
+            var iconSize = _font.MeasureString(iconText);
+            spriteBatch.DrawString(_font, iconText,
+                screenPos - iconSize / 2,
+                isUnlocked ? Color.White : Color.Gray);
+
+            // Draw name label if nearby
+            if (portal == _nearbyDungeonPortal)
+            {
+                var dungeon = portal.GetDungeon();
+                if (dungeon != null)
+                {
+                    var labelText = dungeon.Name;
+                    var labelSize = _font.MeasureString(labelText);
+                    var labelPos = new Vector2(
+                        screenPos.X - labelSize.X / 2,
+                        screenPos.Y - 40
+                    );
+
+                    // Background
+                    spriteBatch.Draw(_pixelTexture,
+                        new Rectangle((int)labelPos.X - 4, (int)labelPos.Y - 2,
+                            (int)labelSize.X + 8, (int)labelSize.Y + 4),
+                        Color.Black * 0.7f);
+
+                    // Text
+                    spriteBatch.DrawString(_font, labelText, labelPos,
+                        isUnlocked ? Color.Magenta : Color.Red);
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -983,6 +1641,25 @@ public class WorldScreen : GameScreen
             spriteBatch.DrawString(_font, portalText, portalPos, portalColor);
         }
 
+        // Draw dungeon portal interaction prompt
+        bool canInteractDungeon = _nearbyDungeonPortal != null;
+        if (canInteractDungeon)
+        {
+            var dungeon = _nearbyDungeonPortal!.GetDungeon();
+            var isUnlocked = IsDungeonPortalUnlocked(_nearbyDungeonPortal!);
+
+            var dungeonText = isUnlocked
+                ? $"[E] Enter {dungeon?.Name ?? "Dungeon"} (Lv.{dungeon?.MinLevel}-{dungeon?.MaxLevel})"
+                : $"[LOCKED] Requires: {_nearbyDungeonPortal!.RequiredFlag}";
+            var dungeonColor = isUnlocked ? Color.Magenta : Color.Red;
+            var dungeonSize = _font.MeasureString(dungeonText);
+            var dungeonPos = new Vector2(
+                ScreenManager.BaseScreenSize.X / 2 - dungeonSize.X / 2,
+                ScreenManager.BaseScreenSize.Y - 100
+            );
+            spriteBatch.DrawString(_font, dungeonText, dungeonPos, dungeonColor);
+        }
+
         if (canInteractNPC)
         {
             var interactText = "[E] Interact";
@@ -1058,5 +1735,7 @@ public class CombatEndedEventArgs : EventArgs
     public bool Defeat { get; init; }
     public bool Fled { get; init; }
     public int ExperienceEarned { get; init; }
+    public int CurrencyEarned { get; init; }
+    public int TelemetryUnitsEarned { get; init; }
     public Stray? RecruitedStray { get; init; }
 }

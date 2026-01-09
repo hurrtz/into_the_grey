@@ -170,12 +170,14 @@ public class InventoryScreen : GameScreen
             var augDef = Augmentations.Get(itemId);
             if (augDef != null)
             {
-                // Find matching slot
-                var slotName = augDef.Slot.ToString();
-                if (!stray.EquippedAugmentations.ContainsKey(slotName) ||
-                    stray.EquippedAugmentations[slotName] == null)
+                // Check if slot is empty and category is compatible
+                var slot = augDef.Slot;
+                var slotKey = slot.ToKey();
+                if (stray.EquippedAugmentations.TryGetValue(slotKey, out var equipped) &&
+                    equipped == null &&
+                    augDef.IsCompatibleWith(stray.Definition.Category))
                 {
-                    stray.EquippedAugmentations[slotName] = itemId;
+                    stray.EquipAugmentation(itemId, slot);
                     _ownedAugmentations.Remove(itemId);
                 }
             }

@@ -9,6 +9,7 @@ using Strays.Core.Game.Data;
 using Strays.Core.Game.Entities;
 using Strays.Core.Game.World;
 using Strays.Core.Inputs;
+using Strays.Core.Services;
 using Strays.ScreenManagers;
 
 namespace Strays.Screens;
@@ -22,6 +23,7 @@ public class CombatScreen : GameScreen
     private readonly List<Stray> _enemyStrays;
     private readonly Encounter? _encounter;
     private readonly Companion? _companion;
+    private readonly GameStateService? _gameState;
 
     private CombatState _combatState = null!;
     private Texture2D? _pixelTexture;
@@ -40,12 +42,13 @@ public class CombatScreen : GameScreen
     /// </summary>
     public event EventHandler<CombatEndedEventArgs>? CombatEnded;
 
-    public CombatScreen(List<Stray> partyStrays, List<Stray> enemyStrays, Encounter? encounter = null, Companion? companion = null)
+    public CombatScreen(List<Stray> partyStrays, List<Stray> enemyStrays, Encounter? encounter = null, Companion? companion = null, GameStateService? gameState = null)
     {
         _partyStrays = partyStrays;
         _enemyStrays = enemyStrays;
         _encounter = encounter;
         _companion = companion;
+        _gameState = gameState;
 
         IsPopup = true; // Draw on top of world screen
         TransitionOnTime = TimeSpan.FromSeconds(0.3);
@@ -66,6 +69,18 @@ public class CombatScreen : GameScreen
         _combatState = new CombatState();
         _combatState.Initialize(_partyStrays, _enemyStrays, _encounter);
         _combatState.CombatEnded += OnCombatStateEnded;
+        _combatState.CompanionIntervened += OnCompanionIntervened;
+
+        // Set companion-related combat state
+        if (_companion != null)
+        {
+            _combatState.CompanionPresent = _companion.IsPresent;
+            _combatState.GravitationStage = _companion.GravitationStage;
+        }
+        else
+        {
+            _combatState.CompanionPresent = false;
+        }
     }
 
     public override void UnloadContent()
@@ -239,12 +254,77 @@ public class CombatScreen : GameScreen
                 Defeat = phase == CombatPhase.Defeat,
                 Fled = phase == CombatPhase.Fled,
                 ExperienceEarned = _combatState.ExperienceEarned,
+                CurrencyEarned = _combatState.CurrencyEarned,
+                TelemetryUnitsEarned = _combatState.TelemetryUnitsEarned,
                 RecruitedStray = _combatState.RecruitableStray
             };
 
             CombatEnded?.Invoke(this, args);
             ExitScreen();
         });
+    }
+
+    private void OnCompanionIntervened(object? sender, GravitationInterventionEventArgs e)
+    {
+        // Record use and check for escalation
+        bool escalated = false;
+        if (_gameState != null)
+        {
+            escalated = _gameState.RecordGravitationUse();
+
+            // Update combat state with new stage if escalated
+            if (escalated)
+            {
+                _combatState.GravitationStage = _gameState.GravitationStage;
+            }
+
+            // Check for companion departure at Critical stage hitting ally
+            if (e.HitAlly && e.Stage == GravitationStage.Critical && e.Target != null)
+            {
+                var targetStray = e.Target.Stray;
+                if (_gameState.CheckCriticalGravitationDeparture(targetStray.CurrentHp, targetStray.MaxHp))
+                {
+                    // Companion departure triggered!
+                    _combatState.CompanionPresent = false;
+                    System.Diagnostics.Debug.WriteLine($"[Combat] COMPANION DEPARTURE TRIGGERED! {targetStray.DisplayName} nearly killed!");
+                }
+            }
+        }
+
+        // Show intervention message based on stage
+        string companionName = _companion?.Name ?? "Companion";
+        string message;
+
+        if (e.HitAlly)
+        {
+            message = e.Stage switch
+            {
+                GravitationStage.Unstable => $"{companionName}'s Gravitation wavers... hits ally!",
+                GravitationStage.Dangerous => $"{companionName} loses control! Ally targeted!",
+                GravitationStage.Critical => $"{companionName} CAN'T STOP! ALLY HIT!",
+                _ => $"{companionName} uses Gravitation... but hits wrong target!"
+            };
+        }
+        else
+        {
+            message = e.Stage switch
+            {
+                GravitationStage.Normal => $"{companionName} uses Gravitation!",
+                GravitationStage.Unstable => $"{companionName}'s unstable Gravitation strikes!",
+                GravitationStage.Dangerous => $"{companionName} unleashes dangerous Gravitation!",
+                GravitationStage.Critical => $"{companionName}'s CRITICAL Gravitation!!",
+                _ => $"{companionName} uses Gravitation!"
+            };
+        }
+
+        // Log the intervention
+        System.Diagnostics.Debug.WriteLine($"[Combat] {message} (Damage: {e.DamagePercent * 100}%)");
+
+        // Log escalation warning
+        if (escalated)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Combat] WARNING: Gravitation has escalated to {_gameState?.GravitationStage}!");
+        }
     }
 
     public override void Draw(GameTime gameTime)
@@ -345,19 +425,47 @@ public class CombatScreen : GameScreen
                             _combatState.Phase == CombatPhase.Defeat ? Color.Red : Color.White;
             var phasePos = new Vector2(
                 ScreenManager.BaseScreenSize.X / 2 - _font.MeasureString(phaseText).X / 2,
-                ScreenManager.BaseScreenSize.Y / 2 - 20
+                ScreenManager.BaseScreenSize.Y / 2 - 40
             );
             spriteBatch.DrawString(_font, phaseText, phasePos, phaseColor);
 
-            // Show experience if victory
+            // Show experience, currency and TU if victory
             if (_combatState.Phase == CombatPhase.Victory)
             {
-                var expText = $"EXP: {_combatState.ExperienceEarned}";
-                var expPos = new Vector2(
-                    ScreenManager.BaseScreenSize.X / 2 - _font.MeasureString(expText).X / 2,
-                    ScreenManager.BaseScreenSize.Y / 2 + 10
+                // Show EXP and Currency on same line
+                var rewardsText = $"EXP: +{_combatState.ExperienceEarned}   Currency: +{_combatState.CurrencyEarned}";
+                var rewardsPos = new Vector2(
+                    ScreenManager.BaseScreenSize.X / 2 - _font.MeasureString(rewardsText).X / 2,
+                    ScreenManager.BaseScreenSize.Y / 2 - 10
                 );
-                spriteBatch.DrawString(_font, expText, expPos, Color.Cyan);
+                spriteBatch.DrawString(_font, rewardsText, rewardsPos, Color.Cyan);
+
+                // Show TU earned
+                if (_combatState.TelemetryUnitsEarned > 0)
+                {
+                    var tuText = $"TU: +{_combatState.TelemetryUnitsEarned}";
+                    var tuPos = new Vector2(
+                        ScreenManager.BaseScreenSize.X / 2 - _font.MeasureString(tuText).X / 2,
+                        ScreenManager.BaseScreenSize.Y / 2 + 15
+                    );
+                    spriteBatch.DrawString(_font, tuText, tuPos, Color.LimeGreen);
+                }
+
+                // Show chip level-ups
+                if (_combatState.ChipsLeveledUp.Count > 0)
+                {
+                    var levelUpY = ScreenManager.BaseScreenSize.Y / 2 + 45;
+                    foreach (var (strayName, chipName, newLevel) in _combatState.ChipsLeveledUp)
+                    {
+                        var levelUpText = $"{strayName}'s {chipName} -> {newLevel}!";
+                        var levelUpPos = new Vector2(
+                            ScreenManager.BaseScreenSize.X / 2 - _font.MeasureString(levelUpText).X / 2,
+                            levelUpY
+                        );
+                        spriteBatch.DrawString(_font, levelUpText, levelUpPos, Color.Yellow);
+                        levelUpY += 20;
+                    }
+                }
             }
         }
 
@@ -423,10 +531,11 @@ public class CombatScreen : GameScreen
             return;
 
         var abilities = _combatState.GetAvailableAbilities();
+        var combatant = _combatState.ActiveCombatant;
         var menuX = 60;
-        var menuY = (int)ScreenManager.BaseScreenSize.Y - 200;
-        var menuWidth = 250;
-        var menuHeight = Math.Min(abilities.Count, 6) * 25 + 30;
+        var menuY = (int)ScreenManager.BaseScreenSize.Y - 220;
+        var menuWidth = 280;
+        var menuHeight = Math.Min(abilities.Count, 6) * 28 + 50;
 
         // Menu background
         var menuRect = new Rectangle(menuX, menuY, menuWidth, menuHeight);
@@ -444,47 +553,73 @@ public class CombatScreen : GameScreen
         spriteBatch.DrawString(_font, title, new Vector2(menuX + 5, menuY - 20), Color.Cyan);
 
         // Abilities list
-        var currentEnergy = _combatState.ActiveCombatant.CurrentEnergy;
+        var currentEnergy = combatant.CurrentEnergy;
         for (int i = 0; i < Math.Min(abilities.Count, 6); i++)
         {
             var ability = abilities[i];
             var def = ability.Definition;
             var isSelected = i == _combatState.AbilityIndex;
-            var canUse = ability.IsReady && def.EnergyCost <= currentEnergy;
+            var isOverheated = combatant.IsAbilityOverheated(def.Id);
+            var canUse = ability.IsReady && def.EnergyCost <= currentEnergy && !isOverheated;
 
-            var color = isSelected ? Color.Yellow :
+            var color = isOverheated ? Color.OrangeRed :
+                       isSelected ? Color.Yellow :
                        !canUse ? Color.Gray : Color.White;
             var prefix = isSelected ? "> " : "  ";
 
-            // Ability name and cost
+            // Ability name
             var text = $"{prefix}{def.Name}";
-            var costText = $"[{def.EnergyCost} EP]";
-
-            // Add cooldown indicator
-            if (ability.CurrentCooldown > 0)
-            {
-                costText = $"[CD:{ability.CurrentCooldown}]";
-            }
-
-            var textPos = new Vector2(menuX + 5, menuY + 5 + i * 25);
+            var textPos = new Vector2(menuX + 5, menuY + 5 + i * 28);
             spriteBatch.DrawString(_font, text, textPos, color);
 
-            var costPos = new Vector2(menuX + menuWidth - _font.MeasureString(costText).X - 10, textPos.Y);
-            spriteBatch.DrawString(_font, costText, costPos, canUse ? Color.Cyan : Color.Gray);
+            // Energy cost
+            var costText = $"{def.EnergyCost}E";
+            if (ability.CurrentCooldown > 0)
+            {
+                costText = $"CD:{ability.CurrentCooldown}";
+            }
+            var costPos = new Vector2(menuX + 160, textPos.Y);
+            spriteBatch.DrawString(_font, costText, costPos, def.EnergyCost <= currentEnergy ? Color.Cyan : Color.Gray);
+
+            // Heat indicator for chip abilities
+            var (heatCurrent, heatMax) = combatant.GetAbilityHeat(def.Id);
+            if (heatMax > 0)
+            {
+                // Draw mini heat bar
+                var heatBarX = (int)(menuX + 210);
+                var heatBarY = (int)(textPos.Y + 4);
+                var heatBarWidth = 50;
+                var heatBarHeight = 8;
+
+                // Background
+                spriteBatch.Draw(_pixelTexture, new Rectangle(heatBarX, heatBarY, heatBarWidth, heatBarHeight), Color.DarkGray);
+
+                // Fill
+                var heatPercent = heatCurrent / heatMax;
+                var heatColor = heatPercent >= 1f ? Color.Red :
+                               heatPercent > 0.7f ? Color.OrangeRed :
+                               heatPercent > 0.4f ? Color.Orange : Color.Yellow;
+                spriteBatch.Draw(_pixelTexture, new Rectangle(heatBarX, heatBarY, (int)(heatBarWidth * heatPercent), heatBarHeight), heatColor);
+
+                // Overheat indicator
+                if (isOverheated)
+                {
+                    spriteBatch.DrawString(_font, "!", new Vector2(heatBarX + heatBarWidth + 2, textPos.Y), Color.Red);
+                }
+            }
         }
 
         // Draw energy bar at bottom
-        var energyText = $"Energy: {currentEnergy}/{_combatState.ActiveCombatant.MaxEnergy}";
-        var energyPos = new Vector2(menuX + 5, menuY + menuHeight - 22);
-        spriteBatch.DrawString(_font, energyText, energyPos, Color.Cyan);
+        var energyBarY = menuY + menuHeight - 40;
+        DrawEnergyBar(spriteBatch, menuX + 5, energyBarY, menuWidth - 10, combatant.CurrentEnergy, combatant.MaxEnergy);
 
         // Draw selected ability description
         if (_combatState.AbilityIndex < abilities.Count)
         {
             var selectedAbility = abilities[_combatState.AbilityIndex];
             var descText = selectedAbility.Definition.Description;
-            if (descText.Length > 40)
-                descText = descText.Substring(0, 37) + "...";
+            if (descText.Length > 35)
+                descText = descText.Substring(0, 32) + "...";
 
             var descPos = new Vector2(menuX + menuWidth + 10, menuY + 5);
             spriteBatch.DrawString(_font, descText, descPos, Color.LightGray);
@@ -494,7 +629,42 @@ public class CombatScreen : GameScreen
             var targetText = $"Target: {selectedAbility.Definition.Target}";
             spriteBatch.DrawString(_font, elementText, new Vector2(descPos.X, descPos.Y + 20), GetElementColor(selectedAbility.Definition.Element));
             spriteBatch.DrawString(_font, targetText, new Vector2(descPos.X, descPos.Y + 40), Color.LightGray);
+
+            // Show heat info for chip abilities
+            var (heat, maxHeat) = combatant.GetAbilityHeat(selectedAbility.Definition.Id);
+            if (maxHeat > 0)
+            {
+                var heatText = $"Heat: {(int)heat}/{(int)maxHeat}";
+                var heatColor = combatant.IsAbilityOverheated(selectedAbility.Definition.Id) ? Color.Red : Color.Orange;
+                spriteBatch.DrawString(_font, heatText, new Vector2(descPos.X, descPos.Y + 60), heatColor);
+            }
         }
+    }
+
+    private void DrawEnergyBar(SpriteBatch spriteBatch, int x, int y, int width, int current, int max)
+    {
+        if (_pixelTexture == null || _font == null)
+            return;
+
+        // Background
+        spriteBatch.Draw(_pixelTexture, new Rectangle(x, y, width, 16), new Color(20, 20, 40));
+
+        // Fill
+        var fillWidth = max > 0 ? (int)(width * ((float)current / max)) : 0;
+        var energyColor = current > max * 0.5f ? Color.DeepSkyBlue :
+                         current > max * 0.25f ? Color.DodgerBlue : Color.Blue;
+        spriteBatch.Draw(_pixelTexture, new Rectangle(x, y, fillWidth, 16), energyColor);
+
+        // Border
+        spriteBatch.Draw(_pixelTexture, new Rectangle(x, y, width, 2), Color.White * 0.5f);
+        spriteBatch.Draw(_pixelTexture, new Rectangle(x, y + 14, width, 2), Color.White * 0.5f);
+        spriteBatch.Draw(_pixelTexture, new Rectangle(x, y, 2, 16), Color.White * 0.5f);
+        spriteBatch.Draw(_pixelTexture, new Rectangle(x + width - 2, y, 2, 16), Color.White * 0.5f);
+
+        // Text
+        var text = $"EP: {current}/{max}";
+        var textPos = new Vector2(x + width / 2 - _font.MeasureString(text).X / 2, y);
+        spriteBatch.DrawString(_font, text, textPos, Color.White);
     }
 
     private Color GetElementColor(Element element)

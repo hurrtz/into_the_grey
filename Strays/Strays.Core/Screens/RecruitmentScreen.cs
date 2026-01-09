@@ -240,7 +240,9 @@ public class RecruitmentScreen : GameScreen
         var levelPos = new Vector2(centerX - levelSize.X / 2, strayY + 90);
         spriteBatch.DrawString(_font, levelText, levelPos, Color.Gray * TransitionAlpha);
         
-        var dialogue = _stray.Definition.RecruitmentDialogue.GetValueOrDefault("introduction", new System.Collections.Generic.List<string> { "It watches you silently." });
+        var dialogue = _stray.Definition.RecruitmentDialogue.TryGetValue("introduction", out var introDialogue)
+            ? introDialogue
+            : new System.Collections.Generic.List<string> { "It watches you silently." };
         var prompt = string.Join("\n", dialogue);
         var promptSize = _font.MeasureString(prompt);
         var promptPos = new Vector2(centerX - promptSize.X / 2, panelRect.Y + 180);
@@ -315,7 +317,9 @@ public class RecruitmentScreen : GameScreen
         spriteBatch.Draw(_pixelTexture, strayRect, _stray.Definition.PlaceholderColor * TransitionAlpha);
 
         var dialogueKey = _result == RecruitmentResult.Success ? "success" : "failure";
-        var dialogue = _stray.Definition.RecruitmentDialogue.GetValueOrDefault(dialogueKey, new System.Collections.Generic.List<string> { _resultMessage });
+        var dialogue = _stray.Definition.RecruitmentDialogue.TryGetValue(dialogueKey, out var resultDialogue)
+            ? resultDialogue
+            : new System.Collections.Generic.List<string> { _resultMessage };
         _resultMessage = string.Join("\n", dialogue);
 
         var messageLines = WrapText(_resultMessage, panelRect.Width - 40);
