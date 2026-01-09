@@ -85,6 +85,16 @@ public class CombatAction
     public int Priority { get; set; } = 0;
 
     /// <summary>
+    /// Damage percent for Gravitation (0.5 = 50% HP).
+    /// </summary>
+    public float GravitationDamagePercent { get; set; } = 0.5f;
+
+    /// <summary>
+    /// Whether this Gravitation was from a corrupted companion (targets ally).
+    /// </summary>
+    public bool IsCorruptedGravitation { get; set; } = false;
+
+    /// <summary>
     /// Creates an attack action.
     /// </summary>
     public static CombatAction Attack(Combatant source, Combatant target)
@@ -128,6 +138,9 @@ public class CombatAction
     /// <summary>
     /// Creates a Gravitation action.
     /// </summary>
+    /// <param name="target">The target combatant.</param>
+    /// <param name="damagePercent">Percentage of HP to remove (0.5 = 50%).</param>
+    /// <param name="fromCorruptedCompanion">Whether this was caused by companion corruption.</param>
     public static CombatAction Gravitation(Combatant target, float damagePercent, bool fromCorruptedCompanion)
     {
         return new CombatAction
@@ -135,7 +148,9 @@ public class CombatAction
             Type = CombatActionType.Gravitation,
             Target = target,
             Targets = new List<Combatant> { target },
-            Priority = 50 // Gravitation interrupts
+            Priority = 50, // Gravitation interrupts
+            GravitationDamagePercent = damagePercent,
+            IsCorruptedGravitation = fromCorruptedCompanion
         };
     }
 

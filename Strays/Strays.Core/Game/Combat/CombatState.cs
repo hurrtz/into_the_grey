@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Strays.Core.Game.Data;
 using Strays.Core.Game.Entities;
+using Strays.Core.Game.Items;
 using Strays.Core.Game.World;
 
 namespace Strays.Core.Game.Combat;
@@ -56,7 +57,12 @@ public enum CombatPhase
     /// <summary>
     /// Player fled from combat.
     /// </summary>
-    Fled
+    Fled,
+
+    /// <summary>
+    /// Player survived an unwinnable battle (triggers special story event).
+    /// </summary>
+    Survived
 }
 
 /// <summary>
@@ -65,6 +71,27 @@ public enum CombatPhase
 public class CombatState
 {
     private readonly Random _random = new();
+
+    // Companion intervention settings
+    private const float InterventionCheckInterval = 3.0f; // Check every 3 seconds
+    private const float BaseInterventionChance = 0.15f;   // 15% base chance per check
+    private float _interventionTimer = 0f;
+    private bool _companionHasIntervened = false;         // Only one intervention per battle
+
+    /// <summary>
+    /// Current Gravitation stage (passed from GameState).
+    /// </summary>
+    public GravitationStage GravitationStage { get; set; } = GravitationStage.Normal;
+
+    /// <summary>
+    /// Whether the companion is present (can intervene).
+    /// </summary>
+    public bool CompanionPresent { get; set; } = true;
+
+    /// <summary>
+    /// Event fired when the companion intervenes with Gravitation.
+    /// </summary>
+    public event EventHandler<GravitationInterventionEventArgs>? CompanionIntervened;
 
     /// <summary>
     /// Current combat phase.
@@ -126,6 +153,34 @@ public class CombatState
     /// </summary>
     public Encounter? SourceEncounter { get; set; }
 
+    // Boss battle mechanics
+    /// <summary>
+    /// Whether this is a boss battle (special rules apply).
+    /// </summary>
+    public bool IsBossBattle { get; set; } = false;
+
+    /// <summary>
+    /// Whether this is an unwinnable battle (e.g., Hyper-evolved Bandit).
+    /// Player must survive rather than win.
+    /// </summary>
+    public bool IsUnwinnableBattle { get; set; } = false;
+
+    /// <summary>
+    /// Number of turns survived in an unwinnable battle.
+    /// </summary>
+    public int TurnsSurvived { get; set; } = 0;
+
+    /// <summary>
+    /// Number of turns required to "survive" an unwinnable battle.
+    /// When reached, triggers special ending.
+    /// </summary>
+    public int TurnsToSurvive { get; set; } = 5;
+
+    /// <summary>
+    /// Event fired when player survives long enough in an unwinnable battle.
+    /// </summary>
+    public event EventHandler? SurvivalTriggered;
+
     /// <summary>
     /// Results of actions executed this combat.
     /// </summary>
@@ -140,6 +195,11 @@ public class CombatState
     /// Total experience earned from this combat.
     /// </summary>
     public int ExperienceEarned { get; private set; } = 0;
+
+    /// <summary>
+    /// Total currency earned from this combat.
+    /// </summary>
+    public int CurrencyEarned { get; private set; } = 0;
 
     /// <summary>
     /// Stray that can be recruited after victory (if any).
@@ -172,9 +232,22 @@ public class CombatState
         Party.Clear();
         Enemies.Clear();
         ActionHistory.Clear();
+        ChipsLeveledUp.Clear();
         SourceEncounter = encounter;
         ExperienceEarned = 0;
+        CurrencyEarned = 0;
+        TelemetryUnitsEarned = 0;
         RecruitableStray = null;
+
+        // Reset companion intervention tracking
+        _interventionTimer = 0f;
+        _companionHasIntervened = false;
+
+        // Reset boss battle tracking
+        IsBossBattle = false;
+        IsUnwinnableBattle = false;
+        TurnsSurvived = 0;
+        TurnsToSurvive = 5;
 
         // Create party combatants
         float partyX = 150;
@@ -233,6 +306,7 @@ public class CombatState
         {
             case CombatPhase.Running:
                 UpdateAtbGauges(deltaTime);
+                CheckCompanionIntervention(deltaTime);
                 CheckForReadyCombatants();
                 ProcessEnemyActions();
                 CheckCombatEnd();
@@ -261,6 +335,83 @@ public class CombatState
     }
 
     /// <summary>
+    /// Checks for random companion intervention using Gravitation.
+    /// </summary>
+    private void CheckCompanionIntervention(float deltaTime)
+    {
+        // Skip if companion is not present or has already intervened this battle
+        if (!CompanionPresent || _companionHasIntervened)
+            return;
+
+        // Skip during action execution
+        if (Phase != CombatPhase.Running)
+            return;
+
+        // Update intervention timer
+        _interventionTimer += deltaTime;
+        if (_interventionTimer < InterventionCheckInterval)
+            return;
+
+        _interventionTimer = 0f;
+
+        // Roll for intervention chance
+        // Chance increases with corruption stage
+        float interventionChance = GravitationStage switch
+        {
+            GravitationStage.Normal => BaseInterventionChance,
+            GravitationStage.Unstable => BaseInterventionChance * 1.2f,
+            GravitationStage.Dangerous => BaseInterventionChance * 1.5f,
+            GravitationStage.Critical => BaseInterventionChance * 2.0f,
+            _ => BaseInterventionChance
+        };
+
+        if (_random.NextDouble() >= interventionChance)
+            return;
+
+        // Companion intervenes!
+        _companionHasIntervened = true;
+
+        // Get damage percent and ally target chance from stage
+        float damagePercent = GravitationStage.GetDamagePercent();
+        float allyTargetChance = GravitationStage.GetAllyTargetChance();
+
+        // Determine if targeting ally or enemy
+        bool targetAlly = _random.NextDouble() < allyTargetChance;
+
+        // Select target
+        Combatant? target = null;
+        if (targetAlly && Party.Any(p => p.IsAlive))
+        {
+            // Target random alive party member
+            var aliveParty = Party.Where(p => p.IsAlive).ToList();
+            target = aliveParty[_random.Next(aliveParty.Count)];
+        }
+        else if (Enemies.Any(e => e.IsAlive))
+        {
+            // Target random alive enemy
+            var aliveEnemies = Enemies.Where(e => e.IsAlive).ToList();
+            target = aliveEnemies[_random.Next(aliveEnemies.Count)];
+        }
+
+        if (target == null)
+            return;
+
+        // Create and execute Gravitation action
+        var action = CombatAction.Gravitation(target, damagePercent, targetAlly);
+        ExecuteAction(action);
+
+        // Fire intervention event
+        CompanionIntervened?.Invoke(this, new GravitationInterventionEventArgs
+        {
+            Stage = GravitationStage,
+            DamagePercent = damagePercent,
+            HitAlly = targetAlly,
+            Target = target,
+            DamageDealt = LastResult?.DamageDealt ?? 0
+        });
+    }
+
+    /// <summary>
     /// Checks for combatants that are ready to act.
     /// </summary>
     private void CheckForReadyCombatants()
@@ -282,8 +433,8 @@ public class CombatState
     {
         foreach (var enemy in Enemies.Where(e => e.IsReady && e.SelectedAction == null))
         {
-            // Get AI behavior based on Stray type
-            var behavior = CombatAI.GetBehaviorForStray(enemy.Stray.Definition.Type);
+            // Get AI behavior based on Stray category
+            var behavior = CombatAI.GetBehaviorForCategory(enemy.Stray.Definition.Category);
 
             // Use combat AI to select action
             var action = CombatAI.SelectAction(
@@ -298,19 +449,69 @@ public class CombatState
     }
 
     /// <summary>
+    /// Telemetry Units earned from this combat (for microchip leveling).
+    /// </summary>
+    public int TelemetryUnitsEarned { get; private set; } = 0;
+
+    /// <summary>
+    /// List of chips that leveled up during this combat.
+    /// </summary>
+    public List<(string strayName, string chipName, FirmwareLevel newLevel)> ChipsLeveledUp { get; } = new();
+
+    /// <summary>
     /// Checks if combat has ended.
     /// </summary>
     private void CheckCombatEnd()
     {
+        // Check for survival completion in unwinnable battles
+        if (IsUnwinnableBattle && TurnsSurvived >= TurnsToSurvive)
+        {
+            Phase = CombatPhase.Survived;
+            SurvivalTriggered?.Invoke(this, EventArgs.Empty);
+            CombatEnded?.Invoke(this, Phase);
+            return;
+        }
+
         if (!Party.Any(p => p.IsAlive))
         {
-            Phase = CombatPhase.Defeat;
-            CombatEnded?.Invoke(this, Phase);
+            // In unwinnable battles, party wipe triggers survival (Bandit's sacrifice)
+            if (IsUnwinnableBattle)
+            {
+                Phase = CombatPhase.Survived;
+                SurvivalTriggered?.Invoke(this, EventArgs.Empty);
+                CombatEnded?.Invoke(this, Phase);
+            }
+            else
+            {
+                Phase = CombatPhase.Defeat;
+                CombatEnded?.Invoke(this, Phase);
+            }
         }
         else if (!Enemies.Any(e => e.IsAlive))
         {
+            // In unwinnable battles, enemies can't actually be killed (boss regenerates)
+            // This shouldn't normally happen, but handle it gracefully
+            if (IsUnwinnableBattle)
+            {
+                // Boss "regenerates" - restore to full HP
+                foreach (var enemy in Enemies)
+                {
+                    enemy.Stray.CurrentHp = enemy.Stray.MaxHp;
+                }
+                return;
+            }
+
             // Calculate experience
             ExperienceEarned = Enemies.Sum(e => e.Stray.Level * 20);
+
+            // Calculate currency earned (based on enemy levels, slightly more than XP)
+            CurrencyEarned = Enemies.Sum(e => e.Stray.Level * 15 + 10);
+
+            // Calculate TU earned based on enemy levels
+            TelemetryUnitsEarned = Enemies.Sum(e => 5 + e.Stray.Level);
+
+            // Award TU to all equipped chips on party members
+            AwardBattleTu();
 
             // Check for recruitable Stray
             if (SourceEncounter?.CanRecruit == true && Enemies.Count > 0)
@@ -324,6 +525,23 @@ public class CombatState
 
             Phase = CombatPhase.Victory;
             CombatEnded?.Invoke(this, Phase);
+        }
+    }
+
+    /// <summary>
+    /// Awards battle TU to all party members' equipped chips.
+    /// </summary>
+    private void AwardBattleTu()
+    {
+        ChipsLeveledUp.Clear();
+
+        foreach (var combatant in Party.Where(c => c.IsAlive))
+        {
+            var leveledChips = combatant.Stray.AwardBattleTu(TelemetryUnitsEarned);
+            foreach (var chip in leveledChips)
+            {
+                ChipsLeveledUp.Add((combatant.Stray.DisplayName, chip.Definition.Name, chip.FirmwareLevel));
+            }
         }
     }
 
@@ -555,6 +773,13 @@ public class CombatState
         LastResult = result;
         ResultDisplayTimer = 1.5f; // Show result for 1.5 seconds
 
+        // In unwinnable battles, count turns survived (each action = 1 turn progress)
+        if (IsUnwinnableBattle)
+        {
+            TurnsSurvived++;
+            System.Diagnostics.Debug.WriteLine($"[Combat] Unwinnable battle: {TurnsSurvived}/{TurnsToSurvive} turns survived");
+        }
+
         // Reset the acting combatant
         action.Source?.ResetAtb();
 
@@ -577,9 +802,13 @@ public class CombatState
         // Calculate damage
         int baseDamage = action.Source.Attack;
 
+        // Position modifier for attacker (physical damage dealt)
+        // Front row: +20% damage, Back row: -20% damage
+        float attackerPositionMod = action.Source.Stray.CombatRow == Entities.CombatRow.Front ? 1.2f : 0.8f;
+
         // Random variance (90-110%)
         float variance = 0.9f + (float)_random.NextDouble() * 0.2f;
-        int damage = (int)(baseDamage * variance);
+        int damage = (int)(baseDamage * attackerPositionMod * variance);
 
         // Critical hit chance (10%)
         if (_random.NextDouble() < 0.1)
@@ -587,6 +816,11 @@ public class CombatState
             damage = (int)(damage * 1.5f);
             result.WasCritical = true;
         }
+
+        // Position modifier for defender (physical damage taken)
+        // Front row: +20% damage taken, Back row: -20% damage taken
+        float defenderPositionMod = action.Target.Stray.CombatRow == Entities.CombatRow.Front ? 1.2f : 0.8f;
+        damage = (int)(damage * defenderPositionMod);
 
         // Apply damage
         int actualDamage = action.Target.TakeDamage(damage);
@@ -637,17 +871,27 @@ public class CombatState
         if (action.Target == null)
             return;
 
-        // Gravitation deals percentage-based damage
-        float damagePercent = 0.50f; // Default 50%, can be modified by GravitationStage
+        // Gravitation deals percentage-based damage from the action
+        float damagePercent = action.GravitationDamagePercent;
 
         int damage = action.Target.TakePercentDamage(damagePercent);
         result.DamageDealt = damage;
-        result.Message = $"GRAVITATION hits {action.Target.Name} for {damage} damage!";
+
+        // Build message based on whether it was corrupted (hit ally)
+        if (action.IsCorruptedGravitation)
+        {
+            result.Message = $"Bandit's GRAVITATION misfires! {action.Target.Name} takes {damage} damage!";
+        }
+        else
+        {
+            result.Message = $"Bandit uses GRAVITATION! {action.Target.Name} takes {damage} damage!";
+        }
 
         if (!action.Target.IsAlive)
         {
             result.CausedDefeat = true;
             result.DefeatedCombatant = action.Target;
+            result.Message += $" {action.Target.Name} is defeated!";
         }
     }
 
@@ -665,6 +909,14 @@ public class CombatState
         if (ability == null)
             return;
 
+        // Check if the ability's source chip is overheated
+        if (action.Source.IsAbilityOverheated(action.AbilityId))
+        {
+            result.Success = false;
+            result.Message = $"{action.Source.Name}'s chip is overheated!";
+            return;
+        }
+
         // Use energy
         if (!action.Source.UseEnergy(abilityDef.EnergyCost))
         {
@@ -672,6 +924,12 @@ public class CombatState
             result.Message = $"{action.Source.Name} doesn't have enough energy!";
             return;
         }
+
+        // Apply heat to the source chip
+        action.Source.ApplyAbilityHeat(action.AbilityId);
+
+        // Award TU to the chip for usage (1 TU per use)
+        action.Source.AwardAbilityTu(action.AbilityId, 1);
 
         // Mark ability as used
         ability.Use();
@@ -900,4 +1158,35 @@ public class CombatState
 
         return actions;
     }
+}
+
+/// <summary>
+/// Event arguments for companion Gravitation intervention.
+/// </summary>
+public class GravitationInterventionEventArgs : EventArgs
+{
+    /// <summary>
+    /// The current Gravitation stage.
+    /// </summary>
+    public GravitationStage Stage { get; init; }
+
+    /// <summary>
+    /// The percentage of HP damage dealt.
+    /// </summary>
+    public float DamagePercent { get; init; }
+
+    /// <summary>
+    /// Whether the Gravitation hit an ally (corruption misfire).
+    /// </summary>
+    public bool HitAlly { get; init; }
+
+    /// <summary>
+    /// The target that was hit.
+    /// </summary>
+    public Combatant? Target { get; init; }
+
+    /// <summary>
+    /// The damage dealt.
+    /// </summary>
+    public int DamageDealt { get; init; }
 }

@@ -211,11 +211,19 @@ public class StrayRoster
     }
 
     /// <summary>
-    /// Gets all Strays of a specific type.
+    /// Gets all Strays of a specific creature type.
     /// </summary>
-    public IEnumerable<Stray> GetStraysByType(StrayType type)
+    public IEnumerable<Stray> GetStraysByCreatureType(CreatureType type)
     {
-        return _allStrays.Values.Where(s => s.Definition.Type == type);
+        return _allStrays.Values.Where(s => s.Definition.CreatureType == type);
+    }
+
+    /// <summary>
+    /// Gets all Strays of a specific creature category.
+    /// </summary>
+    public IEnumerable<Stray> GetStraysByCategory(CreatureCategory category)
+    {
+        return _allStrays.Values.Where(s => s.Definition.Category == category);
     }
 
     /// <summary>

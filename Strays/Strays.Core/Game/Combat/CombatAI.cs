@@ -507,28 +507,39 @@ public class CombatAI
     }
 
     /// <summary>
-    /// Gets AI behavior for a Stray based on its type.
+    /// Gets AI behavior for a Stray based on its creature category.
     /// </summary>
-    public static AIBehavior GetBehaviorForStray(Data.StrayType type)
+    public static AIBehavior GetBehaviorForCategory(Data.CreatureCategory category)
     {
-        return type switch
+        return category switch
         {
-            Data.StrayType.Canine => AIBehavior.Aggressive,
-            Data.StrayType.Feline => AIBehavior.Balanced,
-            Data.StrayType.Rodent => AIBehavior.Random,
-            Data.StrayType.Avian => AIBehavior.ThreatBased,
-            Data.StrayType.Insect => AIBehavior.Aggressive,
-            Data.StrayType.Reptile => AIBehavior.Defensive,
-            Data.StrayType.Amphibian => AIBehavior.Support,
-            Data.StrayType.Arachnid => AIBehavior.Aggressive,
-            Data.StrayType.Mammal => AIBehavior.Balanced,
-            Data.StrayType.Primate => AIBehavior.ThreatBased,
-            Data.StrayType.Mustelid => AIBehavior.Aggressive,
-            Data.StrayType.Procyonid => AIBehavior.Balanced,
-            Data.StrayType.Marsupial => AIBehavior.Defensive,
-            Data.StrayType.Chimera => AIBehavior.Boss,
-            Data.StrayType.Invertebrate => AIBehavior.Random,
-            _ => AIBehavior.Random
+            // Aggressive hunters
+            Data.CreatureCategory.Predatoria => AIBehavior.Aggressive,
+            Data.CreatureCategory.Exoskeletalis => AIBehavior.Aggressive,
+
+            // Balanced fighters
+            Data.CreatureCategory.Manipularis => AIBehavior.Balanced,
+            Data.CreatureCategory.Marsupialis => AIBehavior.Balanced,
+
+            // Support roles - Jellyfish use CC/AoE
+            Data.CreatureCategory.Medusalia => AIBehavior.Support,
+
+            // Defensive tanks - Big chassis and armored
+            Data.CreatureCategory.Colossomammalia => AIBehavior.Defensive,
+            Data.CreatureCategory.Armormammalia => AIBehavior.Defensive,
+
+            // Threat-based/tactical - Stealth and smart creatures
+            Data.CreatureCategory.Octomorpha => AIBehavior.ThreatBased,
+            Data.CreatureCategory.Mollusca => AIBehavior.ThreatBased,
+
+            // Unpredictable - Small/fast creatures
+            Data.CreatureCategory.Micromammalia => AIBehavior.Random,
+
+            // Fun categories - unique behaviors
+            Data.CreatureCategory.Obscura => AIBehavior.ThreatBased, // Platypus - weird tech
+            Data.CreatureCategory.Tardigrada => AIBehavior.Defensive, // Sloth - zen tank
+
+            _ => AIBehavior.Balanced
         };
     }
 }

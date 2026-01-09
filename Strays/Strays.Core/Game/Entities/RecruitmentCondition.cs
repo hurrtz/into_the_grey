@@ -137,7 +137,9 @@ public class RecruitmentCondition
 
         foreach (var stray in roster.Party)
         {
-            if (stray.Definition.Id == TargetId || stray.Definition.Type.ToString() == TargetId)
+            if (stray.Definition.Id == TargetId ||
+                stray.Definition.CreatureType.ToString() == TargetId ||
+                stray.Definition.Category.ToString() == TargetId)
                 return true;
         }
 
@@ -339,7 +341,16 @@ public class RecruitmentManager
         // Roll for recruitment
         if (_random.NextDouble() < finalChance)
         {
-            // Success!
+            // Success! Revive and heal the Stray before adding to party
+            if (!stray.IsAlive)
+            {
+                stray.Revive(1.0f); // Revive at full HP
+            }
+            else
+            {
+                stray.FullHeal(); // Heal to full HP
+            }
+
             _roster.AddStray(stray);
 
             message = $"{stray.DisplayName} joined your party!";

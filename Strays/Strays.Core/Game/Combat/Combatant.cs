@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -74,14 +75,19 @@ public class Combatant
     public int MaxHp => Stray.MaxHp;
 
     /// <summary>
-    /// Current energy for abilities.
+    /// Current energy for abilities (delegated to Stray).
     /// </summary>
-    public int CurrentEnergy { get; private set; }
+    public int CurrentEnergy => Stray.CurrentEnergy;
 
     /// <summary>
-    /// Maximum energy for abilities.
+    /// Maximum energy for abilities (delegated to Stray).
     /// </summary>
-    public int MaxEnergy => 100 + Stray.Special / 2;
+    public int MaxEnergy => Stray.MaxEnergy;
+
+    /// <summary>
+    /// Energy regeneration per ATB tick (delegated to Stray).
+    /// </summary>
+    public int EnergyRegen => Stray.EnergyRegen;
 
     /// <summary>
     /// Speed stat (affects ATB fill rate).
@@ -109,6 +115,11 @@ public class Combatant
     public List<Ability> Abilities { get; } = new();
 
     /// <summary>
+    /// Maps ability IDs to the microchip socket index that grants them (-1 for innate abilities).
+    /// </summary>
+    public Dictionary<string, int> AbilitySourceChips { get; } = new();
+
+    /// <summary>
     /// Active status effects with remaining duration.
     /// </summary>
     public Dictionary<StatusEffect, int> StatusEffects { get; } = new();
@@ -123,7 +134,11 @@ public class Combatant
         Stray = stray;
         IsEnemy = isEnemy;
         stray.IsHostile = isEnemy;
-        CurrentEnergy = MaxEnergy;
+
+        // Initialize energy and heat for combat
+        stray.FullEnergy();
+        stray.ResetChipHeat();
+
         LoadAbilities();
     }
 
@@ -133,26 +148,54 @@ public class Combatant
     private void LoadAbilities()
     {
         Abilities.Clear();
+        AbilitySourceChips.Clear();
 
         // Add innate abilities based on level
         var innateAbilityIds = new List<string>();
 
         // All Strays get basic strike
         innateAbilityIds.Add("strike");
+        AbilitySourceChips["strike"] = -1; // Innate
 
         // Add abilities based on level
         if (Stray.Level >= 5)
+        {
             innateAbilityIds.Add("power_strike");
+            AbilitySourceChips["power_strike"] = -1;
+        }
         if (Stray.Level >= 10)
+        {
             innateAbilityIds.Add("fortify");
+            AbilitySourceChips["fortify"] = -1;
+        }
 
-        // Add abilities from equipped microchips
+        // Add abilities from equipped microchips (new socket system)
+        if (Stray.MicrochipSockets != null)
+        {
+            for (int socketIndex = 0; socketIndex < Stray.MicrochipSockets.Length; socketIndex++)
+            {
+                var socket = Stray.MicrochipSockets[socketIndex];
+                if (socket?.EquippedChip?.Definition?.GrantsAbility != null)
+                {
+                    var abilityId = socket.EquippedChip.Definition.GrantsAbility;
+                    if (!innateAbilityIds.Contains(abilityId))
+                    {
+                        innateAbilityIds.Add(abilityId);
+                    }
+                    // Track which socket this ability comes from (last one wins if duplicates)
+                    AbilitySourceChips[abilityId] = socketIndex;
+                }
+            }
+        }
+
+        // Legacy support: Add abilities from EquippedMicrochips list
         foreach (var chipId in Stray.EquippedMicrochips)
         {
             var chipDef = Microchips.Get(chipId);
-            if (chipDef?.GrantsAbility != null)
+            if (chipDef?.GrantsAbility != null && !innateAbilityIds.Contains(chipDef.GrantsAbility))
             {
                 innateAbilityIds.Add(chipDef.GrantsAbility);
+                AbilitySourceChips[chipDef.GrantsAbility] = -2; // Legacy chip (no socket)
             }
         }
 
@@ -160,7 +203,10 @@ public class Combatant
         foreach (var abilityId in Stray.EvolutionState.EvolvedAbilities)
         {
             if (!innateAbilityIds.Contains(abilityId))
+            {
                 innateAbilityIds.Add(abilityId);
+                AbilitySourceChips[abilityId] = -1; // Evolved ability = innate
+            }
         }
 
         // Create ability instances
@@ -175,31 +221,106 @@ public class Combatant
     }
 
     /// <summary>
-    /// Gets abilities that are currently usable.
+    /// Gets abilities that are currently usable (has energy, not on cooldown, chip not overheated).
     /// </summary>
     public IEnumerable<Ability> GetUsableAbilities()
     {
-        return Abilities.Where(a => a.IsReady && a.Definition.EnergyCost <= CurrentEnergy);
+        return Abilities.Where(a => a.IsReady &&
+            a.Definition.EnergyCost <= CurrentEnergy &&
+            !IsAbilityOverheated(a.Definition.Id));
     }
 
     /// <summary>
-    /// Uses energy for an ability.
+    /// Checks if an ability's source chip is overheated.
+    /// </summary>
+    public bool IsAbilityOverheated(string abilityId)
+    {
+        if (!AbilitySourceChips.TryGetValue(abilityId, out var socketIndex))
+            return false;
+
+        // Innate abilities (-1) and legacy chips (-2) don't overheat
+        if (socketIndex < 0)
+            return false;
+
+        // Check if the chip in that socket is overheated
+        if (Stray.MicrochipSockets == null || socketIndex >= Stray.MicrochipSockets.Length)
+            return false;
+
+        var socket = Stray.MicrochipSockets[socketIndex];
+        return socket?.EquippedChip?.IsOverheated == true;
+    }
+
+    /// <summary>
+    /// Gets the current heat of an ability's source chip.
+    /// </summary>
+    public (float current, float max) GetAbilityHeat(string abilityId)
+    {
+        if (!AbilitySourceChips.TryGetValue(abilityId, out var socketIndex))
+            return (0, 0);
+
+        if (socketIndex < 0)
+            return (0, 0);
+
+        if (Stray.MicrochipSockets == null || socketIndex >= Stray.MicrochipSockets.Length)
+            return (0, 0);
+
+        var chip = Stray.MicrochipSockets[socketIndex]?.EquippedChip;
+        if (chip == null)
+            return (0, 0);
+
+        return (chip.CurrentHeat, chip.Definition.HeatMax);
+    }
+
+    /// <summary>
+    /// Uses energy for an ability (delegates to Stray).
     /// </summary>
     public bool UseEnergy(int amount)
     {
-        if (CurrentEnergy < amount)
-            return false;
-
-        CurrentEnergy -= amount;
-        return true;
+        return Stray.ConsumeEnergy(amount);
     }
 
     /// <summary>
-    /// Restores energy.
+    /// Restores energy (adds to Stray's current energy).
     /// </summary>
     public void RestoreEnergy(int amount)
     {
-        CurrentEnergy = System.Math.Min(MaxEnergy, CurrentEnergy + amount);
+        Stray.CurrentEnergy = Math.Min(Stray.MaxEnergy, Stray.CurrentEnergy + amount);
+    }
+
+    /// <summary>
+    /// Applies heat to the chip that granted an ability.
+    /// </summary>
+    public void ApplyAbilityHeat(string abilityId)
+    {
+        if (!AbilitySourceChips.TryGetValue(abilityId, out var socketIndex))
+            return;
+
+        if (socketIndex < 0)
+            return;
+
+        if (Stray.MicrochipSockets == null || socketIndex >= Stray.MicrochipSockets.Length)
+            return;
+
+        var chip = Stray.MicrochipSockets[socketIndex]?.EquippedChip;
+        chip?.AddHeat();
+    }
+
+    /// <summary>
+    /// Awards TU to the chip that granted an ability (per-use bonus).
+    /// </summary>
+    public void AwardAbilityTu(string abilityId, int amount = 1)
+    {
+        if (!AbilitySourceChips.TryGetValue(abilityId, out var socketIndex))
+            return;
+
+        if (socketIndex < 0)
+            return;
+
+        if (Stray.MicrochipSockets == null || socketIndex >= Stray.MicrochipSockets.Length)
+            return;
+
+        var chip = Stray.MicrochipSockets[socketIndex]?.EquippedChip;
+        chip?.AddTu(amount);
     }
 
     /// <summary>
@@ -279,14 +400,34 @@ public class Combatant
             ability.TickCooldown();
         }
 
-        // Restore a bit of energy each turn
-        RestoreEnergy(5);
+        // Note: Energy regeneration and heat dissipation are handled in UpdateAtb()
+        // which runs continuously during ATB gauge filling.
 
         return damage;
     }
 
     /// <summary>
-    /// Updates the ATB gauge based on speed.
+    /// Accumulator for energy regeneration ticks.
+    /// </summary>
+    private float _energyTickAccumulator = 0f;
+
+    /// <summary>
+    /// Accumulator for heat dissipation ticks.
+    /// </summary>
+    private float _heatTickAccumulator = 0f;
+
+    /// <summary>
+    /// How often energy regenerates (in seconds).
+    /// </summary>
+    private const float EnergyTickInterval = 1.0f;
+
+    /// <summary>
+    /// How often heat dissipates (in seconds).
+    /// </summary>
+    private const float HeatTickInterval = 0.5f;
+
+    /// <summary>
+    /// Updates the ATB gauge based on speed, and handles energy regen/heat dissipation.
     /// </summary>
     /// <param name="deltaTime">Time elapsed in seconds.</param>
     public void UpdateAtb(float deltaTime)
@@ -301,6 +442,22 @@ public class Combatant
 
         if (AtbGauge > 100)
             AtbGauge = 100;
+
+        // Energy regeneration per tick interval
+        _energyTickAccumulator += deltaTime;
+        while (_energyTickAccumulator >= EnergyTickInterval)
+        {
+            _energyTickAccumulator -= EnergyTickInterval;
+            Stray.RegenerateEnergy();
+        }
+
+        // Heat dissipation per tick interval
+        _heatTickAccumulator += deltaTime;
+        while (_heatTickAccumulator >= HeatTickInterval)
+        {
+            _heatTickAccumulator -= HeatTickInterval;
+            Stray.DissipateChipHeat();
+        }
     }
 
     /// <summary>

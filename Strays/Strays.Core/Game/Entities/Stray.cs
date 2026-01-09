@@ -1,10 +1,28 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Strays.Core.Game.Data;
+using Strays.Core.Game.Items;
 
 namespace Strays.Core.Game.Entities;
+
+/// <summary>
+/// Combat row positioning for a Stray.
+/// </summary>
+public enum CombatRow
+{
+    /// <summary>
+    /// Front row: +20% physical damage dealt and taken.
+    /// </summary>
+    Front,
+
+    /// <summary>
+    /// Back row: -20% physical damage dealt and taken.
+    /// </summary>
+    Back
+}
 
 /// <summary>
 /// Represents an individual Stray instance - a recruited or wild cybernetic creature.
@@ -57,27 +75,47 @@ public class Stray
     /// <summary>
     /// Maximum HP (scaled by level and augmentations).
     /// </summary>
-    public int MaxHp => CalculateStat(Definition.BaseStats.MaxHp);
+    public int MaxHp => CalculateStat(Definition.BaseStats.MaxHp, "MaxHp");
 
     /// <summary>
     /// Attack stat.
     /// </summary>
-    public int Attack => CalculateStat(Definition.BaseStats.Attack);
+    public int Attack => CalculateStat(Definition.BaseStats.Attack, "Attack");
 
     /// <summary>
     /// Defense stat.
     /// </summary>
-    public int Defense => CalculateStat(Definition.BaseStats.Defense);
+    public int Defense => CalculateStat(Definition.BaseStats.Defense, "Defense");
 
     /// <summary>
     /// Speed stat (affects ATB fill rate).
     /// </summary>
-    public int Speed => CalculateStat(Definition.BaseStats.Speed);
+    public int Speed => CalculateStat(Definition.BaseStats.Speed, "Speed");
 
     /// <summary>
     /// Special stat (affects ability power).
     /// </summary>
-    public int Special => CalculateStat(Definition.BaseStats.Special);
+    public int Special => CalculateStat(Definition.BaseStats.Special, "Special");
+
+    /// <summary>
+    /// Maximum energy pool (for microchip abilities).
+    /// </summary>
+    public int MaxEnergy => CalculateStat(Definition.BaseStats.MaxEnergy, "MaxEnergy");
+
+    /// <summary>
+    /// Energy regeneration per ATB tick.
+    /// </summary>
+    public int EnergyRegen => CalculateStat(Definition.BaseStats.EnergyRegen, "EnergyRegen");
+
+    /// <summary>
+    /// Current energy (0 to MaxEnergy).
+    /// </summary>
+    public int CurrentEnergy { get; set; }
+
+    /// <summary>
+    /// Energy as a percentage (0-1).
+    /// </summary>
+    public float EnergyPercent => MaxEnergy > 0 ? (float)CurrentEnergy / MaxEnergy : 0f;
 
     /// <summary>
     /// Whether this Stray is alive.
@@ -85,7 +123,12 @@ public class Stray
     public bool IsAlive => CurrentHp > 0;
 
     /// <summary>
-    /// Whether this Stray has evolved.
+    /// Current evolution stage (0 = base form).
+    /// </summary>
+    public int EvolutionStage { get; private set; } = 0;
+
+    /// <summary>
+    /// Whether this Stray has evolved at least once.
     /// </summary>
     public bool IsEvolved { get; private set; } = false;
 
@@ -101,14 +144,390 @@ public class Stray
     public int BondLevel { get; set; } = 0;
 
     /// <summary>
-    /// Equipped augmentations by slot name.
+    /// Combat row (front or back).
+    /// Front row: +20% physical damage dealt/taken.
+    /// Back row: -20% physical damage dealt/taken.
+    /// </summary>
+    public CombatRow CombatRow { get; set; } = CombatRow.Front;
+
+    /// <summary>
+    /// Equipped augmentations by slot key.
+    /// Key: SlotReference.ToKey(), Value: Augmentation definition ID (null = empty slot).
     /// </summary>
     public Dictionary<string, string?> EquippedAugmentations { get; } = new();
 
     /// <summary>
-    /// Equipped microchips.
+    /// Equipped microchips (legacy - use MicrochipSockets for new code).
     /// </summary>
     public List<string> EquippedMicrochips { get; } = new();
+
+    /// <summary>
+    /// Microchip sockets for this Stray.
+    /// </summary>
+    public MicrochipSocket[] MicrochipSockets { get; private set; } = Array.Empty<MicrochipSocket>();
+
+    /// <summary>
+    /// Gets the socket configuration for the current evolution stage.
+    /// </summary>
+    public SocketConfiguration CurrentSocketConfiguration =>
+        Definition.GetSocketConfiguration(EvolutionStage);
+
+    /// <summary>
+    /// Gets all equipped microchip instances.
+    /// </summary>
+    public IEnumerable<Microchip> GetEquippedChips()
+    {
+        foreach (var socket in MicrochipSockets)
+        {
+            if (socket.EquippedChip != null)
+                yield return socket.EquippedChip;
+        }
+    }
+
+    /// <summary>
+    /// Gets the chip in a specific socket.
+    /// </summary>
+    public Microchip? GetChipInSocket(int socketIndex)
+    {
+        if (socketIndex < 0 || socketIndex >= MicrochipSockets.Length)
+            return null;
+        return MicrochipSockets[socketIndex].EquippedChip;
+    }
+
+    /// <summary>
+    /// Gets the chip linked to a socket (if any).
+    /// </summary>
+    public Microchip? GetLinkedChip(int socketIndex)
+    {
+        if (socketIndex < 0 || socketIndex >= MicrochipSockets.Length)
+            return null;
+
+        var socket = MicrochipSockets[socketIndex];
+        if (!socket.IsLinked)
+            return null;
+
+        return GetChipInSocket(socket.LinkedSocketIndex);
+    }
+
+    /// <summary>
+    /// Equips a microchip to a socket.
+    /// </summary>
+    /// <param name="chip">The chip to equip.</param>
+    /// <param name="socketIndex">The socket index.</param>
+    /// <returns>The previously equipped chip, or null.</returns>
+    public Microchip? EquipMicrochip(Microchip chip, int socketIndex)
+    {
+        if (socketIndex < 0 || socketIndex >= MicrochipSockets.Length)
+            return null;
+
+        // Check level requirement
+        if (Level < chip.Definition.MinLevel)
+            return null;
+
+        var socket = MicrochipSockets[socketIndex];
+        var previousChip = socket.EquippedChip;
+
+        // Unequip from previous location if already equipped
+        if (chip.IsEquipped && chip.EquippedToStrayId == InstanceId)
+        {
+            UnequipMicrochip(chip.SocketIndex);
+        }
+
+        // Update previous chip state
+        if (previousChip != null)
+        {
+            previousChip.IsEquipped = false;
+            previousChip.EquippedToStrayId = null;
+            previousChip.SocketIndex = -1;
+        }
+
+        // Equip new chip
+        socket.EquippedChip = chip;
+        chip.IsEquipped = true;
+        chip.EquippedToStrayId = InstanceId;
+        chip.SocketIndex = socketIndex;
+
+        return previousChip;
+    }
+
+    /// <summary>
+    /// Unequips a microchip from a socket.
+    /// </summary>
+    /// <param name="socketIndex">The socket index.</param>
+    /// <returns>The removed chip, or null.</returns>
+    public Microchip? UnequipMicrochip(int socketIndex)
+    {
+        if (socketIndex < 0 || socketIndex >= MicrochipSockets.Length)
+            return null;
+
+        var socket = MicrochipSockets[socketIndex];
+        var chip = socket.EquippedChip;
+
+        if (chip != null)
+        {
+            chip.IsEquipped = false;
+            chip.EquippedToStrayId = null;
+            chip.SocketIndex = -1;
+            socket.EquippedChip = null;
+        }
+
+        return chip;
+    }
+
+    /// <summary>
+    /// Initializes microchip sockets for the current evolution stage.
+    /// </summary>
+    private void InitializeMicrochipSockets()
+    {
+        var config = CurrentSocketConfiguration;
+        MicrochipSockets = config.CreateSockets();
+    }
+
+    /// <summary>
+    /// Upgrades sockets after evolution, preserving existing chips.
+    /// </summary>
+    private void UpgradeMicrochipSockets()
+    {
+        var oldSockets = MicrochipSockets;
+        var config = CurrentSocketConfiguration;
+        var newSockets = config.CreateSockets();
+
+        // Preserve chips from old sockets
+        for (int i = 0; i < Math.Min(oldSockets.Length, newSockets.Length); i++)
+        {
+            newSockets[i].EquippedChip = oldSockets[i].EquippedChip;
+        }
+
+        MicrochipSockets = newSockets;
+    }
+
+    /// <summary>
+    /// Gets all abilities from equipped microchips.
+    /// </summary>
+    public IEnumerable<string> GetMicrochipAbilities()
+    {
+        foreach (var chip in GetEquippedChips())
+        {
+            if (!string.IsNullOrEmpty(chip.Definition.GrantsAbility))
+            {
+                yield return chip.Definition.GrantsAbility;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Regenerates energy (called per ATB tick in combat).
+    /// </summary>
+    /// <returns>Amount of energy regenerated.</returns>
+    public int RegenerateEnergy()
+    {
+        int regenAmount = EnergyRegen;
+        int previousEnergy = CurrentEnergy;
+        CurrentEnergy = Math.Min(MaxEnergy, CurrentEnergy + regenAmount);
+        return CurrentEnergy - previousEnergy;
+    }
+
+    /// <summary>
+    /// Consumes energy for using a chip ability.
+    /// </summary>
+    /// <param name="amount">Energy to consume.</param>
+    /// <returns>True if successful, false if not enough energy.</returns>
+    public bool ConsumeEnergy(int amount)
+    {
+        if (CurrentEnergy < amount)
+            return false;
+
+        CurrentEnergy -= amount;
+        return true;
+    }
+
+    /// <summary>
+    /// Restores energy to full (called at combat start or out of combat).
+    /// </summary>
+    public void FullEnergy()
+    {
+        CurrentEnergy = MaxEnergy;
+    }
+
+    /// <summary>
+    /// Dissipates heat on all equipped chips (called per ATB tick).
+    /// </summary>
+    public void DissipateChipHeat()
+    {
+        foreach (var chip in GetEquippedChips())
+        {
+            chip.DissipateHeat();
+        }
+    }
+
+    /// <summary>
+    /// Resets heat on all chips (called at combat start).
+    /// </summary>
+    public void ResetChipHeat()
+    {
+        foreach (var chip in GetEquippedChips())
+        {
+            chip.ResetHeat();
+        }
+    }
+
+    /// <summary>
+    /// Awards TU to all equipped chips (called after battle victory).
+    /// </summary>
+    /// <param name="amount">Base TU to award.</param>
+    /// <returns>List of chips that leveled up.</returns>
+    public List<Microchip> AwardBattleTu(int amount)
+    {
+        var leveledUp = new List<Microchip>();
+
+        foreach (var chip in GetEquippedChips())
+        {
+            if (chip.AddTu(amount))
+            {
+                leveledUp.Add(chip);
+            }
+        }
+
+        return leveledUp;
+    }
+
+    /// <summary>
+    /// Initializes the augmentation slots for this Stray based on its category.
+    /// </summary>
+    private void InitializeAugmentationSlots()
+    {
+        // Add all 9 universal slots
+        foreach (var slot in AugmentationSlotUtility.GetUniversalSlots())
+        {
+            var slotRef = new SlotReference(slot);
+            EquippedAugmentations[slotRef.ToKey()] = null;
+        }
+
+        // Add category-specific slots (4-5 depending on category)
+        foreach (var slot in AugmentationSlotUtility.GetCategorySlotsFor(Definition.Category))
+        {
+            var slotRef = new SlotReference(slot);
+            EquippedAugmentations[slotRef.ToKey()] = null;
+        }
+    }
+
+    /// <summary>
+    /// Gets all available slots for this Stray (universal + category-specific).
+    /// </summary>
+    public IEnumerable<SlotReference> GetAvailableSlots()
+    {
+        foreach (var slot in AugmentationSlotUtility.GetUniversalSlots())
+            yield return new SlotReference(slot);
+
+        foreach (var slot in AugmentationSlotUtility.GetCategorySlotsFor(Definition.Category))
+            yield return new SlotReference(slot);
+    }
+
+    /// <summary>
+    /// Gets the augmentation equipped in a slot.
+    /// </summary>
+    public string? GetEquippedAugmentationId(SlotReference slot)
+    {
+        var key = slot.ToKey();
+        return EquippedAugmentations.TryGetValue(key, out var augId) ? augId : null;
+    }
+
+    /// <summary>
+    /// Gets whether a slot has an augmentation equipped.
+    /// </summary>
+    public bool HasAugmentationInSlot(SlotReference slot)
+    {
+        return GetEquippedAugmentationId(slot) != null;
+    }
+
+    /// <summary>
+    /// Equips an augmentation to a slot.
+    /// </summary>
+    /// <param name="augmentationId">The augmentation to equip.</param>
+    /// <param name="slot">The slot to equip to.</param>
+    /// <returns>The ID of the previously equipped augmentation, or null.</returns>
+    public string? EquipAugmentation(string augmentationId, SlotReference slot)
+    {
+        // Verify slot is valid for this creature's category
+        if (!slot.IsValidForCategory(Definition.Category))
+            return null;
+
+        var key = slot.ToKey();
+        if (!EquippedAugmentations.ContainsKey(key))
+            return null;
+
+        var previousAugment = EquippedAugmentations[key];
+        EquippedAugmentations[key] = augmentationId;
+
+        // Recalculate HP if MaxHp changed
+        var newMaxHp = MaxHp;
+        if (CurrentHp > newMaxHp)
+            CurrentHp = newMaxHp;
+
+        return previousAugment;
+    }
+
+    /// <summary>
+    /// Unequips an augmentation from a slot.
+    /// </summary>
+    /// <param name="slot">The slot to clear.</param>
+    /// <returns>The ID of the removed augmentation, or null if slot was empty.</returns>
+    public string? UnequipAugmentation(SlotReference slot)
+    {
+        var key = slot.ToKey();
+        if (!EquippedAugmentations.ContainsKey(key))
+            return null;
+
+        var previousAugment = EquippedAugmentations[key];
+        EquippedAugmentations[key] = null;
+
+        // Recalculate HP if MaxHp changed
+        var newMaxHp = MaxHp;
+        if (CurrentHp > newMaxHp)
+            CurrentHp = newMaxHp;
+
+        return previousAugment;
+    }
+
+    /// <summary>
+    /// Gets the augmentation definition equipped in a slot.
+    /// </summary>
+    /// <param name="slot">The slot to check.</param>
+    /// <returns>The augmentation definition, or null if slot is empty.</returns>
+    public AugmentationDefinition? GetEquippedAugmentation(SlotReference slot)
+    {
+        var augId = GetEquippedAugmentationId(slot);
+        return augId != null ? Augmentations.Get(augId) : null;
+    }
+
+    /// <summary>
+    /// Gets all abilities granted by equipped augmentations.
+    /// </summary>
+    public IEnumerable<string> GetAugmentationAbilities()
+    {
+        foreach (var slotKey in EquippedAugmentations.Keys)
+        {
+            var augId = EquippedAugmentations[slotKey];
+            if (augId != null)
+            {
+                var augDef = Augmentations.Get(augId);
+                if (augDef?.GrantsAbility != null)
+                {
+                    yield return augDef.GrantsAbility;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets all abilities this Stray has (innate + augmentation-granted + microchip-granted).
+    /// </summary>
+    public IEnumerable<string> GetAllAbilities()
+    {
+        return Definition.InnateAbilities
+            .Concat(GetAugmentationAbilities())
+            .Concat(GetMicrochipAbilities());
+    }
 
     /// <summary>
     /// Whether this Stray is hostile (enemy in combat).
@@ -130,7 +549,10 @@ public class Stray
         InstanceId = $"stray_{_nextInstanceId++}";
         Definition = definition;
         Level = Math.Max(1, level);
+        InitializeAugmentationSlots();
+        InitializeMicrochipSockets();
         CurrentHp = MaxHp;
+        CurrentEnergy = MaxEnergy;
     }
 
     /// <summary>
@@ -150,14 +572,88 @@ public class Stray
     /// <summary>
     /// Calculates a stat value based on level and augmentations.
     /// </summary>
-    private int CalculateStat(int baseStat)
+    private int CalculateStat(int baseStat, string statName = "")
     {
         // Scale by level (10% per level)
         float levelMultiplier = 1f + (Level - 1) * 0.1f;
+        float scaledStat = baseStat * levelMultiplier;
 
-        // TODO: Add augmentation bonuses
+        // Add augmentation bonuses
+        int flatBonus = 0;
+        float multiplier = 1f;
 
-        return (int)(baseStat * levelMultiplier);
+        foreach (var kvp in EquippedAugmentations)
+        {
+            var augId = kvp.Value;
+            if (augId == null)
+                continue;
+
+            var augDef = Augmentations.Get(augId);
+            if (augDef == null)
+                continue;
+
+            // Flat bonuses
+            if (!string.IsNullOrEmpty(statName) && augDef.StatBonuses.TryGetValue(statName, out var bonus))
+            {
+                flatBonus += bonus;
+            }
+
+            // Multipliers
+            if (!string.IsNullOrEmpty(statName) && augDef.StatMultipliers.TryGetValue(statName, out var mult))
+            {
+                multiplier *= mult;
+            }
+        }
+
+        // Add microchip bonuses (from Driver chips)
+        foreach (var chip in GetEquippedChips())
+        {
+            if (chip.Definition.Category != MicrochipCategory.Driver)
+                continue;
+
+            // Flat bonuses (scaled by firmware level)
+            if (!string.IsNullOrEmpty(statName))
+            {
+                flatBonus += chip.GetStatBonus(statName);
+            }
+
+            // Multipliers
+            var chipMult = chip.GetStatMultiplier(statName);
+            if (chipMult != 1f)
+            {
+                multiplier *= chipMult;
+            }
+        }
+
+        return (int)((scaledStat + flatBonus) * multiplier);
+    }
+
+    /// <summary>
+    /// Gets the total stat bonuses from all equipped augmentations for a stat.
+    /// </summary>
+    private (int flatBonus, float multiplier) GetAugmentationStatBonus(string statName)
+    {
+        int flatBonus = 0;
+        float multiplier = 1f;
+
+        foreach (var kvp in EquippedAugmentations)
+        {
+            var augId = kvp.Value;
+            if (augId == null)
+                continue;
+
+            var augDef = Augmentations.Get(augId);
+            if (augDef == null)
+                continue;
+
+            if (augDef.StatBonuses.TryGetValue(statName, out var bonus))
+                flatBonus += bonus;
+
+            if (augDef.StatMultipliers.TryGetValue(statName, out var mult))
+                multiplier *= mult;
+        }
+
+        return (flatBonus, multiplier);
     }
 
     /// <summary>
@@ -271,11 +767,20 @@ public class Stray
         if (string.IsNullOrEmpty(Definition.EvolvedFormId))
             return false;
 
-        // Mark as evolved (the definition stays the same, but stats are boosted)
+        // Check if max evolutions reached
+        if (EvolutionStage >= Definition.MaxEvolutions)
+            return false;
+
+        // Increment evolution stage
+        EvolutionStage++;
         IsEvolved = true;
+
+        // Upgrade microchip sockets for new evolution stage
+        UpgradeMicrochipSockets();
 
         // Heal to full on evolution
         CurrentHp = MaxHp;
+        CurrentEnergy = MaxEnergy;
 
         return true;
     }
@@ -362,6 +867,13 @@ public class Stray
     /// </summary>
     public StraySaveData ToSaveData()
     {
+        // Convert AugmentationSlot keys to strings for serialization
+        var augmentationData = new Dictionary<string, string?>();
+        foreach (var kvp in EquippedAugmentations)
+        {
+            augmentationData[kvp.Key.ToString()] = kvp.Value;
+        }
+
         return new StraySaveData
         {
             InstanceId = InstanceId,
@@ -371,7 +883,7 @@ public class Stray
             Experience = Experience,
             CurrentHp = CurrentHp,
             IsEvolved = IsEvolved,
-            EquippedAugmentations = new Dictionary<string, string?>(EquippedAugmentations),
+            EquippedAugmentations = augmentationData,
             EquippedMicrochips = new List<string>(EquippedMicrochips),
             BondLevel = BondLevel
         };
@@ -396,9 +908,14 @@ public class Stray
 
         stray.Experience = data.Experience;
 
+        // Restore augmentations from string keys (e.g., "U_Dermis", "C_Chassis")
         foreach (var aug in data.EquippedAugmentations)
         {
-            stray.EquippedAugmentations[aug.Key] = aug.Value;
+            // Only restore if the slot key is valid for this Stray
+            if (stray.EquippedAugmentations.ContainsKey(aug.Key))
+            {
+                stray.EquippedAugmentations[aug.Key] = aug.Value;
+            }
         }
 
         stray.EquippedMicrochips.AddRange(data.EquippedMicrochips);
