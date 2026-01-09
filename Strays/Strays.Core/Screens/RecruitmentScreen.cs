@@ -14,16 +14,26 @@ namespace Strays.Screens;
 /// </summary>
 public class RecruitmentScreen : GameScreen
 {
+    private enum RecruitmentState
+    {
+        CheckingConditions,
+        Introduction,
+        Negotiation,
+        Result
+    }
+
     private readonly Stray _stray;
     private readonly RecruitmentManager _recruitmentManager;
 
     private Texture2D? _pixelTexture;
     private SpriteFont? _font;
 
+    private RecruitmentState _state;
     private int _selectedOption;
-    private bool _attemptComplete;
     private RecruitmentResult _result;
     private string _resultMessage = "";
+    private bool _conditionsMet;
+    private string _conditionFailureMessage = "";
 
     // Animation
     private float _strayBobTimer;
@@ -55,6 +65,11 @@ public class RecruitmentScreen : GameScreen
         _pixelTexture.SetData(new[] { Color.White });
 
         _font = ScreenManager.Font;
+
+        // Initial state
+        _state = RecruitmentState.CheckingConditions;
+        _conditionsMet = _recruitmentManager.CanAttemptRecruitment(_stray, out _conditionFailureMessage);
+        _state = RecruitmentState.Introduction;
     }
 
     public override void UnloadContent()
@@ -70,58 +85,70 @@ public class RecruitmentScreen : GameScreen
 
         var keyboardState = Keyboard.GetState();
 
-        if (_attemptComplete)
+        switch (_state)
         {
-            // Any key to close
-            if (IsKeyPressed(keyboardState, Keys.Enter) ||
-                IsKeyPressed(keyboardState, Keys.Space) ||
-                IsKeyPressed(keyboardState, Keys.Escape))
-            {
-                RecruitmentComplete?.Invoke(this, _result);
-                ExitScreen();
-            }
-        }
-        else
-        {
-            // Navigate options
-            if (IsKeyPressed(keyboardState, Keys.Up) || IsKeyPressed(keyboardState, Keys.W))
-            {
-                _selectedOption = _selectedOption == 0 ? 1 : 0;
-            }
-            if (IsKeyPressed(keyboardState, Keys.Down) || IsKeyPressed(keyboardState, Keys.S))
-            {
-                _selectedOption = _selectedOption == 1 ? 0 : 1;
-            }
-
-            // Select option
-            if (IsKeyPressed(keyboardState, Keys.Enter) || IsKeyPressed(keyboardState, Keys.Space))
-            {
-                if (_selectedOption == 0)
+            case RecruitmentState.Introduction:
+                if (IsKeyPressed(keyboardState, Keys.Enter) || IsKeyPressed(keyboardState, Keys.Space))
                 {
-                    // Attempt recruitment
-                    _result = _recruitmentManager.AttemptRecruitment(_stray, out _resultMessage);
-                    _attemptComplete = true;
+                    if (_conditionsMet)
+                        _state = RecruitmentState.Negotiation;
+                    else
+                    {
+                        _result = RecruitmentResult.ConditionsNotMet;
+                        _resultMessage = _conditionFailureMessage;
+                        _state = RecruitmentState.Result;
+                    }
                 }
-                else
+                break;
+            case RecruitmentState.Negotiation:
+                HandleNegotiationInput(keyboardState);
+                break;
+            case RecruitmentState.Result:
+                if (IsKeyPressed(keyboardState, Keys.Enter) || IsKeyPressed(keyboardState, Keys.Space) || IsKeyPressed(keyboardState, Keys.Escape))
                 {
-                    // Skip
-                    _result = RecruitmentResult.Refused;
-                    _resultMessage = "You decided not to recruit the Stray.";
                     RecruitmentComplete?.Invoke(this, _result);
                     ExitScreen();
                 }
-            }
-
-            // Cancel
-            if (IsKeyPressed(keyboardState, Keys.Escape))
-            {
-                _result = RecruitmentResult.Refused;
-                RecruitmentComplete?.Invoke(this, _result);
-                ExitScreen();
-            }
+                break;
         }
 
         _previousKeyboardState = keyboardState;
+    }
+
+    private void HandleNegotiationInput(KeyboardState keyboardState)
+    {
+        // Navigate options
+        if (IsKeyPressed(keyboardState, Keys.Up) || IsKeyPressed(keyboardState, Keys.W))
+        {
+            _selectedOption = _selectedOption == 0 ? 1 : 0;
+        }
+        if (IsKeyPressed(keyboardState, Keys.Down) || IsKeyPressed(keyboardState, Keys.S))
+        {
+            _selectedOption = _selectedOption == 1 ? 0 : 1;
+        }
+
+        // Select option
+        if (IsKeyPressed(keyboardState, Keys.Enter) || IsKeyPressed(keyboardState, Keys.Space))
+        {
+            if (_selectedOption == 0) // Yes, recruit
+            {
+                _result = _recruitmentManager.AttemptRecruitment(_stray, out _resultMessage);
+            }
+            else // No, leave it
+            {
+                _result = RecruitmentResult.Refused;
+                _resultMessage = "You decided not to recruit the Stray.";
+            }
+            _state = RecruitmentState.Result;
+        }
+
+        // Cancel
+        if (IsKeyPressed(keyboardState, Keys.Escape))
+        {
+            _result = RecruitmentResult.Refused;
+            RecruitmentComplete?.Invoke(this, _result);
+            ExitScreen();
+        }
     }
 
     private bool IsKeyPressed(KeyboardState current, Keys key)
@@ -156,9 +183,8 @@ public class RecruitmentScreen : GameScreen
         var overlayRect = new Rectangle(0, 0, (int)screenSize.X, (int)screenSize.Y);
         spriteBatch.Draw(_pixelTexture, overlayRect, Color.Black * 0.7f * TransitionAlpha);
 
-        // Draw panel
         var panelWidth = 450;
-        var panelHeight = _attemptComplete ? 200 : 280;
+        var panelHeight = 280;
         var panelX = (int)(screenSize.X / 2 - panelWidth / 2);
         var panelY = (int)(screenSize.Y / 2 - panelHeight / 2);
         var panelRect = new Rectangle(panelX, panelY, panelWidth, panelHeight);
@@ -171,64 +197,83 @@ public class RecruitmentScreen : GameScreen
 
         if (_font != null && _pixelTexture != null)
         {
-            if (_attemptComplete)
+            switch (_state)
             {
-                DrawResult(spriteBatch, panelRect);
-            }
-            else
-            {
-                DrawRecruitmentPrompt(spriteBatch, panelRect);
+                case RecruitmentState.Introduction:
+                    DrawIntroduction(spriteBatch, panelRect);
+                    break;
+                case RecruitmentState.Negotiation:
+                    DrawNegotiation(spriteBatch, panelRect);
+                    break;
+                case RecruitmentState.Result:
+                    DrawResult(spriteBatch, panelRect);
+                    break;
             }
         }
 
         spriteBatch.End();
     }
 
-    private void DrawRecruitmentPrompt(SpriteBatch spriteBatch, Rectangle panelRect)
+    private void DrawIntroduction(SpriteBatch spriteBatch, Rectangle panelRect)
     {
-        if (_font == null || _pixelTexture == null)
-            return;
+        if (_font == null || _pixelTexture == null) return;
 
         float centerX = panelRect.X + panelRect.Width / 2;
 
-        // Title
-        var title = "Recruitment Opportunity!";
+        var title = "A Stray Approaches...";
         var titleSize = _font.MeasureString(title);
         var titlePos = new Vector2(centerX - titleSize.X / 2, panelRect.Y + 15);
         spriteBatch.DrawString(_font, title, titlePos, Color.Yellow * TransitionAlpha);
 
-        // Draw Stray representation
         float strayY = panelRect.Y + 70;
         float bob = (float)Math.Sin(_strayBobTimer * 3) * 3;
-        var strayRect = new Rectangle(
-            (int)(centerX - 30),
-            (int)(strayY + bob),
-            60,
-            60
-        );
+        var strayRect = new Rectangle((int)(centerX - 30), (int)(strayY + bob), 60, 60);
         spriteBatch.Draw(_pixelTexture, strayRect, _stray.Definition.PlaceholderColor * TransitionAlpha);
 
-        // Stray name
         var strayName = _stray.DisplayName;
         var nameSize = _font.MeasureString(strayName);
         var namePos = new Vector2(centerX - nameSize.X / 2, strayY + 70);
         spriteBatch.DrawString(_font, strayName, namePos, Color.White * TransitionAlpha);
 
-        // Level
         var levelText = $"Level {_stray.Level}";
         var levelSize = _font.MeasureString(levelText);
         var levelPos = new Vector2(centerX - levelSize.X / 2, strayY + 90);
         spriteBatch.DrawString(_font, levelText, levelPos, Color.Gray * TransitionAlpha);
-
-        // Prompt
-        var prompt = "Attempt to recruit this Stray?";
+        
+        var dialogue = _stray.Definition.RecruitmentDialogue.GetValueOrDefault("introduction", new System.Collections.Generic.List<string> { "It watches you silently." });
+        var prompt = string.Join("\n", dialogue);
         var promptSize = _font.MeasureString(prompt);
         var promptPos = new Vector2(centerX - promptSize.X / 2, panelRect.Y + 180);
         spriteBatch.DrawString(_font, prompt, promptPos, Color.LightGray * TransitionAlpha);
 
-        // Options
-        string[] options = { "Yes, recruit!", "No, leave it" };
-        float optionY = panelRect.Y + 215;
+        var continueText = "Press Enter to continue";
+        var continueSize = _font.MeasureString(continueText);
+        var pulse = (float)Math.Sin(DateTime.Now.Millisecond / 200.0) * 0.3f + 0.7f;
+        var continuePos = new Vector2(centerX - continueSize.X / 2, panelRect.Bottom - 30);
+        spriteBatch.DrawString(_font, continueText, continuePos, Color.Gray * pulse * TransitionAlpha);
+    }
+
+    private void DrawNegotiation(SpriteBatch spriteBatch, Rectangle panelRect)
+    {
+        if (_font == null) return;
+
+        float centerX = panelRect.X + panelRect.Width / 2;
+
+        var title = "Negotiation";
+        var titleSize = _font.MeasureString(title);
+        var titlePos = new Vector2(centerX - titleSize.X / 2, panelRect.Y + 15);
+        spriteBatch.DrawString(_font, title, titlePos, Color.Yellow * TransitionAlpha);
+
+        var condition = _stray.Definition.RecruitCondition;
+        var prompt = condition?.FailureMessage ?? "Will you accept this Stray?";
+        
+        var wrappedPrompt = WrapText(prompt, panelRect.Width - 40);
+        var promptSize = _font.MeasureString(wrappedPrompt);
+        var promptPos = new Vector2(centerX - promptSize.X / 2, panelRect.Y + 80);
+        spriteBatch.DrawString(_font, wrappedPrompt, promptPos, Color.LightGray * TransitionAlpha);
+
+        string[] options = { "Yes, join us.", "No, go your own way." };
+        float optionY = panelRect.Y + 180;
 
         for (int i = 0; i < options.Length; i++)
         {
@@ -238,7 +283,7 @@ public class RecruitmentScreen : GameScreen
 
             var optionText = prefix + options[i];
             var optionSize = _font.MeasureString(optionText);
-            var optionPos = new Vector2(centerX - optionSize.X / 2, optionY + i * 25);
+            var optionPos = new Vector2(centerX - optionSize.X / 2, optionY + i * 30);
 
             spriteBatch.DrawString(_font, optionText, optionPos, color * TransitionAlpha);
         }
@@ -251,7 +296,6 @@ public class RecruitmentScreen : GameScreen
 
         float centerX = panelRect.X + panelRect.Width / 2;
 
-        // Title based on result
         var (title, titleColor) = _result switch
         {
             RecruitmentResult.Success => ("Success!", Color.LimeGreen),
@@ -265,20 +309,15 @@ public class RecruitmentScreen : GameScreen
         var titlePos = new Vector2(centerX - titleSize.X / 2, panelRect.Y + 30);
         spriteBatch.DrawString(_font, title, titlePos, titleColor * TransitionAlpha);
 
-        // Draw Stray (celebratory bob on success)
         float strayY = panelRect.Y + 70;
-        float bob = _result == RecruitmentResult.Success
-            ? (float)Math.Sin(_strayBobTimer * 6) * 5
-            : 0;
-        var strayRect = new Rectangle(
-            (int)(centerX - 25),
-            (int)(strayY + bob),
-            50,
-            50
-        );
+        float bob = _result == RecruitmentResult.Success ? (float)Math.Sin(_strayBobTimer * 6) * 5 : 0;
+        var strayRect = new Rectangle((int)(centerX - 25), (int)(strayY + bob), 50, 50);
         spriteBatch.Draw(_pixelTexture, strayRect, _stray.Definition.PlaceholderColor * TransitionAlpha);
 
-        // Result message
+        var dialogueKey = _result == RecruitmentResult.Success ? "success" : "failure";
+        var dialogue = _stray.Definition.RecruitmentDialogue.GetValueOrDefault(dialogueKey, new System.Collections.Generic.List<string> { _resultMessage });
+        _resultMessage = string.Join("\n", dialogue);
+
         var messageLines = WrapText(_resultMessage, panelRect.Width - 40);
         var messageY = panelRect.Y + 130;
         foreach (var line in messageLines.Split('\n'))
@@ -289,7 +328,6 @@ public class RecruitmentScreen : GameScreen
             messageY += 20;
         }
 
-        // Continue prompt
         var continueText = "Press Enter to continue";
         var continueSize = _font.MeasureString(continueText);
         var pulse = (float)Math.Sin(DateTime.Now.Millisecond / 200.0) * 0.3f + 0.7f;

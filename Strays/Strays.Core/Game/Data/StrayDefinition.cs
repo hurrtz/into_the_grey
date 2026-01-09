@@ -158,6 +158,12 @@ public class StrayDefinition
     /// Special recruitment conditions (if any).
     /// </summary>
     public RecruitmentCondition? RecruitCondition { get; set; }
+
+    /// <summary>
+    /// Dialogue lines for recruitment negotiation.
+    /// Keyed by situation (e.g., "introduction", "success", "failure").
+    /// </summary>
+    public Dictionary<string, List<string>> RecruitmentDialogue { get; set; } = new();
 }
 
 /// <summary>
@@ -220,7 +226,13 @@ public static class StrayDefinitions
             MicrochipSlots = 3,
             InnateAbilities = new List<string> { "glitch_detect", "data_digest" },
             PlaceholderColor = Color.LightGreen,
-            PlaceholderSize = 18
+            PlaceholderSize = 18,
+            RecruitmentDialogue = new()
+            {
+                { "introduction", new List<string> { "It looks at you with intelligent eyes, tilting its head.", "It seems to be waiting for something." } },
+                { "success", new List<string> { "It barks happily and joins your side." } },
+                { "failure", new List<string> { "It whines and backs away." } }
+            }
         });
 
         // Circuit Crow - Accuracy and vision
@@ -239,7 +251,13 @@ public static class StrayDefinitions
             MicrochipSlots = 2,
             InnateAbilities = new List<string> { "eagle_eye" },
             PlaceholderColor = Color.DarkGray,
-            PlaceholderSize = 16
+            PlaceholderSize = 16,
+            RecruitmentDialogue = new()
+            {
+                { "introduction", new List<string> { "The crow watches you, its head cocked.", "It seems to be judging your worth." } },
+                { "success", new List<string> { "It lands on your shoulder, ready for the journey." } },
+                { "failure", new List<string> { "It caws dismissively and flies away." } }
+            }
         });
 
         // Relay Rodent - Energy regen
