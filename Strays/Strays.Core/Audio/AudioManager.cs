@@ -763,4 +763,362 @@ public class AudioManager
         _soundPools.Clear();
         _music.Clear();
     }
+
+    #region Audio Ducking
+
+    private float _duckingFactor = 1f;
+    private float _targetDuckingFactor = 1f;
+    private const float DUCKING_SPEED = 3f;
+
+    /// <summary>
+    /// Enables audio ducking (reduces music/ambient volume for important audio).
+    /// </summary>
+    /// <param name="duckAmount">Amount to reduce (0.0 = full volume, 1.0 = silent)</param>
+    public void StartDucking(float duckAmount = 0.7f)
+    {
+        _targetDuckingFactor = 1f - MathHelper.Clamp(duckAmount, 0f, 1f);
+    }
+
+    /// <summary>
+    /// Stops audio ducking (restores normal volume).
+    /// </summary>
+    public void StopDucking()
+    {
+        _targetDuckingFactor = 1f;
+    }
+
+    /// <summary>
+    /// Updates ducking effect (call from Update).
+    /// </summary>
+    private void UpdateDucking(float deltaTime)
+    {
+        if (Math.Abs(_duckingFactor - _targetDuckingFactor) > 0.01f)
+        {
+            _duckingFactor = MathHelper.Lerp(_duckingFactor, _targetDuckingFactor, deltaTime * DUCKING_SPEED);
+            UpdateVolumes();
+        }
+    }
+
+    #endregion
+
+    #region Music Playlist
+
+    private readonly Queue<MusicTrack> _playlist = new();
+    private bool _playlistLoop = false;
+    private MusicTrack? _playlistCurrentTrack;
+
+    /// <summary>
+    /// Sets a playlist of music tracks to play sequentially.
+    /// </summary>
+    public void SetPlaylist(IEnumerable<MusicTrack> tracks, bool loop = false)
+    {
+        _playlist.Clear();
+
+        foreach (var track in tracks)
+        {
+            _playlist.Enqueue(track);
+        }
+
+        _playlistLoop = loop;
+    }
+
+    /// <summary>
+    /// Starts playing the playlist.
+    /// </summary>
+    public void StartPlaylist()
+    {
+        if (_playlist.Count == 0)
+        {
+            return;
+        }
+
+        var nextTrack = _playlist.Dequeue();
+        _playlistCurrentTrack = nextTrack;
+
+        if (_playlistLoop)
+        {
+            _playlist.Enqueue(nextTrack);
+        }
+
+        PlayMusic(nextTrack, false, true);
+    }
+
+    /// <summary>
+    /// Advances to the next track in the playlist.
+    /// </summary>
+    public void NextPlaylistTrack()
+    {
+        if (_playlist.Count == 0)
+        {
+            if (_playlistLoop && _playlistCurrentTrack.HasValue)
+            {
+                PlayMusic(_playlistCurrentTrack.Value, false, true);
+            }
+
+            return;
+        }
+
+        StartPlaylist();
+    }
+
+    /// <summary>
+    /// Clears the playlist.
+    /// </summary>
+    public void ClearPlaylist()
+    {
+        _playlist.Clear();
+        _playlistCurrentTrack = null;
+    }
+
+    #endregion
+
+    #region Audio Snapshots
+
+    private AudioSnapshot _currentSnapshot = AudioSnapshot.Default;
+
+    /// <summary>
+    /// Applies an audio snapshot (preset volume configuration).
+    /// </summary>
+    public void ApplySnapshot(AudioSnapshot snapshot, float transitionTime = 0.5f)
+    {
+        _currentSnapshot = snapshot;
+
+        switch (snapshot)
+        {
+            case AudioSnapshot.Default:
+                SetVolume(AudioCategory.Music, 0.7f);
+                SetVolume(AudioCategory.Ambient, 0.5f);
+                SetVolume(AudioCategory.SoundEffects, 0.8f);
+                StopDucking();
+                break;
+
+            case AudioSnapshot.Combat:
+                SetVolume(AudioCategory.Music, 0.8f);
+                SetVolume(AudioCategory.Ambient, 0.3f);
+                SetVolume(AudioCategory.SoundEffects, 0.9f);
+                StopDucking();
+                break;
+
+            case AudioSnapshot.Cutscene:
+                SetVolume(AudioCategory.Music, 0.6f);
+                SetVolume(AudioCategory.Ambient, 0.2f);
+                SetVolume(AudioCategory.SoundEffects, 0.5f);
+                StopDucking();
+                break;
+
+            case AudioSnapshot.Dialog:
+                StartDucking(0.5f);
+                SetVolume(AudioCategory.Voice, 1.0f);
+                break;
+
+            case AudioSnapshot.Pause:
+                SetVolume(AudioCategory.Music, 0.4f);
+                SetVolume(AudioCategory.Ambient, 0.2f);
+                SetVolume(AudioCategory.SoundEffects, 0.5f);
+                break;
+
+            case AudioSnapshot.BossIntro:
+                SetVolume(AudioCategory.Music, 0.9f);
+                SetVolume(AudioCategory.Ambient, 0.1f);
+                SetVolume(AudioCategory.SoundEffects, 0.7f);
+                break;
+
+            case AudioSnapshot.EmotionalMoment:
+                SetVolume(AudioCategory.Music, 0.85f);
+                SetVolume(AudioCategory.Ambient, 0.15f);
+                SetVolume(AudioCategory.SoundEffects, 0.4f);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Gets the current audio snapshot.
+    /// </summary>
+    public AudioSnapshot CurrentSnapshot => _currentSnapshot;
+
+    #endregion
+
+    #region Reverb Zones
+
+    private float _reverbAmount = 0f;
+    private float _targetReverbAmount = 0f;
+    private const float REVERB_TRANSITION_SPEED = 2f;
+
+    /// <summary>
+    /// Sets the reverb zone amount (0 = no reverb, 1 = max reverb).
+    /// Simulates enclosed vs open spaces.
+    /// </summary>
+    public void SetReverbZone(float amount)
+    {
+        _targetReverbAmount = MathHelper.Clamp(amount, 0f, 1f);
+    }
+
+    /// <summary>
+    /// Sets reverb based on location type.
+    /// </summary>
+    public void SetReverbForLocation(LocationAcoustics location)
+    {
+        switch (location)
+        {
+            case LocationAcoustics.Outdoor:
+                SetReverbZone(0.1f);
+                break;
+            case LocationAcoustics.SmallRoom:
+                SetReverbZone(0.3f);
+                break;
+            case LocationAcoustics.LargeRoom:
+                SetReverbZone(0.5f);
+                break;
+            case LocationAcoustics.Cave:
+                SetReverbZone(0.7f);
+                break;
+            case LocationAcoustics.Cathedral:
+                SetReverbZone(0.85f);
+                break;
+            case LocationAcoustics.Underwater:
+                SetReverbZone(0.4f);
+                break;
+        }
+    }
+
+    private void UpdateReverb(float deltaTime)
+    {
+        if (Math.Abs(_reverbAmount - _targetReverbAmount) > 0.01f)
+        {
+            _reverbAmount = MathHelper.Lerp(_reverbAmount, _targetReverbAmount, deltaTime * REVERB_TRANSITION_SPEED);
+            // Note: MonoGame doesn't have built-in reverb, but this value
+            // can be used to adjust pitch/volume to simulate reverb effect
+        }
+    }
+
+    #endregion
+
+    #region Time Effects
+
+    private float _timeScale = 1f;
+
+    /// <summary>
+    /// Sets the time scale for audio (affects pitch).
+    /// Used for slow-motion effects.
+    /// </summary>
+    public void SetTimeScale(float scale)
+    {
+        _timeScale = MathHelper.Clamp(scale, 0.25f, 2f);
+    }
+
+    /// <summary>
+    /// Resets time scale to normal.
+    /// </summary>
+    public void ResetTimeScale()
+    {
+        _timeScale = 1f;
+    }
+
+    /// <summary>
+    /// Gets the pitch adjustment for time scale.
+    /// </summary>
+    public float GetTimeScalePitch()
+    {
+        return (_timeScale - 1f) * 0.5f; // Subtle pitch change
+    }
+
+    #endregion
+
+    #region Subtitle Support
+
+    /// <summary>
+    /// Event fired when a sound with subtitles plays.
+    /// </summary>
+    public event EventHandler<SubtitleEventArgs>? SubtitleTriggered;
+
+    /// <summary>
+    /// Plays a sound with subtitle support.
+    /// </summary>
+    public void PlaySoundWithSubtitle(SoundEffect sound, string subtitleText, float duration = 2f, SubtitleType type = SubtitleType.SoundEffect)
+    {
+        PlaySound(sound);
+
+        SubtitleTriggered?.Invoke(this, new SubtitleEventArgs
+        {
+            Text = subtitleText,
+            Duration = duration,
+            Type = type,
+            Source = sound.ToString()
+        });
+    }
+
+    #endregion
+
+    #region Extended Update
+
+    /// <summary>
+    /// Extended update that handles all audio systems.
+    /// </summary>
+    public void UpdateExtended(GameTime gameTime)
+    {
+        Update(gameTime);
+
+        float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+        UpdateDucking(deltaTime);
+        UpdateReverb(deltaTime);
+
+        // Handle playlist progression
+        if (_playlistCurrentTrack.HasValue && _currentTrack != MusicTrack.None &&
+            MediaPlayer.State == MediaState.Stopped && !_isFadingOut)
+        {
+            NextPlaylistTrack();
+        }
+    }
+
+    #endregion
+}
+
+/// <summary>
+/// Audio snapshots for different game states.
+/// </summary>
+public enum AudioSnapshot
+{
+    Default,
+    Combat,
+    Cutscene,
+    Dialog,
+    Pause,
+    BossIntro,
+    EmotionalMoment
+}
+
+/// <summary>
+/// Location acoustics types for reverb.
+/// </summary>
+public enum LocationAcoustics
+{
+    Outdoor,
+    SmallRoom,
+    LargeRoom,
+    Cave,
+    Cathedral,
+    Underwater
+}
+
+/// <summary>
+/// Subtitle types.
+/// </summary>
+public enum SubtitleType
+{
+    Dialog,
+    SoundEffect,
+    Music,
+    Ambient
+}
+
+/// <summary>
+/// Event args for subtitle events.
+/// </summary>
+public class SubtitleEventArgs : EventArgs
+{
+    public string Text { get; set; } = "";
+    public float Duration { get; set; } = 2f;
+    public SubtitleType Type { get; set; } = SubtitleType.SoundEffect;
+    public string Source { get; set; } = "";
 }
