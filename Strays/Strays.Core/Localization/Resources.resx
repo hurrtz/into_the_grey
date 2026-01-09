@@ -1,64 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
-    Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
-    associated with the data types.
-    
-    Example:
-    
-    ... ado.net/XML headers & schema ...
-    <resheader name="resmimetype">text/microsoft-resx</resheader>
-    <resheader name="version">2.0</resheader>
-    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
-    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-        <value>[base64 mime encoded serialized .NET Framework object]</value>
-    </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-        <comment>This is a comment</comment>
-    </data>
-                
-    There are any number of "resheader" rows that contain simple 
-    name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
-    mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
-    extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
-    read any of the formats listed below.
-    
-    mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
-            : and then encoded with base64 encoding.
-    
-    mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
-            : and then encoded with base64 encoding.
-
-    mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
-            : using a System.ComponentModel.TypeConverter
-            : and then encoded with base64 encoding.
-    -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
@@ -117,145 +58,330 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Play" xml:space="preserve">
-    <value>Play</value>
-  </data>
-  <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
-  </data>
-  <data name="Exit" xml:space="preserve">
-    <value>Exit</value>
-  </data>
-  <data name="MainMenu" xml:space="preserve">
-    <value>Main Menu</value>
-  </data>
-  <data name="Back" xml:space="preserve">
-    <value>Back</value>
-  </data>
-  <data name="ErrorNoAnimation" xml:space="preserve">
-    <value>No animation is currently playing.</value>
-  </data>
-  <data name="ErrorUnsupportedTileType" xml:space="preserve">
-    <value>Unsupported tile type character '{0}' at position {1}, {2}.</value>
-  </data>
-  <data name="ErrorLevelExit" xml:space="preserve">
-    <value>A level must have an exit.</value>
-  </data>
-  <data name="ErrorLevelStartingPoint" xml:space="preserve">
-    <value>A level must have a starting point.</value>
-  </data>
-  <data name="ErrorLevelOneStartingPoint" xml:space="preserve">
-    <value>A level may only have one starting point.</value>
-  </data>
-  <data name="ErrorLevelOneExit" xml:space="preserve">
-    <value>A level may only have one exit.</value>
-  </data>
-  <data name="ErrorLevelLineLength" xml:space="preserve">
-    <value>The length of line {0} is different from all preceeding lines.</value>
-  </data>
-  <data name="ErrorAccelerometerMustInitialize" xml:space="preserve">
-    <value>You must Initialize before you can call GetState()</value>
-  </data>
-  <data name="ErrorAccelerometerInitializeOnce" xml:space="preserve">
-    <value>Initialize can only be called once</value>
-  </data>
-  <data name="ErrorAccelerometerToString" xml:space="preserve">
-    <value>Acceleration: {0}, IsActive: {1}</value>
-  </data>
-  <data name="Time" xml:space="preserve">
-    <value>TIME: </value>
-  </data>
-  <data name="Score" xml:space="preserve">
-    <value>SCORE: </value>
-  </data>
-  <data name="Loading" xml:space="preserve">
-    <value>Loading...</value>
-  </data>
-  <data name="ExitQuestion" xml:space="preserve">
-    <value>Are you sure you want to exit?</value>
-  </data>
-  <data name="Resume" xml:space="preserve">
-    <value>Resume</value>
-  </data>
-  <data name="Quit" xml:space="preserve">
-    <value>Quit</value>
-  </data>
-  <data name="Paused" xml:space="preserve">
-    <value>Paused</value>
-  </data>
-  <data name="QuitQuestion" xml:space="preserve">
-    <value>Are you sure you want to quit?</value>
-  </data>
-  <data name="About" xml:space="preserve">
-    <value>About</value>
-  </data>
-  <data name="NoButtonText" xml:space="preserve">
-    <value>[ No ]</value>
-  </data>
-  <data name="YesButtonText" xml:space="preserve">
-    <value>[ Yes ]</value>
-  </data>
-  <data name="DisplayMode" xml:space="preserve">
-    <value>Display Mode : {0}</value>
-  </data>
-  <data name="Windowed" xml:space="preserve">
-    <value>Windowed</value>
-  </data>
-  <data name="FullScreen" xml:space="preserve">
-    <value>Fullscreen</value>
-  </data>
-  <data name="Language" xml:space="preserve">
-    <value>Language: </value>
-  </data>
-  <data name="ParticleEffect" xml:space="preserve">
-    <value>Particle Effect: </value>
-  </data>
-  <data name="LetsGo" xml:space="preserve">
-    <value>Let's GO!!!!</value>
-  </data>
-  <data name="MonoGameSite" xml:space="preserve">
-    <value>MonoGame Site</value>
-  </data>
-  <data name="English" xml:space="preserve">
-    <value>english (English)</value>
-  </data>
-  <data name="Tutorial" xml:space="preserve">
-    <value>Tutorial</value>
-  </data>
-  <data name="CollectThese" xml:space="preserve">
-    <value>Collect These!</value>
-  </data>
-  <data name="GetToHere" xml:space="preserve">
-    <value>Get To Here!</value>
-  </data>
-  <data name="DontDie" xml:space="preserve">
-    <value>Don't Die!</value>
-  </data>
-  <data name="LevelCompleted" xml:space="preserve">
-    <value>Level Completed!</value>
-  </data>
-  <data name="TimeRanOut" xml:space="preserve">
-    <value>Time Ran Out!</value>
-  </data>
-  <data name="YouDied" xml:space="preserve">
-    <value>You DIED!</value>
-  </data>
-  <data name="GemsCollected" xml:space="preserve">
-    <value>Gems Collected</value>
-  </data>
-  <data name="NewHighScore" xml:space="preserve">
-    <value>CONGRATULATIONS!! You set a new high score.</value>
-  </data>
-  <data name="YesButtonHelp" xml:space="preserve">
-    <value>Yes = A Button, Space, Enter</value>
-  </data>
-  <data name="NoButtonHelp" xml:space="preserve">
-    <value>No = B button, Esc</value>
-  </data>
-  <data name="ShowVirtualGamePad" xml:space="preserve">
-    <value>Show Virtual GamePad: </value>
-  </data>
-  <data name="TapToPause" xml:space="preserve">
-    <value>Tap To Pause</value>
-  </data>
+
+  <!-- Common UI -->
+  <data name="UI_OK" xml:space="preserve"><value>OK</value></data>
+  <data name="UI_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="UI_Confirm" xml:space="preserve"><value>Confirm</value></data>
+  <data name="UI_Back" xml:space="preserve"><value>Back</value></data>
+  <data name="UI_Close" xml:space="preserve"><value>Close</value></data>
+  <data name="UI_Yes" xml:space="preserve"><value>Yes</value></data>
+  <data name="UI_No" xml:space="preserve"><value>No</value></data>
+  <data name="UI_Accept" xml:space="preserve"><value>Accept</value></data>
+  <data name="UI_Decline" xml:space="preserve"><value>Decline</value></data>
+  <data name="UI_Continue" xml:space="preserve"><value>Continue</value></data>
+  <data name="UI_Skip" xml:space="preserve"><value>Skip</value></data>
+  <data name="UI_Save" xml:space="preserve"><value>Save</value></data>
+  <data name="UI_Load" xml:space="preserve"><value>Load</value></data>
+  <data name="UI_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="UI_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="UI_Apply" xml:space="preserve"><value>Apply</value></data>
+  <data name="UI_Reset" xml:space="preserve"><value>Reset</value></data>
+  <data name="UI_Default" xml:space="preserve"><value>Default</value></data>
+
+  <!-- Main Menu -->
+  <data name="Menu_NewGame" xml:space="preserve"><value>New Game</value></data>
+  <data name="Menu_Continue" xml:space="preserve"><value>Continue</value></data>
+  <data name="Menu_LoadGame" xml:space="preserve"><value>Load Game</value></data>
+  <data name="Menu_Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Menu_Credits" xml:space="preserve"><value>Credits</value></data>
+  <data name="Menu_Quit" xml:space="preserve"><value>Quit</value></data>
+  <data name="Menu_QuitConfirm" xml:space="preserve"><value>Are you sure you want to quit?</value></data>
+
+  <!-- Pause Menu -->
+  <data name="Pause_Title" xml:space="preserve"><value>Paused</value></data>
+  <data name="Pause_Resume" xml:space="preserve"><value>Resume</value></data>
+  <data name="Pause_Inventory" xml:space="preserve"><value>Inventory</value></data>
+  <data name="Pause_Party" xml:space="preserve"><value>Party</value></data>
+  <data name="Pause_Quests" xml:space="preserve"><value>Quests</value></data>
+  <data name="Pause_Map" xml:space="preserve"><value>Map</value></data>
+  <data name="Pause_Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Pause_MainMenu" xml:space="preserve"><value>Main Menu</value></data>
+  <data name="Pause_MainMenuConfirm" xml:space="preserve"><value>Return to main menu? Unsaved progress will be lost.</value></data>
+
+  <!-- Settings -->
+  <data name="Settings_Title" xml:space="preserve"><value>Settings</value></data>
+  <data name="Settings_Audio" xml:space="preserve"><value>Audio</value></data>
+  <data name="Settings_Video" xml:space="preserve"><value>Video</value></data>
+  <data name="Settings_Controls" xml:space="preserve"><value>Controls</value></data>
+  <data name="Settings_Gameplay" xml:space="preserve"><value>Gameplay</value></data>
+  <data name="Settings_Accessibility" xml:space="preserve"><value>Accessibility</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>Language</value></data>
+  <data name="Settings_MasterVolume" xml:space="preserve"><value>Master Volume</value></data>
+  <data name="Settings_MusicVolume" xml:space="preserve"><value>Music Volume</value></data>
+  <data name="Settings_SFXVolume" xml:space="preserve"><value>Sound Effects</value></data>
+  <data name="Settings_VoiceVolume" xml:space="preserve"><value>Voice Volume</value></data>
+  <data name="Settings_AmbientVolume" xml:space="preserve"><value>Ambient Volume</value></data>
+  <data name="Settings_Resolution" xml:space="preserve"><value>Resolution</value></data>
+  <data name="Settings_Fullscreen" xml:space="preserve"><value>Fullscreen</value></data>
+  <data name="Settings_VSync" xml:space="preserve"><value>VSync</value></data>
+  <data name="Settings_Brightness" xml:space="preserve"><value>Brightness</value></data>
+  <data name="Settings_Rebind" xml:space="preserve"><value>Rebind Controls</value></data>
+  <data name="Settings_Sensitivity" xml:space="preserve"><value>Sensitivity</value></data>
+  <data name="Settings_InvertY" xml:space="preserve"><value>Invert Y Axis</value></data>
+  <data name="Settings_Vibration" xml:space="preserve"><value>Controller Vibration</value></data>
+  <data name="Settings_Subtitles" xml:space="preserve"><value>Subtitles</value></data>
+  <data name="Settings_SubtitleSize" xml:space="preserve"><value>Subtitle Size</value></data>
+  <data name="Settings_ScreenShake" xml:space="preserve"><value>Screen Shake</value></data>
+  <data name="Settings_ColorblindMode" xml:space="preserve"><value>Colorblind Mode</value></data>
+
+  <!-- Combat -->
+  <data name="Combat_Attack" xml:space="preserve"><value>Attack</value></data>
+  <data name="Combat_Defend" xml:space="preserve"><value>Defend</value></data>
+  <data name="Combat_Ability" xml:space="preserve"><value>Ability</value></data>
+  <data name="Combat_Item" xml:space="preserve"><value>Item</value></data>
+  <data name="Combat_Flee" xml:space="preserve"><value>Flee</value></data>
+  <data name="Combat_Switch" xml:space="preserve"><value>Switch</value></data>
+  <data name="Combat_Victory" xml:space="preserve"><value>Victory!</value></data>
+  <data name="Combat_Defeat" xml:space="preserve"><value>Defeat...</value></data>
+  <data name="Combat_Escaped" xml:space="preserve"><value>Escaped successfully!</value></data>
+  <data name="Combat_Damage" xml:space="preserve"><value>{0} damage!</value></data>
+  <data name="Combat_Critical" xml:space="preserve"><value>Critical Hit!</value></data>
+  <data name="Combat_Miss" xml:space="preserve"><value>Miss!</value></data>
+  <data name="Combat_Blocked" xml:space="preserve"><value>Blocked!</value></data>
+  <data name="Combat_Healed" xml:space="preserve"><value>Healed {0} HP!</value></data>
+  <data name="Combat_Resisted" xml:space="preserve"><value>Resisted!</value></data>
+  <data name="Combat_Weak" xml:space="preserve"><value>Super Effective!</value></data>
+  <data name="Combat_YourTurn" xml:space="preserve"><value>Your Turn</value></data>
+  <data name="Combat_EnemyTurn" xml:space="preserve"><value>Enemy Turn</value></data>
+  <data name="Combat_SelectTarget" xml:space="preserve"><value>Select Target</value></data>
+  <data name="Combat_SelectAbility" xml:space="preserve"><value>Select Ability</value></data>
+  <data name="Combat_NotEnoughEnergy" xml:space="preserve"><value>Not enough energy!</value></data>
+  <data name="Combat_XPGained" xml:space="preserve"><value>Gained {0} XP!</value></data>
+  <data name="Combat_CurrencyGained" xml:space="preserve"><value>Found {0} credits!</value></data>
+  <data name="Combat_ItemDropped" xml:space="preserve"><value>Obtained {0}!</value></data>
+  <data name="Combat_LevelUp" xml:space="preserve"><value>Level Up!</value></data>
+
+  <!-- Strays -->
+  <data name="Stray_Level" xml:space="preserve"><value>Level {0}</value></data>
+  <data name="Stray_HP" xml:space="preserve"><value>HP</value></data>
+  <data name="Stray_Energy" xml:space="preserve"><value>Energy</value></data>
+  <data name="Stray_Attack" xml:space="preserve"><value>Attack</value></data>
+  <data name="Stray_Defense" xml:space="preserve"><value>Defense</value></data>
+  <data name="Stray_Speed" xml:space="preserve"><value>Speed</value></data>
+  <data name="Stray_Type" xml:space="preserve"><value>Type</value></data>
+  <data name="Stray_Recruited" xml:space="preserve"><value>{0} joined your party!</value></data>
+  <data name="Stray_Released" xml:space="preserve"><value>{0} has been released.</value></data>
+  <data name="Stray_Evolved" xml:space="preserve"><value>{0} evolved into {1}!</value></data>
+  <data name="Stray_EvolutionAvailable" xml:space="preserve"><value>Evolution available!</value></data>
+  <data name="Stray_Abilities" xml:space="preserve"><value>Abilities</value></data>
+  <data name="Stray_Stats" xml:space="preserve"><value>Stats</value></data>
+  <data name="Stray_Info" xml:space="preserve"><value>Info</value></data>
+  <data name="Stray_Recruit" xml:space="preserve"><value>Recruit</value></data>
+  <data name="Stray_Release" xml:space="preserve"><value>Release</value></data>
+  <data name="Stray_Evolve" xml:space="preserve"><value>Evolve</value></data>
+  <data name="Stray_ViewDetails" xml:space="preserve"><value>View Details</value></data>
+  <data name="Stray_Wild" xml:space="preserve"><value>Wild</value></data>
+  <data name="Stray_Companion" xml:space="preserve"><value>Companion</value></data>
+  <data name="Stray_Boss" xml:space="preserve"><value>Boss</value></data>
+
+  <!-- Items -->
+  <data name="Item_Use" xml:space="preserve"><value>Use</value></data>
+  <data name="Item_Equip" xml:space="preserve"><value>Equip</value></data>
+  <data name="Item_Unequip" xml:space="preserve"><value>Unequip</value></data>
+  <data name="Item_Drop" xml:space="preserve"><value>Drop</value></data>
+  <data name="Item_Sell" xml:space="preserve"><value>Sell</value></data>
+  <data name="Item_Buy" xml:space="preserve"><value>Buy</value></data>
+  <data name="Item_Consumable" xml:space="preserve"><value>Consumable</value></data>
+  <data name="Item_Equipment" xml:space="preserve"><value>Equipment</value></data>
+  <data name="Item_KeyItem" xml:space="preserve"><value>Key Item</value></data>
+  <data name="Item_Material" xml:space="preserve"><value>Material</value></data>
+  <data name="Item_Rarity_Common" xml:space="preserve"><value>Common</value></data>
+  <data name="Item_Rarity_Uncommon" xml:space="preserve"><value>Uncommon</value></data>
+  <data name="Item_Rarity_Rare" xml:space="preserve"><value>Rare</value></data>
+  <data name="Item_Rarity_Epic" xml:space="preserve"><value>Epic</value></data>
+  <data name="Item_Rarity_Legendary" xml:space="preserve"><value>Legendary</value></data>
+  <data name="Item_Quantity" xml:space="preserve"><value>x{0}</value></data>
+  <data name="Item_Value" xml:space="preserve"><value>{0} credits</value></data>
+  <data name="Item_Obtained" xml:space="preserve"><value>Obtained {0}!</value></data>
+  <data name="Item_Used" xml:space="preserve"><value>Used {0}.</value></data>
+
+  <!-- Inventory -->
+  <data name="Inventory_Title" xml:space="preserve"><value>Inventory</value></data>
+  <data name="Inventory_Empty" xml:space="preserve"><value>Empty</value></data>
+  <data name="Inventory_Full" xml:space="preserve"><value>Inventory full!</value></data>
+  <data name="Inventory_Currency" xml:space="preserve"><value>Credits: {0}</value></data>
+  <data name="Inventory_Weight" xml:space="preserve"><value>Weight: {0}/{1}</value></data>
+  <data name="Inventory_Sort" xml:space="preserve"><value>Sort</value></data>
+  <data name="Inventory_Filter" xml:space="preserve"><value>Filter</value></data>
+
+  <!-- Shop -->
+  <data name="Shop_Title" xml:space="preserve"><value>Shop</value></data>
+  <data name="Shop_Buy" xml:space="preserve"><value>Buy</value></data>
+  <data name="Shop_Sell" xml:space="preserve"><value>Sell</value></data>
+  <data name="Shop_Confirm" xml:space="preserve"><value>Purchase {0} for {1} credits?</value></data>
+  <data name="Shop_NoFunds" xml:space="preserve"><value>Not enough credits!</value></data>
+  <data name="Shop_SoldOut" xml:space="preserve"><value>Sold Out</value></data>
+  <data name="Shop_Thanks" xml:space="preserve"><value>Thank you for your purchase!</value></data>
+
+  <!-- Quests -->
+  <data name="Quest_Title" xml:space="preserve"><value>Quest Log</value></data>
+  <data name="Quest_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="Quest_Completed" xml:space="preserve"><value>Completed</value></data>
+  <data name="Quest_Failed" xml:space="preserve"><value>Failed</value></data>
+  <data name="Quest_Main" xml:space="preserve"><value>Main Quest</value></data>
+  <data name="Quest_Side" xml:space="preserve"><value>Side Quest</value></data>
+  <data name="Quest_Bounty" xml:space="preserve"><value>Bounty</value></data>
+  <data name="Quest_Objectives" xml:space="preserve"><value>Objectives</value></data>
+  <data name="Quest_Rewards" xml:space="preserve"><value>Rewards</value></data>
+  <data name="Quest_Progress" xml:space="preserve"><value>Progress: {0}%</value></data>
+  <data name="Quest_New" xml:space="preserve"><value>New Quest: {0}</value></data>
+  <data name="Quest_Updated" xml:space="preserve"><value>Quest Updated: {0}</value></data>
+  <data name="Quest_Complete" xml:space="preserve"><value>Quest Complete: {0}</value></data>
+  <data name="Quest_Track" xml:space="preserve"><value>Track</value></data>
+  <data name="Quest_Abandon" xml:space="preserve"><value>Abandon</value></data>
+  <data name="Quest_AbandonConfirm" xml:space="preserve"><value>Abandon this quest? You may not be able to restart it.</value></data>
+
+  <!-- Map -->
+  <data name="Map_Title" xml:space="preserve"><value>World Map</value></data>
+  <data name="Map_CurrentLocation" xml:space="preserve"><value>Current Location</value></data>
+  <data name="Map_FastTravel" xml:space="preserve"><value>Fast Travel</value></data>
+  <data name="Map_FastTravelConfirm" xml:space="preserve"><value>Travel to {0}?</value></data>
+  <data name="Map_Unexplored" xml:space="preserve"><value>Unexplored</value></data>
+  <data name="Map_Marker" xml:space="preserve"><value>Marker</value></data>
+
+  <!-- Biomes -->
+  <data name="Biome_Fringe" xml:space="preserve"><value>The Fringe</value></data>
+  <data name="Biome_Rust" xml:space="preserve"><value>Rust Belt</value></data>
+  <data name="Biome_Green" xml:space="preserve"><value>The Green</value></data>
+  <data name="Biome_Quiet" xml:space="preserve"><value>The Quiet</value></data>
+  <data name="Biome_Teeth" xml:space="preserve"><value>The Teeth</value></data>
+  <data name="Biome_Glow" xml:space="preserve"><value>The Glow</value></data>
+  <data name="Biome_Archive" xml:space="preserve"><value>Archive Scar</value></data>
+  <data name="Biome_FringeDesc" xml:space="preserve"><value>The border zone between human and digital worlds.</value></data>
+  <data name="Biome_RustDesc" xml:space="preserve"><value>Abandoned industrial sector reclaimed by decay.</value></data>
+  <data name="Biome_GreenDesc" xml:space="preserve"><value>Overgrown nature preserve with wild code.</value></data>
+  <data name="Biome_QuietDesc" xml:space="preserve"><value>Silent suburbs where nothing moves.</value></data>
+  <data name="Biome_TeethDesc" xml:space="preserve"><value>Dangerous territory of corrupted machines.</value></data>
+  <data name="Biome_GlowDesc" xml:space="preserve"><value>Radioactive wasteland of pure data energy.</value></data>
+  <data name="Biome_ArchiveDesc" xml:space="preserve"><value>The wound where reality breaks down.</value></data>
+
+  <!-- Factions -->
+  <data name="Faction_NIMDOK" xml:space="preserve"><value>NIMDOK</value></data>
+  <data name="Faction_Independents" xml:space="preserve"><value>Independents</value></data>
+  <data name="Faction_Scavengers" xml:space="preserve"><value>Scavengers</value></data>
+  <data name="Faction_Archive" xml:space="preserve"><value>Archive Keepers</value></data>
+  <data name="Faction_Reputation" xml:space="preserve"><value>Reputation</value></data>
+  <data name="Faction_Hostile" xml:space="preserve"><value>Hostile</value></data>
+  <data name="Faction_Unfriendly" xml:space="preserve"><value>Unfriendly</value></data>
+  <data name="Faction_Neutral" xml:space="preserve"><value>Neutral</value></data>
+  <data name="Faction_Friendly" xml:space="preserve"><value>Friendly</value></data>
+  <data name="Faction_Allied" xml:space="preserve"><value>Allied</value></data>
+
+  <!-- Dungeons -->
+  <data name="Dungeon_Enter" xml:space="preserve"><value>Enter Dungeon</value></data>
+  <data name="Dungeon_Exit" xml:space="preserve"><value>Exit Dungeon</value></data>
+  <data name="Dungeon_Floor" xml:space="preserve"><value>Floor {0}</value></data>
+  <data name="Dungeon_Clear" xml:space="preserve"><value>Dungeon Cleared!</value></data>
+  <data name="Dungeon_Difficulty_Easy" xml:space="preserve"><value>Easy</value></data>
+  <data name="Dungeon_Difficulty_Normal" xml:space="preserve"><value>Normal</value></data>
+  <data name="Dungeon_Difficulty_Hard" xml:space="preserve"><value>Hard</value></data>
+  <data name="Dungeon_Difficulty_Nightmare" xml:space="preserve"><value>Nightmare</value></data>
+
+  <!-- Dialog -->
+  <data name="Dialog_Continue" xml:space="preserve"><value>[Continue]</value></data>
+  <data name="Dialog_Choice" xml:space="preserve"><value>Choose...</value></data>
+  <data name="Dialog_End" xml:space="preserve"><value>[End]</value></data>
+
+  <!-- Save/Load -->
+  <data name="Save_Title" xml:space="preserve"><value>Save Game</value></data>
+  <data name="Save_Slot" xml:space="preserve"><value>Slot {0}</value></data>
+  <data name="Save_Empty" xml:space="preserve"><value>Empty Slot</value></data>
+  <data name="Save_Overwrite" xml:space="preserve"><value>Overwrite</value></data>
+  <data name="Save_OverwriteConfirm" xml:space="preserve"><value>Overwrite this save?</value></data>
+  <data name="Save_Success" xml:space="preserve"><value>Game saved!</value></data>
+  <data name="Save_Failed" xml:space="preserve"><value>Failed to save game.</value></data>
+  <data name="Load_Title" xml:space="preserve"><value>Load Game</value></data>
+  <data name="Load_Confirm" xml:space="preserve"><value>Load this save?</value></data>
+  <data name="Load_Success" xml:space="preserve"><value>Game loaded!</value></data>
+  <data name="Load_Failed" xml:space="preserve"><value>Failed to load game.</value></data>
+  <data name="Save_PlayTime" xml:space="preserve"><value>Play Time: {0}</value></data>
+  <data name="Save_Location" xml:space="preserve"><value>Location: {0}</value></data>
+  <data name="Save_Chapter" xml:space="preserve"><value>Chapter {0}</value></data>
+
+  <!-- Tutorial -->
+  <data name="Tutorial_Movement" xml:space="preserve"><value>Use WASD or Left Stick to move.</value></data>
+  <data name="Tutorial_Combat" xml:space="preserve"><value>Select actions to fight enemies!</value></data>
+  <data name="Tutorial_Inventory" xml:space="preserve"><value>Press I to open your inventory.</value></data>
+  <data name="Tutorial_Quests" xml:space="preserve"><value>Press J to view your quests.</value></data>
+  <data name="Tutorial_Strays" xml:space="preserve"><value>Recruit Strays to join your party!</value></data>
+  <data name="Tutorial_Map" xml:space="preserve"><value>Press M to open the map.</value></data>
+  <data name="Tutorial_Skip" xml:space="preserve"><value>Skip Tutorial</value></data>
+  <data name="Tutorial_SkipConfirm" xml:space="preserve"><value>Skip the tutorial?</value></data>
+
+  <!-- Notifications -->
+  <data name="Notify_Autosave" xml:space="preserve"><value>Autosaving...</value></data>
+  <data name="Notify_Achievement" xml:space="preserve"><value>Achievement Unlocked!</value></data>
+  <data name="Notify_NewArea" xml:space="preserve"><value>Discovered: {0}</value></data>
+  <data name="Notify_LowHealth" xml:space="preserve"><value>Low Health!</value></data>
+  <data name="Notify_PartyFull" xml:space="preserve"><value>Party is full!</value></data>
+  <data name="Notify_InventoryFull" xml:space="preserve"><value>Inventory is full!</value></data>
+
+  <!-- Weather -->
+  <data name="Weather_Clear" xml:space="preserve"><value>Clear</value></data>
+  <data name="Weather_Rain" xml:space="preserve"><value>Rain</value></data>
+  <data name="Weather_Storm" xml:space="preserve"><value>Storm</value></data>
+  <data name="Weather_Fog" xml:space="preserve"><value>Fog</value></data>
+  <data name="Weather_DataStorm" xml:space="preserve"><value>Data Storm</value></data>
+
+  <!-- Time Formats -->
+  <data name="Format_PlayTimeHours" xml:space="preserve"><value>{0}h {1}m</value></data>
+  <data name="Format_PlayTimeMinutes" xml:space="preserve"><value>{0}m</value></data>
+  <data name="Format_Date" xml:space="preserve"><value>{0:d}</value></data>
+
+  <!-- Error Messages -->
+  <data name="Error_Generic" xml:space="preserve"><value>An error occurred.</value></data>
+  <data name="Error_SaveFailed" xml:space="preserve"><value>Failed to save game.</value></data>
+  <data name="Error_LoadFailed" xml:space="preserve"><value>Failed to load game.</value></data>
+  <data name="Error_NetworkError" xml:space="preserve"><value>Network error.</value></data>
+
+  <!-- Confirmation Dialogs -->
+  <data name="Confirm_Title" xml:space="preserve"><value>Confirm</value></data>
+  <data name="Confirm_UnsavedChanges" xml:space="preserve"><value>You have unsaved changes. Continue?</value></data>
+  <data name="Confirm_DeleteSave" xml:space="preserve"><value>Delete this save file?</value></data>
+  <data name="Confirm_ResetSettings" xml:space="preserve"><value>Reset all settings to default?</value></data>
+
+  <!-- Tooltips -->
+  <data name="Tooltip_Locked" xml:space="preserve"><value>Locked</value></data>
+  <data name="Tooltip_Unlocked" xml:space="preserve"><value>Unlocked</value></data>
+  <data name="Tooltip_Requirement" xml:space="preserve"><value>Requires: {0}</value></data>
+
+  <!-- Creature Categories -->
+  <data name="Category_Glitch" xml:space="preserve"><value>Glitch</value></data>
+  <data name="Category_Mechanical" xml:space="preserve"><value>Mechanical</value></data>
+  <data name="Category_Organic" xml:space="preserve"><value>Organic</value></data>
+  <data name="Category_Hybrid" xml:space="preserve"><value>Hybrid</value></data>
+  <data name="Category_Data" xml:space="preserve"><value>Data</value></data>
+  <data name="Category_Corrupted" xml:space="preserve"><value>Corrupted</value></data>
+
+  <!-- Microchip Categories -->
+  <data name="Microchip_Protocol" xml:space="preserve"><value>Protocol</value></data>
+  <data name="Microchip_Element" xml:space="preserve"><value>Element</value></data>
+  <data name="Microchip_Augment" xml:space="preserve"><value>Augment</value></data>
+  <data name="Microchip_Driver" xml:space="preserve"><value>Driver</value></data>
+  <data name="Microchip_Daemon" xml:space="preserve"><value>Daemon</value></data>
+  <data name="Microchip_Support" xml:space="preserve"><value>Support</value></data>
+
+  <!-- Status Effects -->
+  <data name="Status_Poisoned" xml:space="preserve"><value>Poisoned</value></data>
+  <data name="Status_Burned" xml:space="preserve"><value>Burned</value></data>
+  <data name="Status_Frozen" xml:space="preserve"><value>Frozen</value></data>
+  <data name="Status_Stunned" xml:space="preserve"><value>Stunned</value></data>
+  <data name="Status_Confused" xml:space="preserve"><value>Confused</value></data>
+  <data name="Status_Buffed" xml:space="preserve"><value>Buffed</value></data>
+  <data name="Status_Debuffed" xml:space="preserve"><value>Debuffed</value></data>
+  <data name="Status_Corrupted" xml:space="preserve"><value>Corrupted</value></data>
+
+  <!-- Legacy strings for backwards compatibility -->
+  <data name="Play" xml:space="preserve"><value>Play</value></data>
+  <data name="Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Exit" xml:space="preserve"><value>Exit</value></data>
+  <data name="MainMenu" xml:space="preserve"><value>Main Menu</value></data>
+  <data name="Back" xml:space="preserve"><value>Back</value></data>
+  <data name="Loading" xml:space="preserve"><value>Loading...</value></data>
+  <data name="Paused" xml:space="preserve"><value>Paused</value></data>
+  <data name="Resume" xml:space="preserve"><value>Resume</value></data>
+  <data name="Quit" xml:space="preserve"><value>Quit</value></data>
+  <data name="About" xml:space="preserve"><value>About</value></data>
+  <data name="Language" xml:space="preserve"><value>Language: </value></data>
 </root>

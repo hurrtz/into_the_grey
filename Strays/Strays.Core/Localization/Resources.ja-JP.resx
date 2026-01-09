@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Common UI -->
+  <data name="UI_OK" xml:space="preserve"><value>OK</value></data>
+  <data name="UI_Cancel" xml:space="preserve"><value>キャンセル</value></data>
+  <data name="UI_Confirm" xml:space="preserve"><value>確認</value></data>
+  <data name="UI_Back" xml:space="preserve"><value>戻る</value></data>
+  <data name="UI_Close" xml:space="preserve"><value>閉じる</value></data>
+  <data name="UI_Yes" xml:space="preserve"><value>はい</value></data>
+  <data name="UI_No" xml:space="preserve"><value>いいえ</value></data>
+  <data name="UI_Accept" xml:space="preserve"><value>承諾</value></data>
+  <data name="UI_Decline" xml:space="preserve"><value>辞退</value></data>
+  <data name="UI_Continue" xml:space="preserve"><value>続ける</value></data>
+  <data name="UI_Skip" xml:space="preserve"><value>スキップ</value></data>
+  <data name="UI_Save" xml:space="preserve"><value>セーブ</value></data>
+  <data name="UI_Load" xml:space="preserve"><value>ロード</value></data>
+  <data name="UI_Delete" xml:space="preserve"><value>削除</value></data>
+  <data name="UI_Edit" xml:space="preserve"><value>編集</value></data>
+  <data name="UI_Apply" xml:space="preserve"><value>適用</value></data>
+  <data name="UI_Reset" xml:space="preserve"><value>リセット</value></data>
+  <data name="UI_Default" xml:space="preserve"><value>デフォルト</value></data>
+
+  <!-- Main Menu -->
+  <data name="Menu_NewGame" xml:space="preserve"><value>ニューゲーム</value></data>
+  <data name="Menu_Continue" xml:space="preserve"><value>続きから</value></data>
+  <data name="Menu_LoadGame" xml:space="preserve"><value>ロード</value></data>
+  <data name="Menu_Settings" xml:space="preserve"><value>設定</value></data>
+  <data name="Menu_Credits" xml:space="preserve"><value>クレジット</value></data>
+  <data name="Menu_Quit" xml:space="preserve"><value>終了</value></data>
+  <data name="Menu_QuitConfirm" xml:space="preserve"><value>ゲームを終了しますか？</value></data>
+
+  <!-- Pause Menu -->
+  <data name="Pause_Title" xml:space="preserve"><value>ポーズ</value></data>
+  <data name="Pause_Resume" xml:space="preserve"><value>再開</value></data>
+  <data name="Pause_Inventory" xml:space="preserve"><value>アイテム</value></data>
+  <data name="Pause_Party" xml:space="preserve"><value>パーティー</value></data>
+  <data name="Pause_Quests" xml:space="preserve"><value>クエスト</value></data>
+  <data name="Pause_Map" xml:space="preserve"><value>マップ</value></data>
+  <data name="Pause_Settings" xml:space="preserve"><value>設定</value></data>
+  <data name="Pause_MainMenu" xml:space="preserve"><value>タイトルへ</value></data>
+  <data name="Pause_MainMenuConfirm" xml:space="preserve"><value>タイトルに戻りますか？保存していない進行状況は失われます。</value></data>
+
+  <!-- Settings -->
+  <data name="Settings_Title" xml:space="preserve"><value>設定</value></data>
+  <data name="Settings_Audio" xml:space="preserve"><value>オーディオ</value></data>
+  <data name="Settings_Video" xml:space="preserve"><value>グラフィック</value></data>
+  <data name="Settings_Controls" xml:space="preserve"><value>操作</value></data>
+  <data name="Settings_Gameplay" xml:space="preserve"><value>ゲームプレイ</value></data>
+  <data name="Settings_Accessibility" xml:space="preserve"><value>アクセシビリティ</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>言語</value></data>
+  <data name="Settings_MasterVolume" xml:space="preserve"><value>マスター音量</value></data>
+  <data name="Settings_MusicVolume" xml:space="preserve"><value>BGM</value></data>
+  <data name="Settings_SFXVolume" xml:space="preserve"><value>効果音</value></data>
+  <data name="Settings_VoiceVolume" xml:space="preserve"><value>ボイス</value></data>
+  <data name="Settings_AmbientVolume" xml:space="preserve"><value>環境音</value></data>
+  <data name="Settings_Resolution" xml:space="preserve"><value>解像度</value></data>
+  <data name="Settings_Fullscreen" xml:space="preserve"><value>フルスクリーン</value></data>
+  <data name="Settings_VSync" xml:space="preserve"><value>垂直同期</value></data>
+  <data name="Settings_Brightness" xml:space="preserve"><value>明るさ</value></data>
+  <data name="Settings_Rebind" xml:space="preserve"><value>キー設定</value></data>
+  <data name="Settings_Sensitivity" xml:space="preserve"><value>感度</value></data>
+  <data name="Settings_InvertY" xml:space="preserve"><value>Y軸反転</value></data>
+  <data name="Settings_Vibration" xml:space="preserve"><value>振動</value></data>
+  <data name="Settings_Subtitles" xml:space="preserve"><value>字幕</value></data>
+  <data name="Settings_SubtitleSize" xml:space="preserve"><value>字幕サイズ</value></data>
+  <data name="Settings_ScreenShake" xml:space="preserve"><value>画面揺れ</value></data>
+  <data name="Settings_ColorblindMode" xml:space="preserve"><value>色覚サポート</value></data>
+
+  <!-- Combat -->
+  <data name="Combat_Attack" xml:space="preserve"><value>攻撃</value></data>
+  <data name="Combat_Defend" xml:space="preserve"><value>防御</value></data>
+  <data name="Combat_Ability" xml:space="preserve"><value>スキル</value></data>
+  <data name="Combat_Item" xml:space="preserve"><value>アイテム</value></data>
+  <data name="Combat_Flee" xml:space="preserve"><value>逃げる</value></data>
+  <data name="Combat_Switch" xml:space="preserve"><value>交代</value></data>
+  <data name="Combat_Victory" xml:space="preserve"><value>勝利！</value></data>
+  <data name="Combat_Defeat" xml:space="preserve"><value>敗北...</value></data>
+  <data name="Combat_Escaped" xml:space="preserve"><value>逃げ切った！</value></data>
+  <data name="Combat_Damage" xml:space="preserve"><value>{0}ダメージ！</value></data>
+  <data name="Combat_Critical" xml:space="preserve"><value>クリティカルヒット！</value></data>
+  <data name="Combat_Miss" xml:space="preserve"><value>ミス！</value></data>
+  <data name="Combat_Blocked" xml:space="preserve"><value>ブロック！</value></data>
+  <data name="Combat_Healed" xml:space="preserve"><value>HP{0}回復！</value></data>
+  <data name="Combat_Resisted" xml:space="preserve"><value>耐性あり！</value></data>
+  <data name="Combat_Weak" xml:space="preserve"><value>効果抜群！</value></data>
+  <data name="Combat_YourTurn" xml:space="preserve"><value>あなたのターン</value></data>
+  <data name="Combat_EnemyTurn" xml:space="preserve"><value>敵のターン</value></data>
+  <data name="Combat_SelectTarget" xml:space="preserve"><value>ターゲットを選択</value></data>
+  <data name="Combat_SelectAbility" xml:space="preserve"><value>スキルを選択</value></data>
+  <data name="Combat_NotEnoughEnergy" xml:space="preserve"><value>エネルギーが足りない！</value></data>
+  <data name="Combat_XPGained" xml:space="preserve"><value>{0}EXP獲得！</value></data>
+  <data name="Combat_CurrencyGained" xml:space="preserve"><value>{0}クレジット入手！</value></data>
+  <data name="Combat_ItemDropped" xml:space="preserve"><value>{0}を手に入れた！</value></data>
+  <data name="Combat_LevelUp" xml:space="preserve"><value>レベルアップ！</value></data>
+
+  <!-- Strays -->
+  <data name="Stray_Level" xml:space="preserve"><value>Lv.{0}</value></data>
+  <data name="Stray_HP" xml:space="preserve"><value>HP</value></data>
+  <data name="Stray_Energy" xml:space="preserve"><value>エネルギー</value></data>
+  <data name="Stray_Attack" xml:space="preserve"><value>攻撃力</value></data>
+  <data name="Stray_Defense" xml:space="preserve"><value>防御力</value></data>
+  <data name="Stray_Speed" xml:space="preserve"><value>素早さ</value></data>
+  <data name="Stray_Type" xml:space="preserve"><value>タイプ</value></data>
+  <data name="Stray_Recruited" xml:space="preserve"><value>{0}が仲間になった！</value></data>
+  <data name="Stray_Released" xml:space="preserve"><value>{0}を解放した。</value></data>
+  <data name="Stray_Evolved" xml:space="preserve"><value>{0}が{1}に進化した！</value></data>
+  <data name="Stray_EvolutionAvailable" xml:space="preserve"><value>進化可能！</value></data>
+  <data name="Stray_Abilities" xml:space="preserve"><value>スキル</value></data>
+  <data name="Stray_Stats" xml:space="preserve"><value>ステータス</value></data>
+  <data name="Stray_Info" xml:space="preserve"><value>情報</value></data>
+  <data name="Stray_Recruit" xml:space="preserve"><value>仲間にする</value></data>
+  <data name="Stray_Release" xml:space="preserve"><value>解放</value></data>
+  <data name="Stray_Evolve" xml:space="preserve"><value>進化</value></data>
+  <data name="Stray_ViewDetails" xml:space="preserve"><value>詳細を見る</value></data>
+  <data name="Stray_Wild" xml:space="preserve"><value>野生</value></data>
+  <data name="Stray_Companion" xml:space="preserve"><value>仲間</value></data>
+  <data name="Stray_Boss" xml:space="preserve"><value>ボス</value></data>
+
+  <!-- Items -->
+  <data name="Item_Use" xml:space="preserve"><value>使う</value></data>
+  <data name="Item_Equip" xml:space="preserve"><value>装備</value></data>
+  <data name="Item_Unequip" xml:space="preserve"><value>外す</value></data>
+  <data name="Item_Drop" xml:space="preserve"><value>捨てる</value></data>
+  <data name="Item_Sell" xml:space="preserve"><value>売る</value></data>
+  <data name="Item_Buy" xml:space="preserve"><value>買う</value></data>
+  <data name="Item_Consumable" xml:space="preserve"><value>消耗品</value></data>
+  <data name="Item_Equipment" xml:space="preserve"><value>装備品</value></data>
+  <data name="Item_KeyItem" xml:space="preserve"><value>大事なもの</value></data>
+  <data name="Item_Material" xml:space="preserve"><value>素材</value></data>
+  <data name="Item_Rarity_Common" xml:space="preserve"><value>コモン</value></data>
+  <data name="Item_Rarity_Uncommon" xml:space="preserve"><value>アンコモン</value></data>
+  <data name="Item_Rarity_Rare" xml:space="preserve"><value>レア</value></data>
+  <data name="Item_Rarity_Epic" xml:space="preserve"><value>エピック</value></data>
+  <data name="Item_Rarity_Legendary" xml:space="preserve"><value>レジェンダリー</value></data>
+
+  <!-- Biomes -->
+  <data name="Biome_Fringe" xml:space="preserve"><value>フリンジ</value></data>
+  <data name="Biome_Rust" xml:space="preserve"><value>ラストベルト</value></data>
+  <data name="Biome_Green" xml:space="preserve"><value>グリーン</value></data>
+  <data name="Biome_Quiet" xml:space="preserve"><value>クワイエット</value></data>
+  <data name="Biome_Teeth" xml:space="preserve"><value>ティース</value></data>
+  <data name="Biome_Glow" xml:space="preserve"><value>グロウ</value></data>
+  <data name="Biome_Archive" xml:space="preserve"><value>アーカイブスカー</value></data>
+  <data name="Biome_FringeDesc" xml:space="preserve"><value>人間世界とデジタル世界の境界地帯。</value></data>
+  <data name="Biome_RustDesc" xml:space="preserve"><value>廃墟と化した工業地帯。</value></data>
+  <data name="Biome_GreenDesc" xml:space="preserve"><value>野生のコードが溢れる自然保護区。</value></data>
+  <data name="Biome_QuietDesc" xml:space="preserve"><value>何も動かない静寂の郊外。</value></data>
+  <data name="Biome_TeethDesc" xml:space="preserve"><value>腐敗した機械が支配する危険地帯。</value></data>
+  <data name="Biome_GlowDesc" xml:space="preserve"><value>純粋なデータエネルギーの放射性荒野。</value></data>
+  <data name="Biome_ArchiveDesc" xml:space="preserve"><value>現実が崩壊する傷跡。</value></data>
+
+  <!-- Factions -->
+  <data name="Faction_NIMDOK" xml:space="preserve"><value>NIMDOK</value></data>
+  <data name="Faction_Independents" xml:space="preserve"><value>独立派</value></data>
+  <data name="Faction_Scavengers" xml:space="preserve"><value>スカベンジャー</value></data>
+  <data name="Faction_Archive" xml:space="preserve"><value>アーカイブ管理者</value></data>
+  <data name="Faction_Reputation" xml:space="preserve"><value>評判</value></data>
+  <data name="Faction_Hostile" xml:space="preserve"><value>敵対</value></data>
+  <data name="Faction_Unfriendly" xml:space="preserve"><value>非友好</value></data>
+  <data name="Faction_Neutral" xml:space="preserve"><value>中立</value></data>
+  <data name="Faction_Friendly" xml:space="preserve"><value>友好</value></data>
+  <data name="Faction_Allied" xml:space="preserve"><value>同盟</value></data>
+
+  <!-- Weather -->
+  <data name="Weather_Clear" xml:space="preserve"><value>晴れ</value></data>
+  <data name="Weather_Rain" xml:space="preserve"><value>雨</value></data>
+  <data name="Weather_Storm" xml:space="preserve"><value>嵐</value></data>
+  <data name="Weather_Fog" xml:space="preserve"><value>霧</value></data>
+  <data name="Weather_DataStorm" xml:space="preserve"><value>データストーム</value></data>
+
+  <!-- Legacy -->
+  <data name="Play" xml:space="preserve"><value>プレイ</value></data>
+  <data name="Settings" xml:space="preserve"><value>設定</value></data>
+  <data name="Exit" xml:space="preserve"><value>終了</value></data>
+  <data name="MainMenu" xml:space="preserve"><value>メインメニュー</value></data>
+  <data name="Back" xml:space="preserve"><value>戻る</value></data>
+  <data name="Loading" xml:space="preserve"><value>ロード中...</value></data>
+  <data name="Paused" xml:space="preserve"><value>ポーズ</value></data>
+  <data name="Resume" xml:space="preserve"><value>再開</value></data>
+  <data name="Quit" xml:space="preserve"><value>終了</value></data>
+  <data name="About" xml:space="preserve"><value>このゲームについて</value></data>
+  <data name="Language" xml:space="preserve"><value>言語: </value></data>
+</root>
+
