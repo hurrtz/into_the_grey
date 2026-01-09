@@ -904,4 +904,3 @@ public class InputSettingsScreen : GameScreen
         public GameAction? Action { get; set; }
     }
 }
-
