@@ -152,6 +152,81 @@ public class GameStateService
         set => _currentData.GravitationStage = value;
     }
 
+    // Gravitation escalation constants
+    private const string GravitationUseCountKey = "gravitation_uses";
+    private const int UsesForUnstable = 5;    // Escalates to Unstable after 5 uses
+    private const int UsesForDangerous = 12;  // Escalates to Dangerous after 12 uses
+    private const int UsesForCritical = 20;   // Escalates to Critical after 20 uses
+
+    /// <summary>
+    /// Number of times Gravitation has been used.
+    /// </summary>
+    public int GravitationUseCount
+    {
+        get => _currentData.Counters.TryGetValue(GravitationUseCountKey, out var count) ? count : 0;
+        private set => _currentData.Counters[GravitationUseCountKey] = value;
+    }
+
+    /// <summary>
+    /// Records a Gravitation use and checks for escalation.
+    /// Returns true if the stage escalated.
+    /// </summary>
+    public bool RecordGravitationUse()
+    {
+        GravitationUseCount++;
+
+        // Check for automatic escalation based on use count
+        var previousStage = GravitationStage;
+
+        // Only escalate if we haven't reached Absolute (final boss form)
+        if (GravitationStage < GravitationStage.Critical)
+        {
+            if (GravitationUseCount >= UsesForCritical && GravitationStage < GravitationStage.Critical)
+            {
+                GravitationStage = GravitationStage.Critical;
+            }
+            else if (GravitationUseCount >= UsesForDangerous && GravitationStage < GravitationStage.Dangerous)
+            {
+                GravitationStage = GravitationStage.Dangerous;
+            }
+            else if (GravitationUseCount >= UsesForUnstable && GravitationStage < GravitationStage.Unstable)
+            {
+                GravitationStage = GravitationStage.Unstable;
+            }
+        }
+
+        bool escalated = GravitationStage != previousStage;
+        if (escalated)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Gravitation] Stage escalated to {GravitationStage} after {GravitationUseCount} uses!");
+        }
+
+        return escalated;
+    }
+
+    /// <summary>
+    /// Forces Gravitation to escalate to the next stage (story trigger).
+    /// Returns true if escalation occurred.
+    /// </summary>
+    public bool ForceGravitationEscalation()
+    {
+        if (GravitationStage >= GravitationStage.Absolute)
+            return false;
+
+        GravitationStage = (GravitationStage)((int)GravitationStage + 1);
+        System.Diagnostics.Debug.WriteLine($"[Gravitation] Stage force-escalated to {GravitationStage}!");
+        return true;
+    }
+
+    /// <summary>
+    /// Sets Gravitation directly to Absolute stage (final boss).
+    /// </summary>
+    public void SetGravitationAbsolute()
+    {
+        GravitationStage = GravitationStage.Absolute;
+        System.Diagnostics.Debug.WriteLine("[Gravitation] Stage set to Absolute for final boss!");
+    }
+
     /// <summary>
     /// Whether the companion is still with the party.
     /// </summary>
@@ -159,6 +234,58 @@ public class GameStateService
     {
         get => _currentData.CompanionPresent;
         set => _currentData.CompanionPresent = value;
+    }
+
+    /// <summary>
+    /// Event fired when the companion departs.
+    /// </summary>
+    public event EventHandler<CompanionDepartureEventArgs>? CompanionDeparted;
+
+    /// <summary>
+    /// Triggers companion departure (Bandit leaves to protect the party).
+    /// This happens when Gravitation at Critical stage nearly kills a party member.
+    /// </summary>
+    /// <param name="reason">The reason for departure.</param>
+    public void TriggerCompanionDeparture(string reason = "")
+    {
+        if (!CompanionPresent)
+            return;
+
+        CompanionPresent = false;
+        SetFlag("companion_departed");
+        SetFlag("bandit_departure_scene_pending");
+
+        System.Diagnostics.Debug.WriteLine($"[Companion] Bandit has departed! Reason: {reason}");
+
+        CompanionDeparted?.Invoke(this, new CompanionDepartureEventArgs
+        {
+            Reason = reason,
+            GravitationStage = GravitationStage,
+            TotalUses = GravitationUseCount
+        });
+    }
+
+    /// <summary>
+    /// Checks if Gravitation should trigger companion departure.
+    /// Called when Gravitation hits an ally at Critical stage.
+    /// </summary>
+    /// <param name="allyHp">Current HP of the ally that was hit.</param>
+    /// <param name="allyMaxHp">Max HP of the ally that was hit.</param>
+    /// <returns>True if departure was triggered.</returns>
+    public bool CheckCriticalGravitationDeparture(int allyHp, int allyMaxHp)
+    {
+        if (!CompanionPresent || GravitationStage != GravitationStage.Critical)
+            return false;
+
+        // Departure triggers when ally is reduced to <5% HP (near death)
+        float hpPercent = (float)allyHp / allyMaxHp;
+        if (hpPercent < 0.05f)
+        {
+            TriggerCompanionDeparture("Nearly killed a party member with Critical Gravitation");
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -335,7 +462,8 @@ public class GameStateService
             ExoskeletonPowered = false,
             CompanionPresent = true,
             GravitationStage = GravitationStage.Normal,
-            SaveTimestamp = DateTime.UtcNow.ToString("O")
+            SaveTimestamp = DateTime.UtcNow.ToString("O"),
+            Currency = 1000 // Starting currency for testing
         };
 
         // Reset faction reputation
@@ -935,4 +1063,25 @@ public class SaveSlotInfo
         ActState.Act3_Irreversibility => "Act 3: Irreversibility",
         _ => "Unknown"
     };
+}
+
+/// <summary>
+/// Event arguments for companion departure.
+/// </summary>
+public class CompanionDepartureEventArgs : EventArgs
+{
+    /// <summary>
+    /// The reason for departure.
+    /// </summary>
+    public string Reason { get; init; } = "";
+
+    /// <summary>
+    /// The Gravitation stage at the time of departure.
+    /// </summary>
+    public GravitationStage GravitationStage { get; init; }
+
+    /// <summary>
+    /// Total number of Gravitation uses.
+    /// </summary>
+    public int TotalUses { get; init; }
 }

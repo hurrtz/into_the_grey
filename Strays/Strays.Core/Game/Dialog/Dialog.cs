@@ -977,6 +977,17 @@ public static class Dialogs
             }
         });
 
+        // Generic healer service dialog (used as fallback)
+        Register(new Dialog
+        {
+            Id = "healer_service",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.System("The healer tends to your wounds."),
+                DialogLine.System("Your party has been fully restored!")
+            }
+        });
+
         // === QUEST GIVERS ===
 
         // NIMDOK Terminal
