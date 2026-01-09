@@ -1,30 +1,10 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Strays.Core.Game.Entities;
+using Strays.Core.Game.Items;
 
 namespace Strays.Core.Game.Data;
-
-/// <summary>
-/// The type/species category of a Stray.
-/// </summary>
-public enum StrayType
-{
-    Canine,     // Dogs, wolves, foxes
-    Feline,     // Cats, big cats
-    Avian,      // Birds
-    Rodent,     // Rats, mice, rabbits
-    Mammal,     // Other mammals (bears, boars, etc.)
-    Reptile,    // Snakes, lizards, gators
-    Amphibian,  // Frogs, newts
-    Insect,     // Bugs, bees, wasps
-    Arachnid,   // Spiders
-    Primate,    // Apes, monkeys
-    Mustelid,   // Weasels, badgers
-    Procyonid,  // Raccoons
-    Marsupial,  // Possums
-    Chimera,    // Hybrid/mixed types
-    Invertebrate // Slugs, etc.
-}
 
 /// <summary>
 /// Role a Stray naturally fills in combat.
@@ -51,6 +31,16 @@ public class StrayBaseStats
     public int Special { get; set; } = 10;
 
     /// <summary>
+    /// Maximum energy pool for abilities (like mana).
+    /// </summary>
+    public int MaxEnergy { get; set; } = 100;
+
+    /// <summary>
+    /// Energy regeneration per ATB tick.
+    /// </summary>
+    public int EnergyRegen { get; set; } = 5;
+
+    /// <summary>
     /// Creates stats scaled to a level.
     /// </summary>
     public StrayBaseStats ScaleToLevel(int level)
@@ -63,7 +53,10 @@ public class StrayBaseStats
             Attack = (int)(Attack * multiplier),
             Defense = (int)(Defense * multiplier),
             Speed = (int)(Speed * multiplier),
-            Special = (int)(Special * multiplier)
+            Special = (int)(Special * multiplier),
+            // Energy scales more slowly
+            MaxEnergy = (int)(MaxEnergy * (1f + (level - 1) * 0.05f)),
+            EnergyRegen = EnergyRegen + (level - 1) / 5 // +1 every 5 levels
         };
     }
 }
@@ -90,9 +83,14 @@ public class StrayDefinition
     public string Description { get; set; } = "";
 
     /// <summary>
-    /// The species type.
+    /// The creature type (specific species).
     /// </summary>
-    public StrayType Type { get; set; } = StrayType.Canine;
+    public CreatureType CreatureType { get; set; } = CreatureType.GrayWolf;
+
+    /// <summary>
+    /// Gets the creature category (Ordo) for this Stray.
+    /// </summary>
+    public CreatureCategory Category => CreatureTypes.GetCategory(CreatureType);
 
     /// <summary>
     /// Combat role this Stray naturally fills.
@@ -125,9 +123,64 @@ public class StrayDefinition
     public string? EvolutionTrigger { get; set; }
 
     /// <summary>
-    /// Number of microchip slots.
+    /// Number of microchip slots (legacy, use SocketConfigurations for new code).
     /// </summary>
     public int MicrochipSlots { get; set; } = 2;
+
+    /// <summary>
+    /// Socket configurations per evolution stage.
+    /// Index 0 = base form, Index 1 = first evolution, etc.
+    /// If not specified, uses default configuration based on MicrochipSlots.
+    /// </summary>
+    public List<SocketConfiguration> SocketConfigurations { get; set; } = new();
+
+    /// <summary>
+    /// Maximum number of evolutions this creature can undergo (0-3).
+    /// </summary>
+    public int MaxEvolutions { get; set; } = 1;
+
+    /// <summary>
+    /// Gets the socket configuration for a specific evolution stage.
+    /// Falls back to default if not explicitly defined.
+    /// </summary>
+    public SocketConfiguration GetSocketConfiguration(int evolutionStage = 0)
+    {
+        if (SocketConfigurations.Count > evolutionStage)
+        {
+            return SocketConfigurations[evolutionStage];
+        }
+
+        // Generate default configuration based on MicrochipSlots
+        // Base form: starts with 3 sockets (2 linked)
+        // Each evolution adds up to 2 more sockets with new linked pairs
+        int baseSlots = Math.Max(3, MicrochipSlots);
+        int additionalSlots = evolutionStage * 2; // +2 per evolution
+        int totalSlots = Math.Min(baseSlots + additionalSlots, 8); // Cap at 8
+
+        var linkedPairs = new List<int[]>();
+
+        // First pair is always slots 0-1
+        linkedPairs.Add(new[] { 0, 1 });
+
+        // Add additional linked pairs for evolutions
+        // Evolution 1: adds slots 3-4, links 3-4
+        // Evolution 2: adds slots 5-6, links 5-6
+        // Evolution 3: adds slots 7-8, but we cap at 8
+        for (int i = 1; i <= evolutionStage && linkedPairs.Count < 4; i++)
+        {
+            int pairStart = 2 + (i - 1) * 2 + 1; // 3, 5, 7
+            if (pairStart + 1 < totalSlots)
+            {
+                linkedPairs.Add(new[] { pairStart, pairStart + 1 });
+            }
+        }
+
+        return new SocketConfiguration
+        {
+            SocketCount = totalSlots,
+            LinkedPairs = linkedPairs
+        };
+    }
 
     /// <summary>
     /// Innate abilities this Stray has.
@@ -148,6 +201,11 @@ public class StrayDefinition
     /// Whether this Stray can be recruited.
     /// </summary>
     public bool CanRecruit { get; set; } = true;
+
+    /// <summary>
+    /// Whether this is a boss creature (special combat rules apply).
+    /// </summary>
+    public bool IsBoss { get; set; } = false;
 
     /// <summary>
     /// Base recruitment chance (0.0 - 1.0).
@@ -183,6 +241,7 @@ public static class StrayDefinitions
         RegisterTeethStrays();
         RegisterGlowStrays();
         RegisterArchiveScarStrays();
+        RegisterBossStrays();
     }
 
     /// <summary>
@@ -217,7 +276,7 @@ public static class StrayDefinitions
             Id = "echo_pup",
             Name = "Echo Pup",
             Description = "Detects glitches and digests digital data. A reliable first companion.",
-            Type = StrayType.Canine,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 90, Attack = 12, Defense = 8, Speed = 14, Special = 16 },
             Biomes = new List<string> { "fringe" },
@@ -241,7 +300,7 @@ public static class StrayDefinitions
             Id = "circuit_crow",
             Name = "Circuit Crow",
             Description = "Enhanced vision grants party accuracy. Can spot threats from afar.",
-            Type = StrayType.Avian,
+            CreatureType = CreatureType.SugarGlider,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 70, Attack = 14, Defense = 6, Speed = 16, Special = 14 },
             Biomes = new List<string> { "fringe" },
@@ -266,7 +325,7 @@ public static class StrayDefinitions
             Id = "relay_rodent",
             Name = "Relay Rodent",
             Description = "Generates static energy. Resists shock damage and helps with energy regen.",
-            Type = StrayType.Rodent,
+            CreatureType = CreatureType.BrownRat,
             Role = StrayRole.Utility,
             BaseStats = new StrayBaseStats { MaxHp = 65, Attack = 10, Defense = 8, Speed = 18, Special = 12 },
             Biomes = new List<string> { "fringe" },
@@ -284,7 +343,7 @@ public static class StrayDefinitions
             Id = "static_feline",
             Name = "Static Feline",
             Description = "Phases through attacks with unnatural grace. A stealth specialist.",
-            Type = StrayType.Feline,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 75, Attack = 16, Defense = 6, Speed = 20, Special = 10 },
             Biomes = new List<string> { "fringe" },
@@ -303,7 +362,7 @@ public static class StrayDefinitions
             Id = "buffer_badger",
             Name = "Buffer Badger",
             Description = "Stores damage in reserve systems. A reliable tank that protects the party.",
-            Type = StrayType.Mustelid,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Tank,
             BaseStats = new StrayBaseStats { MaxHp = 140, Attack = 10, Defense = 16, Speed = 8, Special = 8 },
             Biomes = new List<string> { "fringe" },
@@ -322,7 +381,7 @@ public static class StrayDefinitions
             Id = "resonator_hound",
             Name = "Resonator Hound",
             Description = "Evolved Echo Pup. Its howl resonates with data streams.",
-            Type = StrayType.Canine,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 120, Attack = 16, Defense = 12, Speed = 16, Special = 22 },
             Biomes = new List<string> { "fringe", "rust" },
@@ -339,7 +398,7 @@ public static class StrayDefinitions
             Id = "wild_stray",
             Name = "Wild Stray",
             Description = "A generic wild Stray. Not particularly special, but dangerous in groups.",
-            Type = StrayType.Mammal,
+            CreatureType = CreatureType.AmericanBison,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 80, Attack = 12, Defense = 10, Speed = 12, Special = 10 },
             Biomes = new List<string> { "fringe", "rust", "green", "quiet", "teeth", "glow", "archive_scar" },
@@ -360,7 +419,7 @@ public static class StrayDefinitions
             Id = "rust_rat",
             Name = "Rust Rat",
             Description = "Thrives in industrial decay. Can corrode metal with its bite.",
-            Type = StrayType.Rodent,
+            CreatureType = CreatureType.BrownRat,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 70, Attack = 14, Defense = 8, Speed = 16, Special = 10 },
             Biomes = new List<string> { "fringe", "rust" },
@@ -378,7 +437,7 @@ public static class StrayDefinitions
             Id = "scrap_hound",
             Name = "Scrap Hound",
             Description = "Assembled from discarded parts. Loyal once befriended.",
-            Type = StrayType.Canine,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 95, Attack = 16, Defense = 12, Speed = 14, Special = 8 },
             Biomes = new List<string> { "fringe", "rust" },
@@ -396,7 +455,7 @@ public static class StrayDefinitions
             Id = "gear_beetle",
             Name = "Gear Beetle",
             Description = "Its shell is made of interlocking gears. Incredibly durable.",
-            Type = StrayType.Insect,
+            CreatureType = CreatureType.PrayingMantis,
             Role = StrayRole.Tank,
             BaseStats = new StrayBaseStats { MaxHp = 130, Attack = 8, Defense = 20, Speed = 6, Special = 6 },
             Biomes = new List<string> { "rust" },
@@ -414,7 +473,7 @@ public static class StrayDefinitions
             Id = "piston_snake",
             Name = "Piston Snake",
             Description = "Hydraulic muscles give it crushing strength.",
-            Type = StrayType.Reptile,
+            CreatureType = CreatureType.GiantCentipede,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 85, Attack = 18, Defense = 10, Speed = 12, Special = 10 },
             Biomes = new List<string> { "rust" },
@@ -432,7 +491,7 @@ public static class StrayDefinitions
             Id = "forge_spider",
             Name = "Forge Spider",
             Description = "Webs of molten metal. Immune to heat.",
-            Type = StrayType.Arachnid,
+            CreatureType = CreatureType.BlackWidowSpider,
             Role = StrayRole.Control,
             BaseStats = new StrayBaseStats { MaxHp = 75, Attack = 12, Defense = 8, Speed = 14, Special = 16 },
             Biomes = new List<string> { "rust" },
@@ -450,7 +509,7 @@ public static class StrayDefinitions
             Id = "crane_raptor",
             Name = "Crane Raptor",
             Description = "Built from construction equipment. Drops from great heights to strike.",
-            Type = StrayType.Avian,
+            CreatureType = CreatureType.SugarGlider,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 90, Attack = 22, Defense = 8, Speed = 18, Special = 12 },
             Biomes = new List<string> { "rust" },
@@ -467,7 +526,7 @@ public static class StrayDefinitions
             Id = "furnace_golem",
             Name = "Furnace Golem",
             Description = "A walking smelter. Radiates intense heat.",
-            Type = StrayType.Mammal,
+            CreatureType = CreatureType.AmericanBison,
             Role = StrayRole.Tank,
             BaseStats = new StrayBaseStats { MaxHp = 180, Attack = 14, Defense = 18, Speed = 4, Special = 14 },
             Biomes = new List<string> { "rust" },
@@ -484,7 +543,7 @@ public static class StrayDefinitions
             Id = "corrosion_king",
             Name = "Corrosion King",
             Description = "Evolved Rust Rat. Its presence accelerates decay.",
-            Type = StrayType.Rodent,
+            CreatureType = CreatureType.BrownRat,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 100, Attack = 20, Defense = 12, Speed = 18, Special = 16 },
             Biomes = new List<string> { "rust" },
@@ -501,7 +560,7 @@ public static class StrayDefinitions
             Id = "junkyard_alpha",
             Name = "Junkyard Alpha",
             Description = "Evolved Scrap Hound. Commands packs of lesser machines.",
-            Type = StrayType.Canine,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 130, Attack = 22, Defense = 16, Speed = 16, Special = 12 },
             Biomes = new List<string> { "rust" },
@@ -524,7 +583,7 @@ public static class StrayDefinitions
             Id = "vine_serpent",
             Name = "Vine Serpent",
             Description = "Indistinguishable from plant life until it strikes.",
-            Type = StrayType.Reptile,
+            CreatureType = CreatureType.GiantCentipede,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 80, Attack = 16, Defense = 8, Speed = 14, Special = 14 },
             Biomes = new List<string> { "green" },
@@ -542,7 +601,7 @@ public static class StrayDefinitions
             Id = "bloom_moth",
             Name = "Bloom Moth",
             Description = "Its scales carry healing pollen. A gentle presence.",
-            Type = StrayType.Insect,
+            CreatureType = CreatureType.PrayingMantis,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 65, Attack = 6, Defense = 6, Speed = 16, Special = 22 },
             Biomes = new List<string> { "green" },
@@ -560,7 +619,7 @@ public static class StrayDefinitions
             Id = "moss_bear",
             Name = "Moss Bear",
             Description = "Covered in symbiotic moss that heals its wounds.",
-            Type = StrayType.Mammal,
+            CreatureType = CreatureType.AmericanBison,
             Role = StrayRole.Tank,
             BaseStats = new StrayBaseStats { MaxHp = 160, Attack = 14, Defense = 14, Speed = 6, Special = 12 },
             Biomes = new List<string> { "green" },
@@ -578,7 +637,7 @@ public static class StrayDefinitions
             Id = "thorn_cat",
             Name = "Thorn Cat",
             Description = "Its fur is made of thorns. Striking it hurts.",
-            Type = StrayType.Feline,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 75, Attack = 18, Defense = 10, Speed = 18, Special = 8 },
             Biomes = new List<string> { "green" },
@@ -596,7 +655,7 @@ public static class StrayDefinitions
             Id = "spore_toad",
             Name = "Spore Toad",
             Description = "Releases clouds of disorienting spores.",
-            Type = StrayType.Amphibian,
+            CreatureType = CreatureType.Hippopotamus,
             Role = StrayRole.Control,
             BaseStats = new StrayBaseStats { MaxHp = 90, Attack = 8, Defense = 12, Speed = 8, Special = 18 },
             Biomes = new List<string> { "green" },
@@ -614,7 +673,7 @@ public static class StrayDefinitions
             Id = "ancient_oak_deer",
             Name = "Ancient Oak Deer",
             Description = "Its antlers are living trees. Said to be centuries old.",
-            Type = StrayType.Mammal,
+            CreatureType = CreatureType.AmericanBison,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 120, Attack = 12, Defense = 14, Speed = 14, Special = 24 },
             Biomes = new List<string> { "green" },
@@ -631,7 +690,7 @@ public static class StrayDefinitions
             Id = "chloro_phoenix",
             Name = "Chloro Phoenix",
             Description = "Burns with green flame. Can resurrect once per battle.",
-            Type = StrayType.Avian,
+            CreatureType = CreatureType.SugarGlider,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 100, Attack = 16, Defense = 10, Speed = 20, Special = 26 },
             Biomes = new List<string> { "green" },
@@ -648,7 +707,7 @@ public static class StrayDefinitions
             Id = "jungle_hydra",
             Name = "Jungle Hydra",
             Description = "Evolved Vine Serpent. Multiple heads strike simultaneously.",
-            Type = StrayType.Reptile,
+            CreatureType = CreatureType.GiantCentipede,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 120, Attack = 22, Defense = 12, Speed = 16, Special = 18 },
             Biomes = new List<string> { "green" },
@@ -665,7 +724,7 @@ public static class StrayDefinitions
             Id = "aurora_monarch",
             Name = "Aurora Monarch",
             Description = "Evolved Bloom Moth. Its wings shimmer with healing light.",
-            Type = StrayType.Insect,
+            CreatureType = CreatureType.PrayingMantis,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 90, Attack = 10, Defense = 10, Speed = 18, Special = 30 },
             Biomes = new List<string> { "green" },
@@ -688,7 +747,7 @@ public static class StrayDefinitions
             Id = "house_cat",
             Name = "House Cat",
             Description = "Appears normal. Its eyes betray something else.",
-            Type = StrayType.Feline,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Speed,
             BaseStats = new StrayBaseStats { MaxHp = 70, Attack = 14, Defense = 8, Speed = 22, Special = 12 },
             Biomes = new List<string> { "quiet" },
@@ -706,7 +765,7 @@ public static class StrayDefinitions
             Id = "lawn_drone",
             Name = "Lawn Drone",
             Description = "Still tending lawns that no one lives in.",
-            Type = StrayType.Insect,
+            CreatureType = CreatureType.PrayingMantis,
             Role = StrayRole.Utility,
             BaseStats = new StrayBaseStats { MaxHp = 60, Attack = 10, Defense = 10, Speed = 14, Special = 14 },
             Biomes = new List<string> { "quiet" },
@@ -724,7 +783,7 @@ public static class StrayDefinitions
             Id = "sprinkler_serpent",
             Name = "Sprinkler Serpent",
             Description = "Emerged from the irrigation system. Controls water pressure.",
-            Type = StrayType.Reptile,
+            CreatureType = CreatureType.GiantCentipede,
             Role = StrayRole.Control,
             BaseStats = new StrayBaseStats { MaxHp = 85, Attack = 12, Defense = 10, Speed = 14, Special = 16 },
             Biomes = new List<string> { "quiet" },
@@ -742,7 +801,7 @@ public static class StrayDefinitions
             Id = "mailbox_mimic",
             Name = "Mailbox Mimic",
             Description = "Waits patiently for prey. Has been waiting a long time.",
-            Type = StrayType.Chimera,
+            CreatureType = CreatureType.NineBandedArmadillo,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 100, Attack = 18, Defense = 14, Speed = 8, Special = 10 },
             Biomes = new List<string> { "quiet" },
@@ -760,7 +819,7 @@ public static class StrayDefinitions
             Id = "garage_guardian",
             Name = "Garage Guardian",
             Description = "Protects a home that no longer exists.",
-            Type = StrayType.Mammal,
+            CreatureType = CreatureType.AmericanBison,
             Role = StrayRole.Tank,
             BaseStats = new StrayBaseStats { MaxHp = 140, Attack = 12, Defense = 18, Speed = 6, Special = 10 },
             Biomes = new List<string> { "quiet" },
@@ -778,7 +837,7 @@ public static class StrayDefinitions
             Id = "suburb_sentinel",
             Name = "Suburb Sentinel",
             Description = "The neighborhood watch evolved. Sees everything.",
-            Type = StrayType.Avian,
+            CreatureType = CreatureType.SugarGlider,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 100, Attack = 14, Defense = 12, Speed = 16, Special = 20 },
             Biomes = new List<string> { "quiet" },
@@ -795,7 +854,7 @@ public static class StrayDefinitions
             Id = "perfect_pet",
             Name = "Perfect Pet",
             Description = "Too perfect. Too obedient. Something is wrong.",
-            Type = StrayType.Canine,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 90, Attack = 10, Defense = 10, Speed = 14, Special = 24 },
             Biomes = new List<string> { "quiet" },
@@ -812,7 +871,7 @@ public static class StrayDefinitions
             Id = "uncanny_feline",
             Name = "Uncanny Feline",
             Description = "Evolved House Cat. Its wrongness is now visible.",
-            Type = StrayType.Feline,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Speed,
             BaseStats = new StrayBaseStats { MaxHp = 95, Attack = 18, Defense = 12, Speed = 26, Special = 16 },
             Biomes = new List<string> { "quiet" },
@@ -835,7 +894,7 @@ public static class StrayDefinitions
             Id = "turret_hawk",
             Name = "Turret Hawk",
             Description = "Integrated targeting systems make it a deadly marksman.",
-            Type = StrayType.Avian,
+            CreatureType = CreatureType.SugarGlider,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 75, Attack = 22, Defense = 6, Speed = 20, Special = 12 },
             Biomes = new List<string> { "teeth" },
@@ -853,7 +912,7 @@ public static class StrayDefinitions
             Id = "razor_hound",
             Name = "Razor Hound",
             Description = "Blades instead of fur. Built for war.",
-            Type = StrayType.Canine,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 95, Attack = 20, Defense = 12, Speed = 16, Special = 8 },
             Biomes = new List<string> { "teeth" },
@@ -871,7 +930,7 @@ public static class StrayDefinitions
             Id = "bunker_bear",
             Name = "Bunker Bear",
             Description = "Armor-plated survivor. Impervious to most attacks.",
-            Type = StrayType.Mammal,
+            CreatureType = CreatureType.AmericanBison,
             Role = StrayRole.Tank,
             BaseStats = new StrayBaseStats { MaxHp = 200, Attack = 14, Defense = 24, Speed = 4, Special = 8 },
             Biomes = new List<string> { "teeth" },
@@ -889,7 +948,7 @@ public static class StrayDefinitions
             Id = "wall_crawler",
             Name = "Wall Crawler",
             Description = "Moves through any terrain. Silent and deadly.",
-            Type = StrayType.Arachnid,
+            CreatureType = CreatureType.BlackWidowSpider,
             Role = StrayRole.Speed,
             BaseStats = new StrayBaseStats { MaxHp = 65, Attack = 16, Defense = 8, Speed = 24, Special = 12 },
             Biomes = new List<string> { "teeth" },
@@ -907,7 +966,7 @@ public static class StrayDefinitions
             Id = "sentry_spider",
             Name = "Sentry Spider",
             Description = "Webs that detect and trap intruders.",
-            Type = StrayType.Arachnid,
+            CreatureType = CreatureType.BlackWidowSpider,
             Role = StrayRole.Control,
             BaseStats = new StrayBaseStats { MaxHp = 80, Attack = 12, Defense = 14, Speed = 12, Special = 18 },
             Biomes = new List<string> { "teeth" },
@@ -925,7 +984,7 @@ public static class StrayDefinitions
             Id = "fortress_titan",
             Name = "Fortress Titan",
             Description = "A walking fortress. Nearly indestructible.",
-            Type = StrayType.Mammal,
+            CreatureType = CreatureType.AmericanBison,
             Role = StrayRole.Tank,
             BaseStats = new StrayBaseStats { MaxHp = 280, Attack = 16, Defense = 28, Speed = 2, Special = 10 },
             Biomes = new List<string> { "teeth" },
@@ -942,7 +1001,7 @@ public static class StrayDefinitions
             Id = "siege_wyrm",
             Name = "Siege Wyrm",
             Description = "Burrows through fortifications. Unstoppable advance.",
-            Type = StrayType.Reptile,
+            CreatureType = CreatureType.GiantCentipede,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 150, Attack = 26, Defense = 18, Speed = 8, Special = 14 },
             Biomes = new List<string> { "teeth" },
@@ -959,7 +1018,7 @@ public static class StrayDefinitions
             Id = "war_wolf",
             Name = "War Wolf",
             Description = "Evolved Razor Hound. A living weapon.",
-            Type = StrayType.Canine,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 130, Attack = 28, Defense = 16, Speed = 18, Special = 12 },
             Biomes = new List<string> { "teeth" },
@@ -982,7 +1041,7 @@ public static class StrayDefinitions
             Id = "server_sprite",
             Name = "Server Sprite",
             Description = "Pure data given form. Flickers in and out of existence.",
-            Type = StrayType.Invertebrate,
+            CreatureType = CreatureType.GiantSquid,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 55, Attack = 8, Defense = 6, Speed = 22, Special = 24 },
             Biomes = new List<string> { "glow" },
@@ -1000,7 +1059,7 @@ public static class StrayDefinitions
             Id = "data_worm",
             Name = "Data Worm",
             Description = "Burrows through code. Corrupts what it touches.",
-            Type = StrayType.Invertebrate,
+            CreatureType = CreatureType.GiantSquid,
             Role = StrayRole.Control,
             BaseStats = new StrayBaseStats { MaxHp = 70, Attack = 14, Defense = 8, Speed = 16, Special = 18 },
             Biomes = new List<string> { "glow" },
@@ -1018,7 +1077,7 @@ public static class StrayDefinitions
             Id = "cache_cat",
             Name = "Cache Cat",
             Description = "Stores memories in its fur. Never forgets.",
-            Type = StrayType.Feline,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 75, Attack = 12, Defense = 10, Speed = 18, Special = 20 },
             Biomes = new List<string> { "glow" },
@@ -1036,7 +1095,7 @@ public static class StrayDefinitions
             Id = "firewall_fox",
             Name = "Firewall Fox",
             Description = "Burns with protective fire. Blocks intrusions.",
-            Type = StrayType.Canine,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Tank,
             BaseStats = new StrayBaseStats { MaxHp = 110, Attack = 14, Defense = 16, Speed = 14, Special = 16 },
             Biomes = new List<string> { "glow" },
@@ -1054,7 +1113,7 @@ public static class StrayDefinitions
             Id = "bandwidth_bat",
             Name = "Bandwidth Bat",
             Description = "Moves at transmission speeds. Here and gone.",
-            Type = StrayType.Avian,
+            CreatureType = CreatureType.SugarGlider,
             Role = StrayRole.Speed,
             BaseStats = new StrayBaseStats { MaxHp = 60, Attack = 14, Defense = 6, Speed = 28, Special = 14 },
             Biomes = new List<string> { "glow" },
@@ -1072,7 +1131,7 @@ public static class StrayDefinitions
             Id = "kernel_dragon",
             Name = "Kernel Dragon",
             Description = "A manifestation of core system processes. Incredibly powerful.",
-            Type = StrayType.Reptile,
+            CreatureType = CreatureType.GiantCentipede,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 160, Attack = 28, Defense = 16, Speed = 16, Special = 26 },
             Biomes = new List<string> { "glow" },
@@ -1089,7 +1148,7 @@ public static class StrayDefinitions
             Id = "root_access_bear",
             Name = "Root Access Bear",
             Description = "Has administrator privileges to reality itself.",
-            Type = StrayType.Mammal,
+            CreatureType = CreatureType.AmericanBison,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 140, Attack = 16, Defense = 18, Speed = 10, Special = 30 },
             Biomes = new List<string> { "glow" },
@@ -1106,7 +1165,7 @@ public static class StrayDefinitions
             Id = "data_djinn",
             Name = "Data Djinn",
             Description = "Evolved Server Sprite. Grants digital wishes.",
-            Type = StrayType.Invertebrate,
+            CreatureType = CreatureType.GiantSquid,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 85, Attack = 12, Defense = 10, Speed = 24, Special = 32 },
             Biomes = new List<string> { "glow" },
@@ -1123,7 +1182,7 @@ public static class StrayDefinitions
             Id = "virus_wyrm",
             Name = "Virus Wyrm",
             Description = "Evolved Data Worm. A catastrophic system threat.",
-            Type = StrayType.Invertebrate,
+            CreatureType = CreatureType.GiantSquid,
             Role = StrayRole.Control,
             BaseStats = new StrayBaseStats { MaxHp = 100, Attack = 20, Defense = 12, Speed = 18, Special = 26 },
             Biomes = new List<string> { "glow" },
@@ -1146,7 +1205,7 @@ public static class StrayDefinitions
             Id = "memory_ghost",
             Name = "Memory Ghost",
             Description = "An echo of something that was deleted. Half-real.",
-            Type = StrayType.Invertebrate,
+            CreatureType = CreatureType.GiantSquid,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 50, Attack = 10, Defense = 4, Speed = 20, Special = 22 },
             Biomes = new List<string> { "archive_scar" },
@@ -1164,7 +1223,7 @@ public static class StrayDefinitions
             Id = "deleted_dog",
             Name = "Deleted Dog",
             Description = "Parts of it are missing. Still loyal.",
-            Type = StrayType.Canine,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 80, Attack = 16, Defense = 8, Speed = 16, Special = 14 },
             Biomes = new List<string> { "archive_scar" },
@@ -1182,7 +1241,7 @@ public static class StrayDefinitions
             Id = "corrupted_cat",
             Name = "Corrupted Cat",
             Description = "Its data is scrambled. Unpredictable behavior.",
-            Type = StrayType.Feline,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Control,
             BaseStats = new StrayBaseStats { MaxHp = 70, Attack = 14, Defense = 8, Speed = 18, Special = 18 },
             Biomes = new List<string> { "archive_scar" },
@@ -1200,7 +1259,7 @@ public static class StrayDefinitions
             Id = "null_serpent",
             Name = "Null Serpent",
             Description = "Made of nothing. Its bite erases.",
-            Type = StrayType.Reptile,
+            CreatureType = CreatureType.GiantCentipede,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 75, Attack = 20, Defense = 6, Speed = 16, Special = 16 },
             Biomes = new List<string> { "archive_scar" },
@@ -1218,7 +1277,7 @@ public static class StrayDefinitions
             Id = "void_moth",
             Name = "Void Moth",
             Description = "Drawn to the gaps in reality.",
-            Type = StrayType.Insect,
+            CreatureType = CreatureType.PrayingMantis,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 55, Attack = 8, Defense = 6, Speed = 20, Special = 22 },
             Biomes = new List<string> { "archive_scar" },
@@ -1236,7 +1295,7 @@ public static class StrayDefinitions
             Id = "ancient_backup",
             Name = "Ancient Backup",
             Description = "A complete backup from before the fall. Pristine.",
-            Type = StrayType.Mammal,
+            CreatureType = CreatureType.AmericanBison,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 120, Attack = 14, Defense = 14, Speed = 14, Special = 26 },
             Biomes = new List<string> { "archive_scar" },
@@ -1253,7 +1312,7 @@ public static class StrayDefinitions
             Id = "original_instance",
             Name = "Original Instance",
             Description = "The first of its kind. All others are copies.",
-            Type = StrayType.Chimera,
+            CreatureType = CreatureType.NineBandedArmadillo,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 130, Attack = 24, Defense = 16, Speed = 16, Special = 22 },
             Biomes = new List<string> { "archive_scar" },
@@ -1270,7 +1329,7 @@ public static class StrayDefinitions
             Id = "phantom_archive",
             Name = "Phantom Archive",
             Description = "Evolved Memory Ghost. Contains entire deleted histories.",
-            Type = StrayType.Invertebrate,
+            CreatureType = CreatureType.GiantSquid,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 80, Attack = 14, Defense = 8, Speed = 22, Special = 30 },
             Biomes = new List<string> { "archive_scar" },
@@ -1287,7 +1346,7 @@ public static class StrayDefinitions
             Id = "void_hound",
             Name = "Void Hound",
             Description = "Evolved Deleted Dog. Hunts between realities.",
-            Type = StrayType.Canine,
+            CreatureType = CreatureType.GrayWolf,
             Role = StrayRole.Damage,
             BaseStats = new StrayBaseStats { MaxHp = 110, Attack = 22, Defense = 12, Speed = 20, Special = 18 },
             Biomes = new List<string> { "archive_scar" },
@@ -1304,7 +1363,7 @@ public static class StrayDefinitions
             Id = "oblivion_butterfly",
             Name = "Oblivion Butterfly",
             Description = "Evolved Void Moth. Beautiful and terrifying.",
-            Type = StrayType.Insect,
+            CreatureType = CreatureType.PrayingMantis,
             Role = StrayRole.Support,
             BaseStats = new StrayBaseStats { MaxHp = 80, Attack = 12, Defense = 10, Speed = 22, Special = 30 },
             Biomes = new List<string> { "archive_scar" },
@@ -1313,6 +1372,115 @@ public static class StrayDefinitions
             PlaceholderColor = Color.Indigo,
             PlaceholderSize = 18,
             CanRecruit = false
+        });
+    }
+
+    /// <summary>
+    /// Registers special boss Strays.
+    /// </summary>
+    private static void RegisterBossStrays()
+    {
+        // Hyper-evolved Bandit - Final Boss
+        // The companion, fully corrupted by the Boost Control System
+        // Uses Absolute Gravitation to deal 99% HP damage to the party
+        Register(new StrayDefinition
+        {
+            Id = "hyper_bandit",
+            Name = "Hyper-Evolved Bandit",
+            Description = "Your former companion, consumed by the Boost Control System. The Gravitation ability has reached Absolute power - reality itself bends before it. This is not a fight you can win. You can only survive.",
+            CreatureType = CreatureType.GrayWolf,
+            Role = StrayRole.Damage,
+            BaseStats = new StrayBaseStats
+            {
+                MaxHp = 9999,   // Effectively unkillable
+                Attack = 999,   // Massive attack (though Gravitation ignores this)
+                Defense = 999,  // Massive defense
+                Speed = 20,     // Moderate speed - wants to give player time to see the horror
+                Special = 999   // Massive special
+            },
+            Biomes = new List<string> { "glow" },  // Only appears in The Glow
+            MicrochipSlots = 0,  // No chips needed - power is innate
+            InnateAbilities = new List<string> { "absolute_gravitation", "reality_warp", "unending_presence" },
+            PlaceholderColor = new Color(255, 100, 0),  // Glowing orange-red
+            PlaceholderSize = 40,  // Large boss size
+            CanRecruit = false,
+            IsBoss = true
+        });
+
+        // The Ancients - Optional Super Bosses
+        // Ancient Hydra - Multi-headed data construct (uses ColosssalSquid as base)
+        Register(new StrayDefinition
+        {
+            Id = "ancient_hydra",
+            Name = "The Ancient Hydra",
+            Description = "A fragment of NIMDOK's original consciousness, split and endlessly regenerating. Each tendril contains a different corrupted memory.",
+            CreatureType = CreatureType.ColossalSquid,  // Closest to multi-tentacled horror
+            Role = StrayRole.Tank,
+            BaseStats = new StrayBaseStats
+            {
+                MaxHp = 5000,
+                Attack = 150,
+                Defense = 100,
+                Speed = 8,
+                Special = 200
+            },
+            Biomes = new List<string> { "archive_scar" },
+            MicrochipSlots = 0,
+            InnateAbilities = new List<string> { "regenerating_heads", "memory_corruption", "data_flood" },
+            PlaceholderColor = new Color(100, 0, 100),
+            PlaceholderSize = 50,
+            CanRecruit = false,
+            IsBoss = true
+        });
+
+        // Ancient Phoenix - Rebirth construct (uses SugarGlider as flying base)
+        Register(new StrayDefinition
+        {
+            Id = "ancient_phoenix",
+            Name = "The Ancient Phoenix",
+            Description = "Born from deleted save states, this creature resurrects endlessly. Only by breaking its cycle can it be defeated.",
+            CreatureType = CreatureType.SugarGlider,  // Flying creature base
+            Role = StrayRole.Damage,
+            BaseStats = new StrayBaseStats
+            {
+                MaxHp = 3000,
+                Attack = 200,
+                Defense = 50,
+                Speed = 25,
+                Special = 250
+            },
+            Biomes = new List<string> { "glow" },
+            MicrochipSlots = 0,
+            InnateAbilities = new List<string> { "rebirth_flame", "deletion_fire", "save_state_echo" },
+            PlaceholderColor = new Color(255, 200, 0),
+            PlaceholderSize = 45,
+            CanRecruit = false,
+            IsBoss = true
+        });
+
+        // Ancient Leviathan - Deep data ocean monster (uses GiantPacificOctopus)
+        Register(new StrayDefinition
+        {
+            Id = "ancient_leviathan",
+            Name = "The Ancient Leviathan",
+            Description = "Lurking in the deepest memory pools, this behemoth predates even NIMDOK. What it wants is unknown.",
+            CreatureType = CreatureType.GiantPacificOctopus,  // Deep sea horror
+            Role = StrayRole.Tank,
+            BaseStats = new StrayBaseStats
+            {
+                MaxHp = 8000,
+                Attack = 180,
+                Defense = 150,
+                Speed = 5,
+                Special = 100
+            },
+            Biomes = new List<string> { "quiet" },
+            MicrochipSlots = 0,
+            InnateAbilities = new List<string> { "memory_depths", "data_crush", "abyssal_surge" },
+            PlaceholderColor = new Color(0, 50, 100),
+            PlaceholderSize = 60,
+            CanRecruit = false,
+            IsBoss = true
         });
     }
 }
