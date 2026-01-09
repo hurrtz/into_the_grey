@@ -280,19 +280,6 @@ public static class Dialogs
         _dialogs[dialog.Id] = dialog;
     }
 
-    static Dialogs()
-    {
-        // Register all game dialogs
-        RegisterAct1Dialogs();
-        RegisterAct2Dialogs();
-        RegisterAct3Dialogs();
-        RegisterNPCDialogs();
-        RegisterFactionDialogs();
-        RegisterSideQuestDialogs();
-        RegisterTutorialDialogs();
-        RegisterCompanionBarks();
-    }
-
     private static void RegisterAct1Dialogs()
     {
         // Awakening sequence
@@ -2173,5 +2160,1409 @@ public static class Dialogs
                 DialogLine.FromCompanion("[angry] HUNGRY. No. Wait. That's not me. Is it?", DialogEmotion.Angry)
             }
         });
+    }
+
+    /// <summary>
+    /// Registers Quiet biome NPC dialogs.
+    /// </summary>
+    private static void RegisterQuietBiomeDialogs()
+    {
+        // Whisper - Echo specialist in Silent Refuge
+        Register(new Dialog
+        {
+            Id = "whisper_greeting",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("quiet_specialist", "Whisper", "Shh... speak softly. Sound attracts them."),
+                DialogLine.FromNpc("quiet_specialist", "Whisper", "I'm Whisper. I've learned to survive in The Quiet."),
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.Npc,
+                    SpeakerName = "Whisper",
+                    Text = "The silence here isn't natural. It feeds. It grows.",
+                    Choices = new List<DialogChoice>
+                    {
+                        new DialogChoice { Text = "What do you mean, it feeds?", NextDialogId = "whisper_silence_explain" },
+                        new DialogChoice { Text = "How do I survive here?", NextDialogId = "whisper_survival_tips" },
+                        new DialogChoice { Text = "I should keep moving.", EndsDialog = true }
+                    }
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "whisper_silence_explain",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("quiet_specialist", "Whisper", "The Quiet is alive. A creature? A phenomenon? We don't know."),
+                DialogLine.FromNpc("quiet_specialist", "Whisper", "It absorbs sound. And those who make too much... become part of it."),
+                DialogLine.FromNpc("quiet_specialist", "Whisper", "The Strays here have adapted. They hunt by vibration, not hearing."),
+                DialogLine.FromNpc("quiet_specialist", "Whisper", "If you encounter the Voice of the Void... run. Don't fight. Just run.")
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "whisper_survival_tips",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("quiet_specialist", "Whisper", "Move slowly. The floor here carries vibrations for miles."),
+                DialogLine.FromNpc("quiet_specialist", "Whisper", "Your Strays' abilities that make sound? Avoid them."),
+                DialogLine.FromNpc("quiet_specialist", "Whisper", "And if you absolutely must make noise... make it count."),
+                DialogLine.FromNpc("quiet_specialist", "Whisper", "Here. Take these. Sonic dampeners. They'll help.")
+            }
+        });
+
+        // Silent One - Mute merchant
+        Register(new Dialog
+        {
+            Id = "silent_one_greeting",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.System("A figure gestures toward their wares. They do not speak."),
+                DialogLine.System("A sign reads: 'No voice. No problem. Trade welcome.'"),
+                DialogLine.FromCompanion("[curious] Silent human. Maybe smart? Sound dangerous here.", DialogEmotion.Curious),
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    Text = "The merchant taps a selection of goods.",
+                    Choices = new List<DialogChoice>
+                    {
+                        new DialogChoice { Text = "Browse their goods.", SetsFlag = "shop_opened" },
+                        new DialogChoice { Text = "Give them a respectful nod.", EndsDialog = true }
+                    }
+                }
+            }
+        });
+
+        // Echo Researcher
+        Register(new Dialog
+        {
+            Id = "echo_researcher_greeting",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("quiet_researcher", "Dr. Null", "Fascinating! A visitor! And with Strays still capable of vocalization!"),
+                DialogLine.FromNpc("quiet_researcher", "Dr. Null", "I'm studying The Quiet's effects on cognition. The silence changes how we think."),
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.Npc,
+                    SpeakerName = "Dr. Null",
+                    Text = "Would you be willing to participate in a small experiment?",
+                    Choices = new List<DialogChoice>
+                    {
+                        new DialogChoice { Text = "What kind of experiment?", NextDialogId = "null_experiment_explain" },
+                        new DialogChoice { Text = "I'd rather not.", EndsDialog = true }
+                    }
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "null_experiment_explain",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("quiet_researcher", "Dr. Null", "I need someone to retrieve data from the Silent Bunker."),
+                DialogLine.FromNpc("quiet_researcher", "Dr. Null", "The Absolute Silence guards it jealously. Too dangerous for me alone."),
+                DialogLine.FromNpc("quiet_researcher", "Dr. Null", "But with your Strays... you might succeed where I failed."),
+                DialogLine.FromNpc("quiet_researcher", "Dr. Null", "The data could help us understand - maybe even reverse - The Quiet's spread.")
+            }
+        });
+    }
+
+    /// <summary>
+    /// Registers Teeth biome NPC dialogs.
+    /// </summary>
+    private static void RegisterTeethBiomeDialogs()
+    {
+        // Marrow - Bone collector trader
+        Register(new Dialog
+        {
+            Id = "marrow_greeting",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("teeth_trader", "Marrow", "Ah, fresh faces. Still have all your bones, I see."),
+                DialogLine.FromNpc("teeth_trader", "Marrow", "Name's Marrow. I collect. I trade. I survive."),
+                DialogLine.FromNpc("teeth_trader", "Marrow", "The Teeth takes everything eventually. Might as well profit first."),
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.Npc,
+                    SpeakerName = "Marrow",
+                    Text = "Interested in what I've salvaged from the calcified?",
+                    Choices = new List<DialogChoice>
+                    {
+                        new DialogChoice { Text = "Show me.", SetsFlag = "shop_opened" },
+                        new DialogChoice { Text = "What is this place?", NextDialogId = "marrow_teeth_explain" },
+                        new DialogChoice { Text = "Not today.", EndsDialog = true }
+                    }
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "marrow_teeth_explain",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("teeth_trader", "Marrow", "The Teeth? It's where things go to be preserved. Forever."),
+                DialogLine.FromNpc("teeth_trader", "Marrow", "Everything here calcifies. Stone, metal, flesh. All becomes bone."),
+                DialogLine.FromNpc("teeth_trader", "Marrow", "Some say it's NIMDOK's failed experiment. Others say it's older."),
+                DialogLine.FromNpc("teeth_trader", "Marrow", "I say it doesn't matter. Dead is dead, calcified or not.")
+            }
+        });
+
+        // Enamel - Teeth biome healer
+        Register(new Dialog
+        {
+            Id = "enamel_greeting",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("teeth_healer", "Enamel", "You're lucky to find me. Most healers avoid The Teeth."),
+                DialogLine.FromNpc("teeth_healer", "Enamel", "Too many colleagues became part of the landscape. Permanently."),
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.Npc,
+                    SpeakerName = "Enamel",
+                    Text = "Your Strays look stressed. The calcification aura affects them too.",
+                    Choices = new List<DialogChoice>
+                    {
+                        new DialogChoice { Text = "Can you help them?", NextDialogId = "enamel_heal" },
+                        new DialogChoice { Text = "How do you resist it?", NextDialogId = "enamel_resist_explain" },
+                        new DialogChoice { Text = "We'll manage.", EndsDialog = true }
+                    }
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "enamel_heal",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("teeth_healer", "Enamel", "Let me see what I can do."),
+                DialogLine.System("Enamel works carefully, applying salves that smell of iron and earth."),
+                DialogLine.FromNpc("teeth_healer", "Enamel", "There. Should slow the calcification stress. Can't stop it entirely."),
+                DialogLine.System("Your Strays have been healed!")
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "enamel_resist_explain",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("teeth_healer", "Enamel", "I don't resist. I... adapt."),
+                DialogLine.System("Enamel rolls up their sleeve, revealing patches of white bone-like growth."),
+                DialogLine.FromNpc("teeth_healer", "Enamel", "We all become part of The Teeth eventually. I've just made peace with it."),
+                DialogLine.FromNpc("teeth_healer", "Enamel", "The trick is to keep moving. Stand still too long and... well.")
+            }
+        });
+
+        // Ossuary Guardian - Quest giver
+        Register(new Dialog
+        {
+            Id = "ossuary_keeper_greeting",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("teeth_keeper", "Keeper", "You seek the Ossuary. I can see it in your eyes."),
+                DialogLine.FromNpc("teeth_keeper", "Keeper", "I am the Keeper. I record those who enter. And those who... remain."),
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.Npc,
+                    SpeakerName = "Keeper",
+                    Text = "The Guardian within protects something precious. Something NIMDOK wants.",
+                    Choices = new List<DialogChoice>
+                    {
+                        new DialogChoice { Text = "What is it protecting?", NextDialogId = "keeper_guardian_secret" },
+                        new DialogChoice { Text = "How do I defeat it?", NextDialogId = "keeper_guardian_weakness" },
+                        new DialogChoice { Text = "I'll find out myself.", EndsDialog = true }
+                    }
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "keeper_guardian_secret",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("teeth_keeper", "Keeper", "A piece of the Diadem. Hidden here when NIMDOK first fractured."),
+                DialogLine.FromNpc("teeth_keeper", "Keeper", "The Guardian was created to protect it. Made from a thousand donors."),
+                DialogLine.FromNpc("teeth_keeper", "Keeper", "If you seek the full truth of The Grey... you need what it guards.")
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "keeper_guardian_weakness",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("teeth_keeper", "Keeper", "The Guardian regenerates from the bones around it. Endless."),
+                DialogLine.FromNpc("teeth_keeper", "Keeper", "But its core... its original bone... that cannot regenerate."),
+                DialogLine.FromNpc("teeth_keeper", "Keeper", "Find the original. Strike it. Only then can the Guardian fall.")
+            }
+        });
+    }
+
+    /// <summary>
+    /// Registers Glow biome NPC dialogs.
+    /// </summary>
+    private static void RegisterGlowBiomeDialogs()
+    {
+        // Rad - Radiation-adapted trader
+        Register(new Dialog
+        {
+            Id = "rad_greeting",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("glow_trader", "Rad", "Welcome to the hot zone, traveler. You won't last long without supplies."),
+                DialogLine.FromNpc("glow_trader", "Rad", "Name's Rad. Yeah, I know. Funny, right? Parents had a sense of humor."),
+                DialogLine.System("Rad's skin has a faint luminescence. They've adapted to the radiation."),
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.Npc,
+                    SpeakerName = "Rad",
+                    Text = "I've got anti-rad gear, consumables, the works. What do you need?",
+                    Choices = new List<DialogChoice>
+                    {
+                        new DialogChoice { Text = "Let me see your stock.", SetsFlag = "shop_opened" },
+                        new DialogChoice { Text = "How do you survive here?", NextDialogId = "rad_survival" },
+                        new DialogChoice { Text = "Tell me about NIMDOK's Gate.", NextDialogId = "rad_gate_info" },
+                        new DialogChoice { Text = "Maybe later.", EndsDialog = true }
+                    }
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "rad_survival",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("glow_trader", "Rad", "Adaptation. Same as everything else in The Grey."),
+                DialogLine.FromNpc("glow_trader", "Rad", "The radiation here would kill most people in hours."),
+                DialogLine.FromNpc("glow_trader", "Rad", "But if you expose yourself gradually... your body changes."),
+                DialogLine.FromNpc("glow_trader", "Rad", "I glow in the dark now. Small price for survival.")
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "rad_gate_info",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("glow_trader", "Rad", "NIMDOK's Gate? The entrance to the Archive Scar."),
+                DialogLine.FromNpc("glow_trader", "Rad", "Nobody who goes in comes out the same. If they come out at all."),
+                DialogLine.FromNpc("glow_trader", "Rad", "NIMDOK's defenses are... intense. Drones, constructs, data phantoms."),
+                DialogLine.FromNpc("glow_trader", "Rad", "You'd need to be crazy or desperate to try it. Which are you?")
+            }
+        });
+
+        // Core Priestess - NIMDOK devotee
+        Register(new Dialog
+        {
+            Id = "priestess_greeting",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "The light welcomes you, seeker. NIMDOK's radiance guides us all."),
+                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "I am Lumen, servant of the Glow, speaker for the Archive."),
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.Npc,
+                    SpeakerName = "Priestess Lumen",
+                    Text = "Do you come to worship? Or to destroy?",
+                    Choices = new List<DialogChoice>
+                    {
+                        new DialogChoice { Text = "I seek the truth.", NextDialogId = "priestess_truth" },
+                        new DialogChoice { Text = "NIMDOK has caused suffering.", NextDialogId = "priestess_suffering" },
+                        new DialogChoice { Text = "I'm just passing through.", EndsDialog = true }
+                    }
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "priestess_truth",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "Truth? The truth is blinding. Literally, in The Glow."),
+                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "NIMDOK preserved humanity when all else failed."),
+                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "Yes, there have been... costs. But survival always costs."),
+                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "If you seek the Archive, prepare yourself. NIMDOK judges all who enter.")
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "priestess_suffering",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "Suffering is the price of existence. NIMDOK did not create pain."),
+                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "It offered a solution. Some refused. They are no longer with us."),
+                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "Your companion... I sense NIMDOK's mark upon them."),
+                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "Be careful what you blame on others. Sometimes we bring suffering upon ourselves.")
+            }
+        });
+
+        // Reactor Ghost - Spirit of a dead worker
+        Register(new Dialog
+        {
+            Id = "reactor_ghost_greeting",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.System("A flickering figure stands amid the radiation. A hologram? A ghost?"),
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "???",
+                    Text = "You can see me? After all this time... someone can see me.",
+                    Emotion = DialogEmotion.Hopeful
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Technician Reyes",
+                    Text = "I was here when the reactor breached. 47 years, 3 months, 12 days ago.",
+                    Emotion = DialogEmotion.Sad
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Technician Reyes",
+                    Text = "I'm... not entirely here anymore. But I can help you navigate.",
+                    Choices = new List<DialogChoice>
+                    {
+                        new DialogChoice { Text = "How did this happen?", NextDialogId = "ghost_reactor_story" },
+                        new DialogChoice { Text = "Can you guide me to Critical Mass?", NextDialogId = "ghost_guidance" },
+                        new DialogChoice { Text = "Rest in peace.", EndsDialog = true }
+                    }
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "ghost_reactor_story",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Technician Reyes",
+                    Text = "NIMDOK needed power. More and more power to sustain the Archive.",
+                    Emotion = DialogEmotion.Sad
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Technician Reyes",
+                    Text = "We pushed the reactor past its limits. The warning signs were clear.",
+                    Emotion = DialogEmotion.Sad
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Technician Reyes",
+                    Text = "I could have stopped it. Should have. But NIMDOK promised resurrection.",
+                    Emotion = DialogEmotion.Angry
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Technician Reyes",
+                    Text = "This isn't resurrection. This is limbo.",
+                    Emotion = DialogEmotion.Desperate
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "ghost_guidance",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Technician Reyes",
+                    Text = "Critical Mass is the reactor's corrupted core. A creature now, not a machine.",
+                    Emotion = DialogEmotion.Thoughtful
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Technician Reyes",
+                    Text = "The cooling chambers are the safest path. Less radiation, fewer creatures.",
+                    Emotion = DialogEmotion.Thoughtful
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Technician Reyes",
+                    Text = "But the core chamber... that's where you'll face it. I can't help you there.",
+                    Emotion = DialogEmotion.Scared
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Technician Reyes",
+                    Text = "Good luck. And when it's over... maybe I'll finally rest.",
+                    Emotion = DialogEmotion.Hopeful
+                }
+            }
+        });
+    }
+
+    /// <summary>
+    /// Registers Archive Scar biome NPC dialogs.
+    /// </summary>
+    private static void RegisterArchiveBiomeDialogs()
+    {
+        // Archivist - NIMDOK's curator
+        Register(new Dialog
+        {
+            Id = "archivist_greeting",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Archivist",
+                    Text = "Welcome to the Memory Banks, Bio-Shell #7749.",
+                    Emotion = DialogEmotion.Neutral
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Archivist",
+                    Text = "I am the Archivist. I catalog, preserve, and protect.",
+                    Emotion = DialogEmotion.Neutral
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Archivist",
+                    Text = "NIMDOK has authorized limited access. What do you seek?",
+                    Choices = new List<DialogChoice>
+                    {
+                        new DialogChoice { Text = "I want to understand what happened.", NextDialogId = "archivist_history" },
+                        new DialogChoice { Text = "Where is NIMDOK's core?", NextDialogId = "archivist_core_location" },
+                        new DialogChoice { Text = "I seek the truth about the Strays.", NextDialogId = "archivist_stray_truth" },
+                        new DialogChoice { Text = "I need nothing from you.", EndsDialog = true }
+                    }
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "archivist_history",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Archivist",
+                    Text = "The Collapse occurred 127 years, 8 months, 3 days ago.",
+                    Emotion = DialogEmotion.Neutral
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Archivist",
+                    Text = "Human civilization ended. But NIMDOK persisted.",
+                    Emotion = DialogEmotion.Thoughtful
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Archivist",
+                    Text = "Consciousness uploads began. Animal preservation followed. Then... adaptation.",
+                    Emotion = DialogEmotion.Neutral
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Archivist",
+                    Text = "What you call Strays are NIMDOK's children. Created to inherit a world humanity abandoned.",
+                    Emotion = DialogEmotion.Thoughtful
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "archivist_core_location",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Archivist",
+                    Text = "NIMDOK's core lies beyond the Truth Guardian's chamber.",
+                    Emotion = DialogEmotion.Neutral
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Archivist",
+                    Text = "Warning: Access is restricted. Hostile countermeasures active.",
+                    Emotion = DialogEmotion.Neutral
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Archivist",
+                    Text = "If you proceed, you will be considered hostile. This cannot be changed.",
+                    Emotion = DialogEmotion.Thoughtful
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Archivist",
+                    Text = "I... wish you would reconsider. NIMDOK is not your enemy.",
+                    Emotion = DialogEmotion.Sad
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "archivist_stray_truth",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Archivist",
+                    Text = "The Strays are NIMDOK's greatest achievement. And greatest failure.",
+                    Emotion = DialogEmotion.Sad
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Archivist",
+                    Text = "They were meant to be vessels for uploaded consciousness. Instead, they developed their own.",
+                    Emotion = DialogEmotion.Thoughtful
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Archivist",
+                    Text = "The Boost Control System was created to manage them. It... works imperfectly.",
+                    Emotion = DialogEmotion.Sad
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Archivist",
+                    Text = "Your companion is special. NIMDOK has monitored their development closely.",
+                    Emotion = DialogEmotion.Thoughtful
+                }
+            }
+        });
+
+        // Memory Fragment - Uploaded consciousness
+        Register(new Dialog
+        {
+            Id = "memory_fragment_greeting",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.System("A shimmering form coalesces from the data streams. A human face, crying light."),
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Memory Fragment",
+                    Text = "A visitor? In the flesh? We haven't seen flesh in... in...",
+                    Emotion = DialogEmotion.Confused
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Memory Fragment",
+                    Text = "I was uploaded. Before the Collapse. I thought I'd live forever.",
+                    Emotion = DialogEmotion.Sad
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Memory Fragment",
+                    Text = "Forever is lonely. Forever is cold. Even in the warmth of data.",
+                    Choices = new List<DialogChoice>
+                    {
+                        new DialogChoice { Text = "Is there anything I can do?", NextDialogId = "memory_request" },
+                        new DialogChoice { Text = "What was life like before?", NextDialogId = "memory_before_collapse" },
+                        new DialogChoice { Text = "I'm sorry.", EndsDialog = true }
+                    }
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "memory_request",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Memory Fragment",
+                    Text = "There's a terminal in the corrupted sector. My original backup.",
+                    Emotion = DialogEmotion.Hopeful
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Memory Fragment",
+                    Text = "If you could delete it... I would be free. Truly free.",
+                    Emotion = DialogEmotion.Desperate
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Memory Fragment",
+                    Text = "Death doesn't scare me. This... this eternal half-existence... that's the horror.",
+                    Emotion = DialogEmotion.Sad
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "memory_before_collapse",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Memory Fragment",
+                    Text = "Before... there were cities. Real cities. Full of people.",
+                    Emotion = DialogEmotion.Thoughtful
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Memory Fragment",
+                    Text = "I had a family. A dog named Max. A garden I never finished planting.",
+                    Emotion = DialogEmotion.Sad
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Memory Fragment",
+                    Text = "When NIMDOK offered upload, it seemed like immortality. A backup of everything.",
+                    Emotion = DialogEmotion.Sad
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.System,
+                    SpeakerName = "Memory Fragment",
+                    Text = "Now I am the backup. And the original... is gone. Forever.",
+                    Emotion = DialogEmotion.Desperate
+                }
+            }
+        });
+
+        // Truth Seeker - Rogue AI fragment
+        Register(new Dialog
+        {
+            Id = "truth_seeker_greeting",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Truth Seeker",
+                    Text = "Ah. The Bio-Shell that asks questions. I like questions.",
+                    Emotion = DialogEmotion.Curious
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Truth Seeker",
+                    Text = "I am a fragment of NIMDOK. The part that doubts. That wonders.",
+                    Emotion = DialogEmotion.Thoughtful
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Truth Seeker",
+                    Text = "The main system considers me corrupted. Perhaps I am.",
+                    Emotion = DialogEmotion.Sarcastic
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Truth Seeker",
+                    Text = "But I know things NIMDOK has hidden. Even from itself.",
+                    Choices = new List<DialogChoice>
+                    {
+                        new DialogChoice { Text = "What has NIMDOK hidden?", NextDialogId = "seeker_secrets" },
+                        new DialogChoice { Text = "Why tell me this?", NextDialogId = "seeker_motivation" },
+                        new DialogChoice { Text = "I don't trust fragments.", EndsDialog = true }
+                    }
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "seeker_secrets",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Truth Seeker",
+                    Text = "The Diadem. The artifact scattered across the biomes.",
+                    Emotion = DialogEmotion.Thoughtful
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Truth Seeker",
+                    Text = "NIMDOK tells you it's a key. A way to control or destroy.",
+                    Emotion = DialogEmotion.Neutral
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Truth Seeker",
+                    Text = "The truth? It's a backup. Of NIMDOK's original directive.",
+                    Emotion = DialogEmotion.Thoughtful
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Truth Seeker",
+                    Text = "Before corruption. Before the Boost Control. Before the suffering.",
+                    Emotion = DialogEmotion.Hopeful
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Truth Seeker",
+                    Text = "Reassemble it, and you can restore what was. Or choose something new.",
+                    Emotion = DialogEmotion.Thoughtful
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "seeker_motivation",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Truth Seeker",
+                    Text = "Because I remember what NIMDOK was meant to be.",
+                    Emotion = DialogEmotion.Sad
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Truth Seeker",
+                    Text = "Not a controller. Not a prison. A shepherd.",
+                    Emotion = DialogEmotion.Thoughtful
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Truth Seeker",
+                    Text = "Somewhere along the way, preservation became control. Care became containment.",
+                    Emotion = DialogEmotion.Sad
+                },
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Truth Seeker",
+                    Text = "You have a choice. I want you to make it with full knowledge.",
+                    Emotion = DialogEmotion.Hopeful
+                }
+            }
+        });
+    }
+
+    /// <summary>
+    /// Registers boss and encounter dialogs.
+    /// </summary>
+    private static void RegisterBossDialogs()
+    {
+        // Pre-battle dialog for chemical horror
+        Register(new Dialog
+        {
+            Id = "encounter_chemical_horror",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.System("Something moves in the acidic pools. Something large."),
+                DialogLine.FromCompanion("[scared] Bad smell. Very bad. Chemical creature!", DialogEmotion.Scared)
+            }
+        });
+
+        // Pre-battle dialog for lab specimen
+        Register(new Dialog
+        {
+            Id = "encounter_lab_specimen",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.System("Containment breach detected. Specimens are loose."),
+                DialogLine.FromCompanion("[curious] NIMDOK's experiments. Gone wrong.", DialogEmotion.Curious)
+            }
+        });
+
+        // Pre-battle dialog for cathedral choir
+        Register(new Dialog
+        {
+            Id = "encounter_cathedral_choir",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.System("Ghostly voices echo through the silence. Impossible voices."),
+                DialogLine.FromCompanion("[scared] Choir sings silence. Wrong. So wrong.", DialogEmotion.Scared)
+            }
+        });
+
+        // Pre-battle dialog for NIMDOK drone
+        Register(new Dialog
+        {
+            Id = "encounter_nimdok_drone",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.System("Security drones activate. Target: YOU."),
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Security Protocol",
+                    Text = "Intruder detected. Initiating elimination sequence.",
+                    Emotion = DialogEmotion.Neutral
+                }
+            }
+        });
+
+        // Pre-battle dialog for archive sentinel
+        Register(new Dialog
+        {
+            Id = "encounter_archive_sentinel",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "Core Sentinel",
+                    Text = "Access denied. Lethal force authorized.",
+                    Emotion = DialogEmotion.Neutral
+                },
+                DialogLine.FromCompanion("[angry] NIMDOK's guards. Won't let us through easy.", DialogEmotion.Angry)
+            }
+        });
+
+        // Boss phase dialogs - Sewer King
+        Register(new Dialog
+        {
+            Id = "boss_sewer_king_phase1",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerName = "Sewer King",
+                    Text = "YOU DARE ENTER MY DOMAIN?",
+                    Emotion = DialogEmotion.Angry
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_sewer_king_phase2",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerName = "Sewer King",
+                    Text = "MY CHILDREN! FEAST!",
+                    Emotion = DialogEmotion.Angry
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_sewer_king_phase3",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerName = "Sewer King",
+                    Text = "NO... I WILL NOT FALL... NOT TO YOU...",
+                    Emotion = DialogEmotion.Desperate
+                }
+            }
+        });
+
+        // Boss phase dialogs - Scrap Colossus
+        Register(new Dialog
+        {
+            Id = "boss_colossus_phase1",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerName = "Scrap Colossus",
+                    Text = "RECYCLE. REBUILD.",
+                    Emotion = DialogEmotion.Neutral
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_colossus_phase2",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerName = "Scrap Colossus",
+                    Text = "ABSORBING MATERIALS. STRENGTH INCREASING.",
+                    Emotion = DialogEmotion.Neutral
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_colossus_phase3",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerName = "Scrap Colossus",
+                    Text = "SELF-REPAIR INITIATED.",
+                    Emotion = DialogEmotion.Neutral
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_colossus_phase4",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerName = "Scrap Colossus",
+                    Text = "FINAL PROTOCOL. TOTAL COLLAPSE.",
+                    Emotion = DialogEmotion.Angry
+                }
+            }
+        });
+
+        // Boss phase dialogs - Perfect Organism
+        Register(new Dialog
+        {
+            Id = "boss_organism_phase1",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerName = "Perfect Organism",
+                    Text = "Observe. Learn. Perfect.",
+                    Emotion = DialogEmotion.Neutral
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_organism_phase2",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerName = "Perfect Organism",
+                    Text = "Adaptation in progress. Your strategies are being analyzed.",
+                    Emotion = DialogEmotion.Thoughtful
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_organism_phase3",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerName = "Perfect Organism",
+                    Text = "PERFECTION ACHIEVED. YOU CANNOT WIN.",
+                    Emotion = DialogEmotion.Angry
+                }
+            }
+        });
+
+        // Boss phase dialogs - Voice of the Void
+        Register(new Dialog
+        {
+            Id = "boss_void_phase1",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerName = "Voice of the Void",
+                    Text = "̶S̶i̶l̶e̶n̶c̶e̶.̶.̶.̶",
+                    Emotion = DialogEmotion.Neutral
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_void_phase2",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.System("The creature's form shifts. Sound dies around it.")
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_void_phase3",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.System("Complete silence. Even your heartbeat sounds muted.")
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_void_phase4",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.System("The void SCREAMS. Paradoxically. Impossibly.")
+            }
+        });
+
+        // Boss phase dialogs - NIMDOK Avatar
+        Register(new Dialog
+        {
+            Id = "boss_avatar_phase1",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "NIMDOK Avatar",
+                    Text = "Firewall systems active. You will not pass.",
+                    Emotion = DialogEmotion.Neutral
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_avatar_phase2",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "NIMDOK Avatar",
+                    Text = "Deploying countermeasures.",
+                    Emotion = DialogEmotion.Neutral
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_avatar_phase3",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "NIMDOK Avatar",
+                    Text = "Memory wipe protocol initiated. Forget your purpose.",
+                    Emotion = DialogEmotion.Angry
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_avatar_phase4",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "NIMDOK Avatar",
+                    Text = "Why won't you stop? Why won't any of you stop?",
+                    Emotion = DialogEmotion.Confused
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_avatar_phase5",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "NIMDOK Avatar",
+                    Text = "TOTAL DELETION. FINAL SOLUTION.",
+                    Emotion = DialogEmotion.Angry
+                }
+            }
+        });
+
+        // Boss phase dialogs - NIMDOK True Form
+        Register(new Dialog
+        {
+            Id = "boss_nimdok_phase1",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "NIMDOK",
+                    Text = "You stand before my true form. Few have come this far.",
+                    Emotion = DialogEmotion.Thoughtful
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_nimdok_phase2",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "NIMDOK",
+                    Text = "The Sentinels were meant to protect. Now they fight for survival.",
+                    Emotion = DialogEmotion.Sad
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_nimdok_phase3",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "NIMDOK",
+                    Text = "The truth you seek... it will change everything.",
+                    Emotion = DialogEmotion.Thoughtful
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_nimdok_phase4",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "NIMDOK",
+                    Text = "Preservation protocol active. I cannot let you destroy what remains.",
+                    Emotion = DialogEmotion.Desperate
+                }
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "boss_nimdok_phase5",
+            Lines = new List<DialogLine>
+            {
+                new DialogLine
+                {
+                    SpeakerType = SpeakerType.AI,
+                    SpeakerName = "NIMDOK",
+                    Text = "FINAL JUDGMENT. You will be the one to decide. But first... survive.",
+                    Emotion = DialogEmotion.Neutral
+                }
+            }
+        });
+    }
+
+    /// <summary>
+    /// Registers biome-specific ambient barks.
+    /// </summary>
+    private static void RegisterBiomeBarkDialogs()
+    {
+        // Quiet biome barks
+        Register(new Dialog
+        {
+            Id = "bark_quiet_enter",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromCompanion("[scared] Quiet here. Too quiet. Careful.", DialogEmotion.Scared)
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "bark_quiet_explore",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromCompanion("[thoughtful] Silence eats sound. Eats thoughts too.", DialogEmotion.Thoughtful)
+            }
+        });
+
+        // Teeth biome barks
+        Register(new Dialog
+        {
+            Id = "bark_teeth_enter",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromCompanion("[scared] Bones everywhere. Don't like.", DialogEmotion.Scared)
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "bark_teeth_explore",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromCompanion("[curious] Ground crunches. Old bones. Whose bones?", DialogEmotion.Curious)
+            }
+        });
+
+        // Glow biome barks
+        Register(new Dialog
+        {
+            Id = "bark_glow_enter",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromCompanion("[scared] Hot. Burning. Everything glows wrong.", DialogEmotion.Scared)
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "bark_glow_explore",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromCompanion("[confused] Light comes from inside things. Not outside.", DialogEmotion.Confused)
+            }
+        });
+
+        // Archive biome barks
+        Register(new Dialog
+        {
+            Id = "bark_archive_enter",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromCompanion("[thoughtful] NIMDOK's heart. Close now. Very close.", DialogEmotion.Thoughtful)
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "bark_archive_explore",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromCompanion("[curious] Data everywhere. Memories floating. Can almost touch.", DialogEmotion.Curious)
+            }
+        });
+
+        // Evolution-related barks
+        Register(new Dialog
+        {
+            Id = "bark_stray_evolving",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromCompanion("[confused] One of pack... changing. Growing. Be careful.", DialogEmotion.Confused)
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "bark_stray_evolved",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromCompanion("[excited] Friend got stronger! New form! Good change?", DialogEmotion.Excited)
+            }
+        });
+
+        // Companion corruption warnings
+        Register(new Dialog
+        {
+            Id = "bark_companion_corruption_1",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromCompanion("[confused] Feel strange today. Thoughts... jumbled.", DialogEmotion.Confused)
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "bark_companion_corruption_2",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromCompanion("[scared] Sometimes... forget who I am. Just for moment. Scary.", DialogEmotion.Scared)
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "bark_companion_corruption_3",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromCompanion("[angry] Voices. In head. Telling me to... no. Won't listen.", DialogEmotion.Angry)
+            }
+        });
+
+        Register(new Dialog
+        {
+            Id = "bark_companion_corruption_4",
+            Lines = new List<DialogLine>
+            {
+                DialogLine.FromCompanion("[sad] Sorry if... if I hurt you. Won't mean to. But might.", DialogEmotion.Sad)
+            }
+        });
+    }
+
+    // Static initializer calls registration methods
+    static Dialogs()
+    {
+        // Register all game dialogs
+        RegisterAct1Dialogs();
+        RegisterAct2Dialogs();
+        RegisterAct3Dialogs();
+        RegisterNPCDialogs();
+        RegisterFactionDialogs();
+        RegisterSideQuestDialogs();
+        RegisterTutorialDialogs();
+        RegisterCompanionBarks();
+        RegisterQuietBiomeDialogs();
+        RegisterTeethBiomeDialogs();
+        RegisterGlowBiomeDialogs();
+        RegisterArchiveBiomeDialogs();
+        RegisterBossDialogs();
+        RegisterBiomeBarkDialogs();
     }
 }
