@@ -725,4 +725,3 @@ public class BossAttackEventArgs : EventArgs
     /// </summary>
     public BossPhase Phase { get; init; }
 }
-

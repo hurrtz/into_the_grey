@@ -769,4 +769,3 @@ public class EvolutionEventArgs : EventArgs
     /// </summary>
     public StrayDefinition NewDefinition { get; init; } = null!;
 }
-
