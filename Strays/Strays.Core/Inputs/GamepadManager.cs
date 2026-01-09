@@ -661,4 +661,3 @@ internal class VibrationState
         }
     }
 }
-

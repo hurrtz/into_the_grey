@@ -918,4 +918,3 @@ public enum CaptionType
     Music,
     Ambient
 }
-

@@ -436,4 +436,3 @@ public class EnumOption<T> : AccessibilityOption where T : struct, Enum
     public override void Toggle() => Increase();
     public override void Reset() => _setter(_defaultValue);
 }
-
