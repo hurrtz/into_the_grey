@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Strays.Core.Game.Data;
 using Strays.Core.Game.Items;
+using Strays.Core.Game.Stats;
 
 namespace Strays.Core.Game.Entities;
 
@@ -33,14 +34,25 @@ public class Stray
     private static int _nextInstanceId = 1;
 
     /// <summary>
+    /// The complete stat profile for this Stray.
+    /// </summary>
+    private readonly StrayStats _stats = new();
+
+    /// <summary>
     /// Unique instance ID for this specific Stray.
     /// </summary>
     public string InstanceId { get; }
 
     /// <summary>
+    /// Gets the complete stat profile for this Stray.
+    /// Use this to access all 61 stats with base/bonus/total values.
+    /// </summary>
+    public StrayStats Stats => _stats;
+
+    /// <summary>
     /// The definition (species/type) of this Stray.
     /// </summary>
-    public StrayDefinition Definition { get; }
+    public StrayDefinition Definition { get; private set; }
 
     /// <summary>
     /// Custom nickname (null = use default name).
@@ -73,39 +85,49 @@ public class Stray
     public int CurrentHp { get; set; }
 
     /// <summary>
-    /// Maximum HP (scaled by level and augmentations).
+    /// Maximum HP (from stat system).
     /// </summary>
-    public int MaxHp => CalculateStat(Definition.BaseStats.MaxHp, "MaxHp");
+    public int MaxHp => (int)_stats.GetTotal(StatType.HPMax);
 
     /// <summary>
-    /// Attack stat.
+    /// Attack stat (average of physical ATK stats for backward compatibility).
     /// </summary>
-    public int Attack => CalculateStat(Definition.BaseStats.Attack, "Attack");
+    public int Attack => (int)((_stats.GetTotal(StatType.ATK_Impact) +
+                                _stats.GetTotal(StatType.ATK_Piercing) +
+                                _stats.GetTotal(StatType.ATK_Slashing)) / 3f);
 
     /// <summary>
-    /// Defense stat.
+    /// Defense stat (average of physical MIT stats for backward compatibility).
     /// </summary>
-    public int Defense => CalculateStat(Definition.BaseStats.Defense, "Defense");
+    public int Defense => (int)((_stats.GetTotal(StatType.MIT_Impact) +
+                                 _stats.GetTotal(StatType.MIT_Piercing) +
+                                 _stats.GetTotal(StatType.MIT_Slashing)) / 3f);
 
     /// <summary>
     /// Speed stat (affects ATB fill rate).
     /// </summary>
-    public int Speed => CalculateStat(Definition.BaseStats.Speed, "Speed");
+    public int Speed => (int)_stats.GetTotal(StatType.Speed);
 
     /// <summary>
-    /// Special stat (affects ability power).
+    /// Special stat (average of elemental ATK stats for backward compatibility).
     /// </summary>
-    public int Special => CalculateStat(Definition.BaseStats.Special, "Special");
+    public int Special => (int)((_stats.GetTotal(StatType.ATK_Thermal) +
+                                 _stats.GetTotal(StatType.ATK_Cryo) +
+                                 _stats.GetTotal(StatType.ATK_Electric) +
+                                 _stats.GetTotal(StatType.ATK_Corrosive) +
+                                 _stats.GetTotal(StatType.ATK_Toxic) +
+                                 _stats.GetTotal(StatType.ATK_Sonic) +
+                                 _stats.GetTotal(StatType.ATK_Radiant)) / 7f);
 
     /// <summary>
     /// Maximum energy pool (for microchip abilities).
     /// </summary>
-    public int MaxEnergy => CalculateStat(Definition.BaseStats.MaxEnergy, "MaxEnergy");
+    public int MaxEnergy => (int)_stats.GetTotal(StatType.ENMax);
 
     /// <summary>
     /// Energy regeneration per ATB tick.
     /// </summary>
-    public int EnergyRegen => CalculateStat(Definition.BaseStats.EnergyRegen, "EnergyRegen");
+    public int EnergyRegen => (int)_stats.GetTotal(StatType.ENRegen);
 
     /// <summary>
     /// Current energy (0 to MaxEnergy).
@@ -247,6 +269,9 @@ public class Stray
         chip.EquippedToStrayId = InstanceId;
         chip.SocketIndex = socketIndex;
 
+        // Recalculate stat modifiers from equipment
+        RecalculateStatModifiers();
+
         return previousChip;
     }
 
@@ -269,6 +294,9 @@ public class Stray
             chip.EquippedToStrayId = null;
             chip.SocketIndex = -1;
             socket.EquippedChip = null;
+
+            // Recalculate stat modifiers from equipment
+            RecalculateStatModifiers();
         }
 
         return chip;
@@ -459,7 +487,10 @@ public class Stray
         var previousAugment = EquippedAugmentations[key];
         EquippedAugmentations[key] = augmentationId;
 
-        // Recalculate HP if MaxHp changed
+        // Recalculate stat modifiers from equipment
+        RecalculateStatModifiers();
+
+        // Adjust HP if MaxHp changed
         var newMaxHp = MaxHp;
         if (CurrentHp > newMaxHp)
             CurrentHp = newMaxHp;
@@ -481,7 +512,10 @@ public class Stray
         var previousAugment = EquippedAugmentations[key];
         EquippedAugmentations[key] = null;
 
-        // Recalculate HP if MaxHp changed
+        // Recalculate stat modifiers from equipment
+        RecalculateStatModifiers();
+
+        // Adjust HP if MaxHp changed
         var newMaxHp = MaxHp;
         if (CurrentHp > newMaxHp)
             CurrentHp = newMaxHp;
@@ -551,6 +585,7 @@ public class Stray
         Level = Math.Max(1, level);
         InitializeAugmentationSlots();
         InitializeMicrochipSockets();
+        InitializeBaseStats();
         CurrentHp = MaxHp;
         CurrentEnergy = MaxEnergy;
     }
@@ -580,12 +615,165 @@ public class Stray
     {
         Level = Math.Max(1, newLevel);
         Experience = 0; // Reset experience after level change
+        InitializeBaseStats(); // Recalculate stats for new level
         CurrentHp = MaxHp; // Heal to full
+        CurrentEnergy = MaxEnergy;
+    }
+
+    /// <summary>
+    /// Initializes the base stats from the definition.
+    /// Call this after setting the definition or on level up.
+    /// </summary>
+    private void InitializeBaseStats()
+    {
+        // Scale base stats by level (10% per level after level 1)
+        float levelMultiplier = 1f + (Level - 1) * 0.1f;
+        var baseStats = Definition.BaseStats;
+
+        // Map old simple stats to new comprehensive system
+        _stats.SetBase(StatType.HPMax, baseStats.MaxHp * levelMultiplier);
+        _stats.SetBase(StatType.Speed, baseStats.Speed * levelMultiplier);
+        _stats.SetBase(StatType.ENMax, baseStats.MaxEnergy * levelMultiplier);
+        _stats.SetBase(StatType.ENRegen, baseStats.EnergyRegen * levelMultiplier);
+
+        // Distribute Attack stat across physical damage types
+        float attackPerType = baseStats.Attack * levelMultiplier / 3f;
+        _stats.SetBase(StatType.ATK_Impact, attackPerType);
+        _stats.SetBase(StatType.ATK_Piercing, attackPerType);
+        _stats.SetBase(StatType.ATK_Slashing, attackPerType);
+
+        // Distribute Defense stat across physical mitigation types
+        float defensePerType = baseStats.Defense * levelMultiplier / 3f;
+        _stats.SetBase(StatType.MIT_Impact, defensePerType);
+        _stats.SetBase(StatType.MIT_Piercing, defensePerType);
+        _stats.SetBase(StatType.MIT_Slashing, defensePerType);
+
+        // Distribute Special stat across elemental damage types
+        float specialPerType = baseStats.Special * levelMultiplier / 7f;
+        _stats.SetBase(StatType.ATK_Thermal, specialPerType);
+        _stats.SetBase(StatType.ATK_Cryo, specialPerType);
+        _stats.SetBase(StatType.ATK_Electric, specialPerType);
+        _stats.SetBase(StatType.ATK_Corrosive, specialPerType);
+        _stats.SetBase(StatType.ATK_Toxic, specialPerType);
+        _stats.SetBase(StatType.ATK_Sonic, specialPerType);
+        _stats.SetBase(StatType.ATK_Radiant, specialPerType);
+
+        // Recalculate modifiers from equipment
+        RecalculateStatModifiers();
+    }
+
+    /// <summary>
+    /// Recalculates all stat modifiers from augmentations and microchips.
+    /// Call this after equipping/unequipping any gear.
+    /// </summary>
+    public void RecalculateStatModifiers()
+    {
+        // Clear existing modifiers from equipment
+        _stats.RemoveModifiersFromSource("augmentation");
+        _stats.RemoveModifiersFromSource("microchip");
+
+        // Add augmentation modifiers
+        foreach (var kvp in EquippedAugmentations)
+        {
+            var augId = kvp.Value;
+            if (augId == null)
+                continue;
+
+            var augDef = Augmentations.Get(augId);
+            if (augDef == null)
+                continue;
+
+            // Add stat modifiers from augmentation
+            foreach (var statMod in augDef.StatModifiers)
+            {
+                _stats.AddModifier(new StatModifier
+                {
+                    Stat = statMod.Stat,
+                    Value = statMod.Value,
+                    IsPercent = statMod.IsPercent,
+                    Source = "augmentation",
+                    SourceType = ModifierSource.Augmentation,
+                    SourceName = augDef.Name
+                });
+            }
+
+            // Legacy support: map old stat bonuses to new system
+            foreach (var bonus in augDef.StatBonuses)
+            {
+                var statType = MapLegacyStatName(bonus.Key);
+                if (statType.HasValue)
+                {
+                    _stats.AddModifier(StatModifier.Flat(statType.Value, bonus.Value, "augmentation", ModifierSource.Augmentation, augDef.Name));
+                }
+            }
+
+            // Legacy support: map old stat multipliers to new system
+            foreach (var mult in augDef.StatMultipliers)
+            {
+                var statType = MapLegacyStatName(mult.Key);
+                if (statType.HasValue)
+                {
+                    // Convert multiplier to percentage bonus (e.g., 1.2 -> +20%)
+                    float percentBonus = (mult.Value - 1f) * 100f;
+                    _stats.AddModifier(StatModifier.Percent(statType.Value, percentBonus, "augmentation", ModifierSource.Augmentation, augDef.Name));
+                }
+            }
+        }
+
+        // Add microchip modifiers (from Driver chips)
+        foreach (var chip in GetEquippedChips())
+        {
+            // Add stat modifiers from microchip definition
+            foreach (var statMod in chip.Definition.StatModifiers)
+            {
+                // Scale by firmware level for Driver chips
+                float value = statMod.Value;
+                if (chip.Definition.Category == MicrochipCategory.Driver)
+                {
+                    value *= 1f + ((int)chip.FirmwareLevel - 1) * 0.1f;
+                }
+
+                _stats.AddModifier(new StatModifier
+                {
+                    Stat = statMod.Stat,
+                    Value = value,
+                    IsPercent = statMod.IsPercent,
+                    Source = "microchip",
+                    SourceType = ModifierSource.Microchip,
+                    SourceName = chip.Definition.Name
+                });
+            }
+        }
+    }
+
+    /// <summary>
+    /// Maps legacy stat name strings to the new StatType enum.
+    /// </summary>
+    private static StatType? MapLegacyStatName(string legacyName)
+    {
+        return legacyName switch
+        {
+            "MaxHp" or "HP" => StatType.HPMax,
+            "MaxEnergy" or "Energy" => StatType.ENMax,
+            "EnergyRegen" => StatType.ENRegen,
+            "Speed" => StatType.Speed,
+            "Attack" => StatType.ATK_Impact, // Default to Impact for legacy attack
+            "Defense" => StatType.MIT_Impact, // Default to Impact for legacy defense
+            "Special" => StatType.ATK_Thermal, // Default to Thermal for legacy special
+            "MeleeAccuracy" => StatType.MeleeAccuracy,
+            "RangedAccuracy" => StatType.RangedAccuracy,
+            "Evasion" => StatType.Evasion,
+            "CritChance" => StatType.MeleeCritChance,
+            "CritDamage" => StatType.CritSeverity,
+            _ => null
+        };
     }
 
     /// <summary>
     /// Calculates a stat value based on level and augmentations.
+    /// Deprecated: Use Stats.GetTotal(StatType) instead.
     /// </summary>
+    [Obsolete("Use Stats.GetTotal(StatType) instead")]
     private int CalculateStat(int baseStat, string statName = "")
     {
         // Scale by level (10% per level)
@@ -685,9 +873,15 @@ public class Stray
             Experience -= ExperienceToNextLevel;
             Level++;
             leveledUp = true;
+        }
 
+        if (leveledUp)
+        {
+            // Recalculate stats for new level
+            InitializeBaseStats();
             // Heal to full on level up
             CurrentHp = MaxHp;
+            CurrentEnergy = MaxEnergy;
         }
 
         return leveledUp;
@@ -797,6 +991,31 @@ public class Stray
         CurrentEnergy = MaxEnergy;
 
         return true;
+    }
+
+    /// <summary>
+    /// Evolves the Stray to a new definition (used by EvolutionSystem).
+    /// </summary>
+    /// <param name="newDefinition">The new definition for the evolved form.</param>
+    public void Evolve(StrayDefinition newDefinition)
+    {
+        Definition = newDefinition;
+        EvolutionStage++;
+        IsEvolved = true;
+
+        // Upgrade microchip sockets for new evolution stage
+        UpgradeMicrochipSockets();
+
+        // Re-initialize augmentation slots for the new category/type if needed
+        // Keep existing augments that are still compatible
+        foreach (var slot in GetAvailableSlots())
+        {
+            var key = slot.ToKey();
+            if (!EquippedAugmentations.ContainsKey(key))
+            {
+                EquippedAugmentations[key] = null;
+            }
+        }
     }
 
     /// <summary>

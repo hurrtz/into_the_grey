@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Strays.Core.Game.Combat;
+using Strays.Core.Game.Stats;
 
 namespace Strays.Core.Game.Items;
 
@@ -218,14 +219,19 @@ public class MicrochipDefinition
     public ChipElement Element { get; init; } = ChipElement.None;
 
     /// <summary>
-    /// Stat bonuses provided (for Driver chips).
+    /// Stat bonuses provided (for Driver chips). Legacy - use StatModifiers for new code.
     /// </summary>
     public Dictionary<string, int> StatBonuses { get; init; } = new();
 
     /// <summary>
-    /// Stat multipliers provided (for Driver chips).
+    /// Stat multipliers provided (for Driver chips). Legacy - use StatModifiers for new code.
     /// </summary>
     public Dictionary<string, float> StatMultipliers { get; init; } = new();
+
+    /// <summary>
+    /// Stat modifiers using the new comprehensive stat system.
+    /// </summary>
+    public List<StatModifier> StatModifiers { get; init; } = new();
 
     /// <summary>
     /// Whether this chip requires a linked socket to function (Augment chips).

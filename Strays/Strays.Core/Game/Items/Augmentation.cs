@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Strays.Core.Game.Data;
+using Strays.Core.Game.Stats;
 
 namespace Strays.Core.Game.Items;
 
@@ -50,14 +51,19 @@ public class AugmentationDefinition
     public ItemRarity Rarity { get; init; } = ItemRarity.Common;
 
     /// <summary>
-    /// Stat bonuses (flat values added to stats).
+    /// Stat bonuses (flat values added to stats). Legacy - use StatModifiers for new code.
     /// </summary>
     public Dictionary<string, int> StatBonuses { get; init; } = new();
 
     /// <summary>
-    /// Stat multipliers (applied after bonuses).
+    /// Stat multipliers (applied after bonuses). Legacy - use StatModifiers for new code.
     /// </summary>
     public Dictionary<string, float> StatMultipliers { get; init; } = new();
+
+    /// <summary>
+    /// Stat modifiers using the new comprehensive stat system.
+    /// </summary>
+    public List<StatModifier> StatModifiers { get; init; } = new();
 
     /// <summary>
     /// Ability granted by this augmentation.

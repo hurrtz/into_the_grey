@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Strays.Core.Game.Data;
 using Strays.Core.Game.Entities;
+using Strays.Core.Game.Stats;
 using Strays.Core.Inputs;
 using Strays.Core.Services;
 using Strays.ScreenManagers;
@@ -28,9 +29,13 @@ public class PartyScreen : GameScreen
     private bool _inRosterView = false;
     private bool _swapMode = false;
     private int _swapSourceIndex = -1;
+    private bool _showStatsDetail = false;
+    private int _statsScrollOffset = 0;
+    private StatCategory _selectedStatCategory = StatCategory.Tempo;
 
     private const int MaxVisibleRoster = 8;
     private const int PartySlots = 5;
+    private const int MaxVisibleStats = 10;
 
     public PartyScreen(StrayRoster roster, GameStateService gameState)
     {
@@ -121,9 +126,37 @@ public class PartyScreen : GameScreen
         }
 
         // P key to toggle combat position (Front/Back)
-        if (input.IsNewKeyPress(Keys.P, ControllingPlayer, out _) && !_swapMode)
+        if (input.IsNewKeyPress(Keys.P, ControllingPlayer, out _) && !_swapMode && !_showStatsDetail)
         {
             TogglePosition();
+        }
+
+        // S key to toggle stats detail view
+        if (input.IsNewKeyPress(Keys.S, ControllingPlayer, out _) && !_swapMode)
+        {
+            _showStatsDetail = !_showStatsDetail;
+            _statsScrollOffset = 0;
+            _selectedStatCategory = StatCategory.Tempo;
+        }
+
+        // Stats view navigation
+        if (_showStatsDetail)
+        {
+            // Q/A to change category
+            if (input.IsNewKeyPress(Keys.Q, ControllingPlayer, out _))
+            {
+                int cat = (int)_selectedStatCategory - 1;
+                if (cat < 0) cat = 8; // Wrap to StatusResistance
+                _selectedStatCategory = (StatCategory)cat;
+                _statsScrollOffset = 0;
+            }
+            if (input.IsNewKeyPress(Keys.A, ControllingPlayer, out _))
+            {
+                int cat = (int)_selectedStatCategory + 1;
+                if (cat > 8) cat = 0; // Wrap to Tempo
+                _selectedStatCategory = (StatCategory)cat;
+                _statsScrollOffset = 0;
+            }
         }
     }
 
@@ -268,20 +301,30 @@ public class PartyScreen : GameScreen
         spriteBatch.Draw(_pixelTexture, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * 0.85f);
 
         // Title
-        string title = "Party Management";
+        string title = _showStatsDetail ? "Stray Stats" : "Party Management";
         var titleSize = _font.MeasureString(title);
         spriteBatch.DrawString(_font, title, new Vector2((viewport.Width - titleSize.X) / 2, 20), Color.White);
 
-        // Draw party panel (left side)
-        DrawPartyPanel(spriteBatch, new Rectangle(20, 70, viewport.Width / 2 - 30, viewport.Height - 120));
+        if (_showStatsDetail)
+        {
+            // Stats detail view
+            DrawStatsDetailView(spriteBatch, viewport);
+        }
+        else
+        {
+            // Draw party panel (left side)
+            DrawPartyPanel(spriteBatch, new Rectangle(20, 70, viewport.Width / 2 - 30, viewport.Height - 120));
 
-        // Draw roster panel (right side)
-        DrawRosterPanel(spriteBatch, new Rectangle(viewport.Width / 2 + 10, 70, viewport.Width / 2 - 30, viewport.Height - 120));
+            // Draw roster panel (right side)
+            DrawRosterPanel(spriteBatch, new Rectangle(viewport.Width / 2 + 10, 70, viewport.Width / 2 - 30, viewport.Height - 120));
+        }
 
         // Draw instructions
-        string instructions = _swapMode
-            ? "Select target to swap | [ESC] Cancel"
-            : "[Arrows] Navigate | [Enter] Swap | [E] Equip | [P] Position | [Tab] Panel | [ESC] Back";
+        string instructions = _showStatsDetail
+            ? "[Q/A] Category | [S] Close | [ESC] Back"
+            : (_swapMode
+                ? "Select target to swap | [ESC] Cancel"
+                : "[Arrows] Navigate | [Enter] Swap | [E] Equip | [S] Stats | [P] Position | [Tab] Panel | [ESC] Back");
         var instrSize = _smallFont.MeasureString(instructions);
         spriteBatch.DrawString(_smallFont, instructions, new Vector2((viewport.Width - instrSize.X) / 2, viewport.Height - 30), Color.Gray);
 
@@ -471,5 +514,202 @@ public class PartyScreen : GameScreen
         spriteBatch.Draw(_pixelTexture, new Rectangle(bounds.X, bounds.Y + bounds.Height - thickness, bounds.Width, thickness), color);
         spriteBatch.Draw(_pixelTexture, new Rectangle(bounds.X, bounds.Y, thickness, bounds.Height), color);
         spriteBatch.Draw(_pixelTexture, new Rectangle(bounds.X + bounds.Width - thickness, bounds.Y, thickness, bounds.Height), color);
+    }
+
+    private void DrawStatsDetailView(SpriteBatch spriteBatch, Viewport viewport)
+    {
+        // Get selected Stray
+        Stray? selectedStray = GetSelectedStray();
+
+        if (selectedStray == null)
+        {
+            string noSelection = "No Stray selected";
+            var textSize = _font.MeasureString(noSelection);
+            spriteBatch.DrawString(_font, noSelection,
+                new Vector2((viewport.Width - textSize.X) / 2, viewport.Height / 2),
+                Color.Gray);
+            return;
+        }
+
+        int panelWidth = viewport.Width - 40;
+        int panelHeight = viewport.Height - 140;
+        var panelBounds = new Rectangle(20, 70, panelWidth, panelHeight);
+
+        // Panel background
+        spriteBatch.Draw(_pixelTexture, panelBounds, Color.DarkSlateGray * 0.6f);
+        DrawBorder(spriteBatch, panelBounds, Color.Cyan);
+
+        // Stray header info
+        int yPos = panelBounds.Y + 10;
+        string headerText = $"{selectedStray.DisplayName} (Lv.{selectedStray.Level}) - {selectedStray.Definition.Category} / {selectedStray.Definition.Role}";
+        spriteBatch.DrawString(_smallFont, headerText, new Vector2(panelBounds.X + 10, yPos), Color.White);
+        yPos += 25;
+
+        // Category tabs
+        DrawCategoryTabs(spriteBatch, new Rectangle(panelBounds.X + 10, yPos, panelWidth - 20, 25));
+        yPos += 35;
+
+        // Column headers
+        int col1 = panelBounds.X + 20;
+        int col2 = panelBounds.X + 180;
+        int col3 = panelBounds.X + 260;
+        int col4 = panelBounds.X + 340;
+        int col5 = panelBounds.X + 420;
+
+        spriteBatch.DrawString(_smallFont, "Stat", new Vector2(col1, yPos), Color.Yellow);
+        spriteBatch.DrawString(_smallFont, "Base", new Vector2(col2, yPos), Color.Yellow);
+        spriteBatch.DrawString(_smallFont, "Bonus", new Vector2(col3, yPos), Color.Yellow);
+        spriteBatch.DrawString(_smallFont, "Total", new Vector2(col4, yPos), Color.Yellow);
+        spriteBatch.DrawString(_smallFont, "Sources", new Vector2(col5, yPos), Color.Yellow);
+        yPos += 20;
+
+        // Separator line
+        spriteBatch.Draw(_pixelTexture, new Rectangle(panelBounds.X + 10, yPos, panelWidth - 20, 1), Color.Gray);
+        yPos += 5;
+
+        // Get stats for selected category
+        var statsInCategory = GetStatsForCategory(_selectedStatCategory);
+        var stats = selectedStray.Stats;
+
+        foreach (var statType in statsInCategory)
+        {
+            if (yPos > panelBounds.Y + panelHeight - 30) break;
+
+            float baseValue = stats.GetBase(statType);
+            float totalValue = stats.GetTotal(statType);
+            float bonusValue = totalValue - baseValue;
+
+            // Stat name
+            string shortName = StatNames.GetShortName(statType);
+            string fullName = StatNames.GetFullName(statType);
+            spriteBatch.DrawString(_smallFont, shortName, new Vector2(col1, yPos), Color.White);
+
+            // Base value
+            string baseStr = StatNames.FormatValue(statType, baseValue);
+            spriteBatch.DrawString(_smallFont, baseStr, new Vector2(col2, yPos), Color.LightGray);
+
+            // Bonus value
+            string bonusStr = bonusValue >= 0 ? $"+{StatNames.FormatValue(statType, bonusValue)}" : StatNames.FormatValue(statType, bonusValue);
+            Color bonusColor = bonusValue > 0 ? Color.LimeGreen : (bonusValue < 0 ? Color.Red : Color.Gray);
+            spriteBatch.DrawString(_smallFont, bonusStr, new Vector2(col3, yPos), bonusColor);
+
+            // Total value
+            string totalStr = StatNames.FormatValue(statType, totalValue);
+            spriteBatch.DrawString(_smallFont, totalStr, new Vector2(col4, yPos), Color.Cyan);
+
+            // Sources summary
+            var modifiers = stats.GetModifiersForStat(statType).ToList();
+            string sourceStr = modifiers.Count > 0 ? $"[{modifiers.Count} source(s)]" : "-";
+            spriteBatch.DrawString(_smallFont, sourceStr, new Vector2(col5, yPos), Color.DarkGray);
+
+            yPos += 18;
+        }
+
+        // Category description
+        string catDesc = StatNames.GetCategoryName(_selectedStatCategory);
+        spriteBatch.DrawString(_smallFont, $"Category: {catDesc}",
+            new Vector2(panelBounds.X + 10, panelBounds.Y + panelHeight - 25), Color.Gray);
+    }
+
+    private void DrawCategoryTabs(SpriteBatch spriteBatch, Rectangle bounds)
+    {
+        var categories = Enum.GetValues<StatCategory>();
+        int tabWidth = bounds.Width / categories.Length;
+
+        for (int i = 0; i < categories.Length; i++)
+        {
+            var cat = categories[i];
+            var tabBounds = new Rectangle(bounds.X + i * tabWidth, bounds.Y, tabWidth - 2, bounds.Height);
+
+            bool isSelected = cat == _selectedStatCategory;
+            Color bgColor = isSelected ? Color.DarkCyan : Color.DarkSlateGray;
+            spriteBatch.Draw(_pixelTexture, tabBounds, bgColor);
+
+            string catName = GetCategoryShortName(cat);
+            var textSize = _smallFont.MeasureString(catName);
+            float scale = Math.Min(1f, (tabWidth - 4) / textSize.X);
+            Color textColor = isSelected ? Color.White : Color.Gray;
+
+            spriteBatch.DrawString(_smallFont, catName,
+                new Vector2(tabBounds.X + (tabBounds.Width - textSize.X * scale) / 2, tabBounds.Y + 3),
+                textColor, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+        }
+    }
+
+    private string GetCategoryShortName(StatCategory category)
+    {
+        return category switch
+        {
+            StatCategory.Tempo => "TEMPO",
+            StatCategory.Survival => "SURV",
+            StatCategory.Energy => "EN",
+            StatCategory.Heat => "HEAT",
+            StatCategory.Combat => "COMB",
+            StatCategory.PhysicalDamage => "PHYS",
+            StatCategory.ElementalDamage => "ELEM",
+            StatCategory.StatusApplication => "STS+",
+            StatCategory.StatusResistance => "STS-",
+            _ => category.ToString()
+        };
+    }
+
+    private IEnumerable<StatType> GetStatsForCategory(StatCategory category)
+    {
+        return category switch
+        {
+            StatCategory.Tempo => new[] { StatType.Speed, StatType.ATBStartPercent, StatType.ATBDelayResist },
+            StatCategory.Survival => new[] { StatType.HPMax, StatType.BarrierMax, StatType.BarrierRegen },
+            StatCategory.Energy => new[] { StatType.ENMax, StatType.ENRegen },
+            StatCategory.Heat => new[] { StatType.HeatCapacityMod, StatType.HeatDissipationMod, StatType.OverheatRecoveryBonus },
+            StatCategory.Combat => new[] {
+                StatType.MeleeAccuracy, StatType.RangedAccuracy, StatType.Evasion,
+                StatType.MeleeCritChance, StatType.RangedCritChance, StatType.CritSeverity,
+                StatType.Luck, StatType.Threat
+            },
+            StatCategory.PhysicalDamage => new[] {
+                StatType.ATK_Impact, StatType.PEN_Impact, StatType.MIT_Impact,
+                StatType.ATK_Piercing, StatType.PEN_Piercing, StatType.MIT_Piercing,
+                StatType.ATK_Slashing, StatType.PEN_Slashing, StatType.MIT_Slashing
+            },
+            StatCategory.ElementalDamage => new[] {
+                StatType.ATK_Thermal, StatType.PEN_Thermal, StatType.MIT_Thermal,
+                StatType.ATK_Cryo, StatType.PEN_Cryo, StatType.MIT_Cryo,
+                StatType.ATK_Electric, StatType.PEN_Electric, StatType.MIT_Electric,
+                StatType.ATK_Corrosive, StatType.PEN_Corrosive, StatType.MIT_Corrosive,
+                StatType.ATK_Toxic, StatType.PEN_Toxic, StatType.MIT_Toxic,
+                StatType.ATK_Sonic, StatType.PEN_Sonic, StatType.MIT_Sonic,
+                StatType.ATK_Radiant, StatType.PEN_Radiant, StatType.MIT_Radiant
+            },
+            StatCategory.StatusApplication => new[] {
+                StatType.BleedApplication, StatType.PoisonApplication, StatType.BurnApplication,
+                StatType.FreezeApplication, StatType.ShockApplication, StatType.BlindApplication
+            },
+            StatCategory.StatusResistance => new[] {
+                StatType.BleedResist, StatType.PoisonResist, StatType.BurnResist,
+                StatType.FreezeResist, StatType.ShockResist, StatType.BlindResist
+            },
+            _ => Array.Empty<StatType>()
+        };
+    }
+
+    private Stray? GetSelectedStray()
+    {
+        if (_inRosterView)
+        {
+            var storedStrays = _roster.Storage.ToList();
+            if (_selectedIndex >= 0 && _selectedIndex < storedStrays.Count)
+            {
+                return storedStrays[_selectedIndex];
+            }
+        }
+        else
+        {
+            var partyList = _roster.Party.ToList();
+            if (_selectedIndex >= 0 && _selectedIndex < partyList.Count)
+            {
+                return partyList[_selectedIndex];
+            }
+        }
+        return null;
     }
 }
