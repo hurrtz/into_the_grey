@@ -589,4 +589,3 @@ public class BestiaryScreen : GameScreen
         _spriteBatch?.Draw(_pixelTexture, rect, color);
     }
 }
-

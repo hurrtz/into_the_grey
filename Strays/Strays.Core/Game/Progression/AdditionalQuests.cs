@@ -766,4 +766,3 @@ public static class AdditionalQuests
         });
     }
 }
-

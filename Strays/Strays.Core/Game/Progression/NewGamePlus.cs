@@ -567,4 +567,3 @@ public class NewGamePlusSaveData
     public int CarryOverSettings { get; set; }
     public List<string> PermanentFlags { get; set; } = new();
 }
-

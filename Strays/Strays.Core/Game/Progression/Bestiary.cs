@@ -703,4 +703,3 @@ public class BestiaryEntrySaveData
     public List<string> EncounteredBiomes { get; set; } = new();
     public string? PlayerNotes { get; set; }
 }
-
