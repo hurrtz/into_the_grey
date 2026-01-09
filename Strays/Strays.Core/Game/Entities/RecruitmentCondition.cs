@@ -53,7 +53,22 @@ public enum RecruitmentConditionType
     /// <summary>
     /// Must be at a specific act in the story.
     /// </summary>
-    RequiresAct
+    RequiresAct,
+
+    /// <summary>
+    /// Must have spared a certain number of enemies.
+    /// </summary>
+    SparedEnemies,
+
+    /// <summary>
+    /// Must have completed a certain number of bounties.
+    /// </summary>
+    CompletedBounty,
+
+    /// <summary>
+    /// Must have a high enough morality level.
+    /// </summary>
+    HasHighMorality
 }
 
 /// <summary>
@@ -97,6 +112,9 @@ public class RecruitmentCondition
             RecruitmentConditionType.RequiresExoskeleton => gameState.HasExoskeleton && gameState.ExoskeletonPowered,
             RecruitmentConditionType.RequiresGravitationStage => (int)gameState.Data.GravitationStage >= RequiredValue,
             RecruitmentConditionType.RequiresAct => (int)gameState.CurrentAct >= RequiredValue,
+            RecruitmentConditionType.SparedEnemies => gameState.Data.EnemiesSpared >= RequiredValue,
+            RecruitmentConditionType.CompletedBounty => gameState.Data.BountiesCompleted >= RequiredValue,
+            RecruitmentConditionType.HasHighMorality => gameState.Data.Morality >= RequiredValue,
             _ => true
         };
     }
@@ -163,6 +181,45 @@ public class RecruitmentCondition
             TargetId = factionId,
             RequiredValue = minReputation,
             FailureMessage = failureMessage ?? $"You need better standing with {factionId}."
+        };
+    }
+
+    /// <summary>
+    /// Creates a requirement for sparing a number of enemies.
+    /// </summary>
+    public static RecruitmentCondition Spared(int count, string? failureMessage = null)
+    {
+        return new RecruitmentCondition
+        {
+            Type = RecruitmentConditionType.SparedEnemies,
+            RequiredValue = count,
+            FailureMessage = failureMessage ?? $"You haven't shown enough mercy. (Spared: {count})"
+        };
+    }
+
+    /// <summary>
+    /// Creates a requirement for completing a number of bounties.
+    /// </summary>
+    public static RecruitmentCondition Bounty(int count, string? failureMessage = null)
+    {
+        return new RecruitmentCondition
+        {
+            Type = RecruitmentConditionType.CompletedBounty,
+            RequiredValue = count,
+            FailureMessage = failureMessage ?? $"You haven't proven your strength. (Bounties: {count})"
+        };
+    }
+
+    /// <summary>
+    /// Creates a requirement for a minimum morality level.
+    /// </summary>
+    public static RecruitmentCondition Morality(int minMorality, string? failureMessage = null)
+    {
+        return new RecruitmentCondition
+        {
+            Type = RecruitmentConditionType.HasHighMorality,
+            RequiredValue = minMorality,
+            FailureMessage = failureMessage ?? "Your heart isn't in the right place."
         };
     }
 }

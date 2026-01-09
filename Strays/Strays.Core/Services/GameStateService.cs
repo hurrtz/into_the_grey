@@ -765,6 +765,31 @@ public class GameStateService
         return _currentData.DiscoveredSettlements.Contains(settlementId);
     }
 
+    /// <summary>
+    /// Records sparing an enemy.
+    /// </summary>
+    public void RecordEnemySpared()
+    {
+        _currentData.EnemiesSpared++;
+    }
+
+    /// <summary>
+    /// Records completing a bounty.
+    /// </summary>
+    public void RecordBountyCompleted()
+    {
+        _currentData.BountiesCompleted++;
+    }
+
+    /// <summary>
+    /// Adjusts the player's morality score.
+    /// </summary>
+    /// <param name="amount">Positive for good deeds, negative for bad.</param>
+    public void AddMorality(int amount)
+    {
+        _currentData.Morality = Math.Clamp(_currentData.Morality + amount, -100, 100);
+    }
+
     #endregion
 
     #region Play Time Tracking

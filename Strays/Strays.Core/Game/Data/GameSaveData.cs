@@ -161,6 +161,21 @@ public class GameSaveData
     /// Number of battles fled from.
     /// </summary>
     public int BattlesFled { get; set; } = 0;
+
+    /// <summary>
+    /// Number of enemies spared in combat.
+    /// </summary>
+    public int EnemiesSpared { get; set; } = 0;
+
+    /// <summary>
+    /// Number of bounty quests completed.
+    /// </summary>
+    public int BountiesCompleted { get; set; } = 0;
+
+    /// <summary>
+    /// Player's morality score (-100 to 100).
+    /// </summary>
+    public int Morality { get; set; } = 0;
 }
 
 /// <summary>
