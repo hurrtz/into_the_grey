@@ -385,4 +385,3 @@ public class LanguageScreen : GameScreen
         _spriteBatch?.Draw(_pixelTexture, rect, color);
     }
 }
-
