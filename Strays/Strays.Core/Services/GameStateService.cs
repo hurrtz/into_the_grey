@@ -23,6 +23,7 @@ public class GameStateService
     private GameSaveData _currentData;
     private readonly JsonSerializerOptions _jsonOptions;
     private FactionReputation? _factionReputation;
+    private Bestiary? _bestiary;
 
     // Auto-save configuration
     private double _autoSaveIntervalSeconds = 300; // 5 minutes
@@ -108,6 +109,18 @@ public class GameStateService
                 }
             }
             return _factionReputation;
+        }
+    }
+
+    /// <summary>
+    /// Gets the bestiary (Stray encyclopedia) for this save.
+    /// </summary>
+    public Bestiary Bestiary
+    {
+        get
+        {
+            _bestiary ??= new Bestiary();
+            return _bestiary;
         }
     }
 
@@ -1050,7 +1063,12 @@ public class GameStateService
     /// </summary>
     public System.Collections.Generic.Dictionary<string, int> ExportStrayLevels()
     {
-        return new System.Collections.Generic.Dictionary<string, int>(_currentData.OwnedStrays);
+        var result = new System.Collections.Generic.Dictionary<string, int>();
+        foreach (var kvp in _currentData.OwnedStrays)
+        {
+            result[kvp.Key] = kvp.Value.Level;
+        }
+        return result;
     }
 
     /// <summary>

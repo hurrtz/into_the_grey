@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,6 +13,7 @@ using Strays.Core.Game.Items;
 using Strays.Core.Game.Progression;
 using Strays.Core.Game.World;
 using Strays.Core.Game.Dungeons;
+using Strays.Core.Game.Story;
 using Strays.Core.Inputs;
 using Strays.Core.Services;
 using Strays.ScreenManagers;
@@ -124,6 +126,10 @@ public class WorldScreen : GameScreen
         // Create protagonist
         _protagonist = new Protagonist(_gameState);
         _protagonist.Position = _gameState.ProtagonistPosition;
+
+        // Load protagonist sprites
+        string contentPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content");
+        _protagonist.LoadContent(ScreenManager.GraphicsDevice, contentPath);
 
         // Create companion
         _companion = new Companion(_gameState.CompanionType, _gameState);
@@ -422,6 +428,70 @@ public class WorldScreen : GameScreen
     {
         // Show notification
         System.Diagnostics.Debug.WriteLine($"Quest completed: {quest.Name}");
+
+        // Check if this is the final quest
+        if (quest.Id == "main_29_ending")
+        {
+            TriggerGameEnding();
+        }
+    }
+
+    /// <summary>
+    /// Triggers the game ending sequence based on player choices.
+    /// </summary>
+    private void TriggerGameEnding()
+    {
+        // Create ending system and determine ending
+        var endingSystem = new EndingSystem();
+
+        // Collect game flags
+        var gameFlags = new HashSet<string>();
+
+        foreach (var flag in _gameState.Data.StoryFlags)
+        {
+            if (flag.Value)
+            {
+                gameFlags.Add(flag.Key);
+            }
+        }
+
+        // Add the game_complete flag
+        gameFlags.Add(StoryFlags.GameComplete);
+
+        // Update ending state based on game progress
+        if (!_gameState.CompanionPresent)
+        {
+            if (_gameState.HasFlag(StoryFlags.DefeatedHyperEvolvedBandit))
+            {
+                gameFlags.Add("companion_sacrificed");
+                endingSystem.State.CompanionSacrificed = true;
+            }
+            else
+            {
+                gameFlags.Add("companion_departed");
+                endingSystem.State.CompanionDeparted = true;
+            }
+        }
+        else
+        {
+            gameFlags.Add("companion_alive");
+        }
+
+        // Determine ending
+        var ending = endingSystem.DetermineEnding(gameFlags);
+
+        // Show ending screen
+        var endingScreen = EndingScreen.Show(ScreenManager, ending, endingSystem, ControllingPlayer);
+        endingScreen.EndingComplete += OnEndingComplete;
+    }
+
+    /// <summary>
+    /// Called when the ending sequence is complete.
+    /// </summary>
+    private void OnEndingComplete(object? sender, EventArgs e)
+    {
+        // Return to main menu
+        LoadingScreen.Load(ScreenManager, false, null, new StraysMainMenuScreen());
     }
 
     public override void UnloadContent()
@@ -437,12 +507,16 @@ public class WorldScreen : GameScreen
 
         var keyboardState = Keyboard.GetState();
 
-        // Check for pause
+        // Check for pause - open full-screen game menu
         if (input.IsPauseGame(ControllingPlayer))
         {
-            // Add game pause screen with access to game data
-            var pauseScreen = new GamePauseScreen(_roster, _gameState, _gameState.FactionReputation);
-            ScreenManager.AddScreen(pauseScreen, ControllingPlayer);
+            var menuScreen = new GameMenuScreen(
+                _roster,
+                _gameState,
+                _gameState.FactionReputation,
+                _world,
+                _gameState.Bestiary);
+            ScreenManager.AddScreen(menuScreen, ControllingPlayer);
             _previousKeyboardState = keyboardState;
             return;
         }
