@@ -728,4 +728,3 @@ public class SettingsMenuScreen : GameScreen
         public int ChoiceIndex { get; set; }
     }
 }
-
