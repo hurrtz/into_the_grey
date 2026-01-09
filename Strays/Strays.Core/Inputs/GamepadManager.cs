@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -625,6 +626,171 @@ public class GamepadManager
             }
         }
     }
+
+    /// <summary>
+    /// Vibrates with a pattern.
+    /// </summary>
+    public void VibratePattern(PlayerIndex playerIndex, VibrationPattern pattern)
+    {
+        if (_vibrationStates.TryGetValue(playerIndex, out var state))
+        {
+            state.StartPattern(pattern);
+        }
+    }
+
+    /// <summary>
+    /// Vibrates with a heartbeat pattern (for critical health, etc.).
+    /// </summary>
+    public void VibrateHeartbeat(PlayerIndex playerIndex = PlayerIndex.One)
+    {
+        VibratePattern(playerIndex, VibrationPattern.Heartbeat());
+    }
+
+    /// <summary>
+    /// Vibrates with an explosion pattern.
+    /// </summary>
+    public void VibrateExplosion(PlayerIndex playerIndex = PlayerIndex.One)
+    {
+        VibratePattern(playerIndex, VibrationPattern.Explosion());
+    }
+
+    /// <summary>
+    /// Vibrates with a warning pattern.
+    /// </summary>
+    public void VibrateWarning(PlayerIndex playerIndex = PlayerIndex.One)
+    {
+        VibratePattern(playerIndex, VibrationPattern.Warning());
+    }
+
+    /// <summary>
+    /// Vibrates with a success pattern.
+    /// </summary>
+    public void VibrateSuccess(PlayerIndex playerIndex = PlayerIndex.One)
+    {
+        VibratePattern(playerIndex, VibrationPattern.Success());
+    }
+
+    /// <summary>
+    /// Vibrates with an error pattern.
+    /// </summary>
+    public void VibrateError(PlayerIndex playerIndex = PlayerIndex.One)
+    {
+        VibratePattern(playerIndex, VibrationPattern.Error());
+    }
+
+    /// <summary>
+    /// Vibrates with a pulse pattern.
+    /// </summary>
+    public void VibratePulse(PlayerIndex playerIndex, int pulseCount, float intensity = 0.5f)
+    {
+        VibratePattern(playerIndex, VibrationPattern.Pulse(pulseCount, intensity));
+    }
+
+    /// <summary>
+    /// Gets the display name for a binding (for showing in UI).
+    /// </summary>
+    public string GetBindingDisplayName(GameAction action, ControllerType controllerType = ControllerType.Xbox)
+    {
+        if (!_bindings.TryGetValue(action, out var binding))
+        {
+            return "???";
+        }
+
+        if (binding.GamepadButton != 0)
+        {
+            return ControllerGlyphs.GetButtonName(binding.GamepadButton, controllerType);
+        }
+
+        if (binding.PrimaryKey != Keys.None)
+        {
+            return binding.PrimaryKey.ToString();
+        }
+
+        return "Unbound";
+    }
+
+    /// <summary>
+    /// Gets the symbol for a binding (for inline UI display).
+    /// </summary>
+    public string GetBindingSymbol(GameAction action, ControllerType controllerType = ControllerType.Xbox)
+    {
+        if (!_bindings.TryGetValue(action, out var binding))
+        {
+            return "?";
+        }
+
+        if (binding.GamepadButton != 0)
+        {
+            return ControllerGlyphs.GetButtonSymbol(binding.GamepadButton, controllerType);
+        }
+
+        return binding.PrimaryKey.ToString();
+    }
+
+    /// <summary>
+    /// Detects the most recently used input device.
+    /// </summary>
+    public InputDeviceType GetActiveInputDevice(InputState input, PlayerIndex playerIndex = PlayerIndex.One)
+    {
+        int idx = (int)playerIndex;
+
+        // Check for gamepad input
+        var padState = input.CurrentGamePadStates[idx];
+
+        if (padState.IsConnected)
+        {
+            // Check if any button is pressed
+            if (padState.Buttons.A == ButtonState.Pressed ||
+                padState.Buttons.B == ButtonState.Pressed ||
+                padState.Buttons.X == ButtonState.Pressed ||
+                padState.Buttons.Y == ButtonState.Pressed ||
+                padState.Buttons.Start == ButtonState.Pressed ||
+                padState.Buttons.Back == ButtonState.Pressed ||
+                padState.DPad.Up == ButtonState.Pressed ||
+                padState.DPad.Down == ButtonState.Pressed ||
+                padState.DPad.Left == ButtonState.Pressed ||
+                padState.DPad.Right == ButtonState.Pressed)
+            {
+                return InputDeviceType.Gamepad;
+            }
+
+            // Check sticks
+            if (Math.Abs(padState.ThumbSticks.Left.X) > STICK_DEADZONE ||
+                Math.Abs(padState.ThumbSticks.Left.Y) > STICK_DEADZONE ||
+                Math.Abs(padState.ThumbSticks.Right.X) > STICK_DEADZONE ||
+                Math.Abs(padState.ThumbSticks.Right.Y) > STICK_DEADZONE)
+            {
+                return InputDeviceType.Gamepad;
+            }
+
+            // Check triggers
+            if (padState.Triggers.Left > TRIGGER_DEADZONE ||
+                padState.Triggers.Right > TRIGGER_DEADZONE)
+            {
+                return InputDeviceType.Gamepad;
+            }
+        }
+
+        // Check keyboard
+        if (input.CurrentKeyboardStates[idx].GetPressedKeyCount() > 0)
+        {
+            return InputDeviceType.Keyboard;
+        }
+
+        return InputDeviceType.None;
+    }
+}
+
+/// <summary>
+/// Input device types.
+/// </summary>
+public enum InputDeviceType
+{
+    None,
+    Keyboard,
+    Gamepad,
+    Mouse,
+    Touch
 }
 
 /// <summary>
@@ -639,25 +805,492 @@ internal class VibrationState
     public bool IsActive => Duration > 0 && ElapsedTime < Duration;
     public float CurrentIntensity => IsActive ? 1f - (ElapsedTime / Duration) : 0f;
 
+    // Pattern support
+    private VibrationPattern? _currentPattern;
+    private int _patternStep;
+    private float _patternStepTime;
+
     public void Start(float left, float right, float duration)
     {
         LeftMotor = left;
         RightMotor = right;
         Duration = duration;
         ElapsedTime = 0f;
+        _currentPattern = null;
+    }
+
+    public void StartPattern(VibrationPattern pattern)
+    {
+        _currentPattern = pattern;
+        _patternStep = 0;
+        _patternStepTime = 0f;
+
+        if (pattern.Steps.Count > 0)
+        {
+            var step = pattern.Steps[0];
+            LeftMotor = step.LeftMotor;
+            RightMotor = step.RightMotor;
+            Duration = pattern.TotalDuration;
+            ElapsedTime = 0f;
+        }
     }
 
     public void Stop()
     {
         Duration = 0f;
         ElapsedTime = 0f;
+        _currentPattern = null;
     }
 
     public void Update(float deltaTime)
     {
-        if (IsActive)
+        if (!IsActive)
         {
-            ElapsedTime += deltaTime;
+            return;
+        }
+
+        ElapsedTime += deltaTime;
+
+        // Handle pattern updates
+        if (_currentPattern != null && _patternStep < _currentPattern.Steps.Count)
+        {
+            _patternStepTime += deltaTime;
+            var currentStepData = _currentPattern.Steps[_patternStep];
+
+            if (_patternStepTime >= currentStepData.Duration)
+            {
+                _patternStepTime = 0f;
+                _patternStep++;
+
+                if (_patternStep < _currentPattern.Steps.Count)
+                {
+                    var nextStep = _currentPattern.Steps[_patternStep];
+                    LeftMotor = nextStep.LeftMotor;
+                    RightMotor = nextStep.RightMotor;
+                }
+            }
         }
     }
+}
+
+/// <summary>
+/// A step in a vibration pattern.
+/// </summary>
+public struct VibrationStep
+{
+    public float LeftMotor { get; set; }
+    public float RightMotor { get; set; }
+    public float Duration { get; set; }
+
+    public VibrationStep(float left, float right, float duration)
+    {
+        LeftMotor = left;
+        RightMotor = right;
+        Duration = duration;
+    }
+}
+
+/// <summary>
+/// A vibration pattern consisting of multiple steps.
+/// </summary>
+public class VibrationPattern
+{
+    public List<VibrationStep> Steps { get; } = new();
+    public float TotalDuration => Steps.Sum(s => s.Duration);
+
+    public static VibrationPattern Pulse(int pulseCount, float intensity = 0.5f, float onDuration = 0.1f, float offDuration = 0.1f)
+    {
+        var pattern = new VibrationPattern();
+
+        for (int i = 0; i < pulseCount; i++)
+        {
+            pattern.Steps.Add(new VibrationStep(intensity, intensity, onDuration));
+            pattern.Steps.Add(new VibrationStep(0f, 0f, offDuration));
+        }
+
+        return pattern;
+    }
+
+    public static VibrationPattern Heartbeat()
+    {
+        var pattern = new VibrationPattern();
+        pattern.Steps.Add(new VibrationStep(0.7f, 0.3f, 0.08f));
+        pattern.Steps.Add(new VibrationStep(0f, 0f, 0.08f));
+        pattern.Steps.Add(new VibrationStep(0.9f, 0.5f, 0.1f));
+        pattern.Steps.Add(new VibrationStep(0f, 0f, 0.4f));
+
+        return pattern;
+    }
+
+    public static VibrationPattern Explosion()
+    {
+        var pattern = new VibrationPattern();
+        pattern.Steps.Add(new VibrationStep(1f, 1f, 0.15f));
+        pattern.Steps.Add(new VibrationStep(0.8f, 0.6f, 0.1f));
+        pattern.Steps.Add(new VibrationStep(0.5f, 0.3f, 0.15f));
+        pattern.Steps.Add(new VibrationStep(0.2f, 0.1f, 0.2f));
+
+        return pattern;
+    }
+
+    public static VibrationPattern Warning()
+    {
+        return Pulse(3, 0.4f, 0.15f, 0.1f);
+    }
+
+    public static VibrationPattern Success()
+    {
+        var pattern = new VibrationPattern();
+        pattern.Steps.Add(new VibrationStep(0.3f, 0.3f, 0.1f));
+        pattern.Steps.Add(new VibrationStep(0f, 0f, 0.05f));
+        pattern.Steps.Add(new VibrationStep(0.6f, 0.6f, 0.15f));
+
+        return pattern;
+    }
+
+    public static VibrationPattern Error()
+    {
+        return Pulse(2, 0.8f, 0.2f, 0.1f);
+    }
+
+    public static VibrationPattern Continuous(float leftIntensity, float rightIntensity, float duration)
+    {
+        var pattern = new VibrationPattern();
+        pattern.Steps.Add(new VibrationStep(leftIntensity, rightIntensity, duration));
+
+        return pattern;
+    }
+}
+
+/// <summary>
+/// Input buffer for storing recent inputs for combo detection.
+/// </summary>
+public class InputBuffer
+{
+    private readonly List<BufferedInput> _buffer = new();
+    private readonly float _bufferDuration;
+
+    public InputBuffer(float bufferDuration = 0.5f)
+    {
+        _bufferDuration = bufferDuration;
+    }
+
+    public void AddInput(GameAction action, float timestamp)
+    {
+        _buffer.Add(new BufferedInput(action, timestamp));
+    }
+
+    public void Update(float currentTime)
+    {
+        _buffer.RemoveAll(b => currentTime - b.Timestamp > _bufferDuration);
+    }
+
+    public bool HasRecentInput(GameAction action, float currentTime, float withinSeconds = 0.2f)
+    {
+        return _buffer.Any(b => b.Action == action && currentTime - b.Timestamp <= withinSeconds);
+    }
+
+    public bool CheckCombo(GameAction[] sequence, float currentTime, float maxGapSeconds = 0.3f)
+    {
+        if (sequence.Length == 0 || _buffer.Count < sequence.Length)
+        {
+            return false;
+        }
+
+        var recentInputs = _buffer
+            .Where(b => currentTime - b.Timestamp <= _bufferDuration)
+            .OrderBy(b => b.Timestamp)
+            .ToList();
+
+        if (recentInputs.Count < sequence.Length)
+        {
+            return false;
+        }
+
+        int seqIndex = 0;
+        float lastTime = 0f;
+
+        foreach (var input in recentInputs)
+        {
+            if (input.Action == sequence[seqIndex])
+            {
+                if (seqIndex > 0 && input.Timestamp - lastTime > maxGapSeconds)
+                {
+                    seqIndex = 0;
+
+                    if (input.Action == sequence[0])
+                    {
+                        seqIndex = 1;
+                        lastTime = input.Timestamp;
+                    }
+
+                    continue;
+                }
+
+                lastTime = input.Timestamp;
+                seqIndex++;
+
+                if (seqIndex >= sequence.Length)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public void Clear()
+    {
+        _buffer.Clear();
+    }
+
+    private readonly struct BufferedInput
+    {
+        public GameAction Action { get; }
+        public float Timestamp { get; }
+
+        public BufferedInput(GameAction action, float timestamp)
+        {
+            Action = action;
+            Timestamp = timestamp;
+        }
+    }
+}
+
+/// <summary>
+/// Controller type for displaying appropriate button glyphs.
+/// </summary>
+public enum ControllerType
+{
+    Unknown,
+    Xbox,
+    PlayStation,
+    Nintendo,
+    Generic
+}
+
+/// <summary>
+/// Helper class for displaying controller button glyphs.
+/// </summary>
+public static class ControllerGlyphs
+{
+    /// <summary>
+    /// Gets the display name for a button on the specified controller type.
+    /// </summary>
+    public static string GetButtonName(Buttons button, ControllerType controllerType = ControllerType.Xbox)
+    {
+        return controllerType switch
+        {
+            ControllerType.PlayStation => GetPlayStationName(button),
+            ControllerType.Nintendo => GetNintendoName(button),
+            _ => GetXboxName(button)
+        };
+    }
+
+    private static string GetXboxName(Buttons button)
+    {
+        return button switch
+        {
+            Buttons.A => "A",
+            Buttons.B => "B",
+            Buttons.X => "X",
+            Buttons.Y => "Y",
+            Buttons.Start => "Menu",
+            Buttons.Back => "View",
+            Buttons.LeftShoulder => "LB",
+            Buttons.RightShoulder => "RB",
+            Buttons.LeftTrigger => "LT",
+            Buttons.RightTrigger => "RT",
+            Buttons.LeftStick => "LS",
+            Buttons.RightStick => "RS",
+            Buttons.DPadUp => "D-Pad Up",
+            Buttons.DPadDown => "D-Pad Down",
+            Buttons.DPadLeft => "D-Pad Left",
+            Buttons.DPadRight => "D-Pad Right",
+            _ => button.ToString()
+        };
+    }
+
+    private static string GetPlayStationName(Buttons button)
+    {
+        return button switch
+        {
+            Buttons.A => "Cross",
+            Buttons.B => "Circle",
+            Buttons.X => "Square",
+            Buttons.Y => "Triangle",
+            Buttons.Start => "Options",
+            Buttons.Back => "Share",
+            Buttons.LeftShoulder => "L1",
+            Buttons.RightShoulder => "R1",
+            Buttons.LeftTrigger => "L2",
+            Buttons.RightTrigger => "R2",
+            Buttons.LeftStick => "L3",
+            Buttons.RightStick => "R3",
+            Buttons.DPadUp => "D-Pad Up",
+            Buttons.DPadDown => "D-Pad Down",
+            Buttons.DPadLeft => "D-Pad Left",
+            Buttons.DPadRight => "D-Pad Right",
+            _ => button.ToString()
+        };
+    }
+
+    private static string GetNintendoName(Buttons button)
+    {
+        return button switch
+        {
+            Buttons.A => "B",
+            Buttons.B => "A",
+            Buttons.X => "Y",
+            Buttons.Y => "X",
+            Buttons.Start => "+",
+            Buttons.Back => "-",
+            Buttons.LeftShoulder => "L",
+            Buttons.RightShoulder => "R",
+            Buttons.LeftTrigger => "ZL",
+            Buttons.RightTrigger => "ZR",
+            Buttons.LeftStick => "L Stick",
+            Buttons.RightStick => "R Stick",
+            Buttons.DPadUp => "D-Pad Up",
+            Buttons.DPadDown => "D-Pad Down",
+            Buttons.DPadLeft => "D-Pad Left",
+            Buttons.DPadRight => "D-Pad Right",
+            _ => button.ToString()
+        };
+    }
+
+    /// <summary>
+    /// Gets a unicode symbol for a button (for UI display).
+    /// </summary>
+    public static string GetButtonSymbol(Buttons button, ControllerType controllerType = ControllerType.Xbox)
+    {
+        return controllerType switch
+        {
+            ControllerType.PlayStation => GetPlayStationSymbol(button),
+            _ => GetXboxSymbol(button)
+        };
+    }
+
+    private static string GetXboxSymbol(Buttons button)
+    {
+        return button switch
+        {
+            Buttons.A => "Ⓐ",
+            Buttons.B => "Ⓑ",
+            Buttons.X => "Ⓧ",
+            Buttons.Y => "Ⓨ",
+            Buttons.LeftShoulder => "LB",
+            Buttons.RightShoulder => "RB",
+            Buttons.DPadUp => "▲",
+            Buttons.DPadDown => "▼",
+            Buttons.DPadLeft => "◀",
+            Buttons.DPadRight => "▶",
+            _ => button.ToString()
+        };
+    }
+
+    private static string GetPlayStationSymbol(Buttons button)
+    {
+        return button switch
+        {
+            Buttons.A => "✕",
+            Buttons.B => "○",
+            Buttons.X => "□",
+            Buttons.Y => "△",
+            Buttons.LeftShoulder => "L1",
+            Buttons.RightShoulder => "R1",
+            Buttons.DPadUp => "▲",
+            Buttons.DPadDown => "▼",
+            Buttons.DPadLeft => "◀",
+            Buttons.DPadRight => "▶",
+            _ => button.ToString()
+        };
+    }
+
+    /// <summary>
+    /// Attempts to detect the controller type from the gamepad capabilities.
+    /// </summary>
+    public static ControllerType DetectControllerType(GamePadCapabilities capabilities)
+    {
+        if (!capabilities.IsConnected)
+        {
+            return ControllerType.Unknown;
+        }
+
+        // MonoGame doesn't expose vendor/product IDs directly,
+        // so we default to Xbox layout for now
+        return ControllerType.Xbox;
+    }
+}
+
+/// <summary>
+/// Settings for controller configuration.
+/// </summary>
+public class ControllerSettings
+{
+    /// <summary>
+    /// Left stick deadzone (0-1).
+    /// </summary>
+    public float LeftStickDeadzone { get; set; } = 0.25f;
+
+    /// <summary>
+    /// Right stick deadzone (0-1).
+    /// </summary>
+    public float RightStickDeadzone { get; set; } = 0.25f;
+
+    /// <summary>
+    /// Trigger deadzone (0-1).
+    /// </summary>
+    public float TriggerDeadzone { get; set; } = 0.15f;
+
+    /// <summary>
+    /// Whether to invert the Y axis on the left stick.
+    /// </summary>
+    public bool InvertLeftStickY { get; set; } = false;
+
+    /// <summary>
+    /// Whether to invert the Y axis on the right stick.
+    /// </summary>
+    public bool InvertRightStickY { get; set; } = false;
+
+    /// <summary>
+    /// Stick sensitivity multiplier (0.5-2.0).
+    /// </summary>
+    public float StickSensitivity { get; set; } = 1.0f;
+
+    /// <summary>
+    /// Whether to enable aim assist when using controller.
+    /// </summary>
+    public bool AimAssistEnabled { get; set; } = true;
+
+    /// <summary>
+    /// Aim assist strength (0-1).
+    /// </summary>
+    public float AimAssistStrength { get; set; } = 0.5f;
+
+    /// <summary>
+    /// Whether vibration is enabled.
+    /// </summary>
+    public bool VibrationEnabled { get; set; } = true;
+
+    /// <summary>
+    /// Vibration intensity (0-1).
+    /// </summary>
+    public float VibrationIntensity { get; set; } = 1.0f;
+
+    /// <summary>
+    /// Input buffer window in seconds.
+    /// </summary>
+    public float InputBufferWindow { get; set; } = 0.15f;
+
+    /// <summary>
+    /// The detected or preferred controller type.
+    /// </summary>
+    public ControllerType ControllerType { get; set; } = ControllerType.Xbox;
+
+    /// <summary>
+    /// Whether to swap A/B buttons (Nintendo style).
+    /// </summary>
+    public bool SwapConfirmCancel { get; set; } = false;
 }
