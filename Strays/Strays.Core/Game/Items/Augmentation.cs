@@ -2,83 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Strays.Core.Game.Data;
 
 namespace Strays.Core.Game.Items;
-
-/// <summary>
-/// Body slots where augmentations can be equipped.
-/// </summary>
-public enum AugmentationSlot
-{
-    /// <summary>
-    /// Head - sensors, processors, optics.
-    /// </summary>
-    Head,
-
-    /// <summary>
-    /// Torso - core systems, power units.
-    /// </summary>
-    Torso,
-
-    /// <summary>
-    /// Front left limb.
-    /// </summary>
-    FrontLeft,
-
-    /// <summary>
-    /// Front right limb.
-    /// </summary>
-    FrontRight,
-
-    /// <summary>
-    /// Rear left limb.
-    /// </summary>
-    RearLeft,
-
-    /// <summary>
-    /// Rear right limb.
-    /// </summary>
-    RearRight,
-
-    /// <summary>
-    /// Tail or wings (special appendage).
-    /// </summary>
-    Appendage
-}
 
 /// <summary>
 /// Rarity tiers for items.
 /// </summary>
 public enum ItemRarity
 {
-    /// <summary>
-    /// Common - easily found.
-    /// </summary>
     Common,
-
-    /// <summary>
-    /// Uncommon - somewhat rare.
-    /// </summary>
     Uncommon,
-
-    /// <summary>
-    /// Rare - hard to find.
-    /// </summary>
     Rare,
-
-    /// <summary>
-    /// Epic - very rare, powerful.
-    /// </summary>
     Epic,
-
-    /// <summary>
-    /// Legendary - unique or extremely rare.
-    /// </summary>
     Legendary,
-
-    /// <summary>
-    /// Corrupted - tainted by NIMDOK's influence.
-    /// </summary>
     Corrupted
 }
 
@@ -103,9 +40,9 @@ public class AugmentationDefinition
     public string Description { get; init; } = "";
 
     /// <summary>
-    /// Which slot this augmentation fits.
+    /// Which slot this augmentation fits (universal or category-specific).
     /// </summary>
-    public AugmentationSlot Slot { get; init; } = AugmentationSlot.Torso;
+    public SlotReference Slot { get; init; } = new SlotReference(UniversalSlot.Core);
 
     /// <summary>
     /// Rarity tier.
@@ -143,9 +80,9 @@ public class AugmentationDefinition
     public int MinLevel { get; init; } = 1;
 
     /// <summary>
-    /// Stray types that can equip this (empty = all).
+    /// Creature categories that can equip this (empty = all categories).
     /// </summary>
-    public List<string> CompatibleTypes { get; init; } = new();
+    public HashSet<CreatureCategory> CompatibleCategories { get; init; } = new();
 
     /// <summary>
     /// Whether this augmentation can trigger evolution.
@@ -156,6 +93,16 @@ public class AugmentationDefinition
     /// Placeholder color for visuals.
     /// </summary>
     public Color PlaceholderColor { get; init; } = Color.Gray;
+
+    /// <summary>
+    /// Special effect description (if any).
+    /// </summary>
+    public string? SpecialEffect { get; init; }
+
+    /// <summary>
+    /// Whether this is compatible with all categories.
+    /// </summary>
+    public bool IsUniversallyCompatible => CompatibleCategories.Count == 0;
 
     /// <summary>
     /// Gets the color associated with this rarity.
@@ -170,6 +117,18 @@ public class AugmentationDefinition
         ItemRarity.Corrupted => Color.DarkMagenta,
         _ => Color.White
     };
+
+    /// <summary>
+    /// Checks if this augmentation is compatible with a creature category.
+    /// </summary>
+    public bool IsCompatibleWith(CreatureCategory category) =>
+        CompatibleCategories.Count == 0 || CompatibleCategories.Contains(category);
+
+    /// <summary>
+    /// Checks if this augmentation can be equipped to the given slot for a category.
+    /// </summary>
+    public bool CanEquipToSlot(SlotReference slot, CreatureCategory category) =>
+        Slot.Equals(slot) && IsCompatibleWith(category) && slot.IsValidForCategory(category);
 }
 
 /// <summary>
@@ -223,7 +182,6 @@ public class Augmentation
         if (!Definition.StatBonuses.TryGetValue(stat, out int baseBonus))
             return 0;
 
-        // Each upgrade level adds 10% to the bonus
         return (int)(baseBonus * (1f + UpgradeLevel * 0.1f));
     }
 
@@ -235,7 +193,6 @@ public class Augmentation
         if (!Definition.StatMultipliers.TryGetValue(stat, out float baseMult))
             return 1f;
 
-        // Each upgrade level adds 2% to the multiplier bonus
         float bonus = baseMult - 1f;
         return 1f + bonus * (1f + UpgradeLevel * 0.02f);
     }
@@ -243,7 +200,6 @@ public class Augmentation
     /// <summary>
     /// Upgrades the augmentation.
     /// </summary>
-    /// <returns>True if upgrade succeeded.</returns>
     public bool Upgrade()
     {
         if (UpgradeLevel >= MaxUpgradeLevel)
@@ -261,8 +217,11 @@ public class Augmentation
         if (stray.Level < Definition.MinLevel)
             return false;
 
-        if (Definition.CompatibleTypes.Count > 0 &&
-            !Definition.CompatibleTypes.Contains(stray.Definition.Type.ToString()))
+        if (!Definition.IsCompatibleWith(stray.Definition.Category))
+            return false;
+
+        // Verify the slot is valid for this Stray's category
+        if (!Definition.Slot.IsValidForCategory(stray.Definition.Category))
             return false;
 
         return true;
@@ -275,6 +234,7 @@ public class Augmentation
 public static class Augmentations
 {
     private static readonly Dictionary<string, AugmentationDefinition> _augmentations = new();
+    private static bool _initialized = false;
 
     /// <summary>
     /// All registered augmentations.
@@ -288,16 +248,40 @@ public static class Augmentations
         _augmentations.TryGetValue(id, out var aug) ? aug : null;
 
     /// <summary>
-    /// Gets all augmentations for a specific slot.
+    /// Gets all augmentations for a specific universal slot.
     /// </summary>
-    public static IEnumerable<AugmentationDefinition> GetBySlot(AugmentationSlot slot) =>
-        _augmentations.Values.Where(a => a.Slot == slot);
+    public static IEnumerable<AugmentationDefinition> GetByUniversalSlot(UniversalSlot slot) =>
+        _augmentations.Values.Where(a => a.Slot.IsUniversal && a.Slot.UniversalSlot == slot);
+
+    /// <summary>
+    /// Gets all augmentations for a specific category slot.
+    /// </summary>
+    public static IEnumerable<AugmentationDefinition> GetByCategorySlot(CategorySlot slot) =>
+        _augmentations.Values.Where(a => !a.Slot.IsUniversal && a.Slot.CategorySlot == slot);
+
+    /// <summary>
+    /// Gets all augmentations for a specific slot reference.
+    /// </summary>
+    public static IEnumerable<AugmentationDefinition> GetBySlot(SlotReference slot) =>
+        _augmentations.Values.Where(a => a.Slot.Equals(slot));
 
     /// <summary>
     /// Gets all augmentations of a specific rarity.
     /// </summary>
     public static IEnumerable<AugmentationDefinition> GetByRarity(ItemRarity rarity) =>
         _augmentations.Values.Where(a => a.Rarity == rarity);
+
+    /// <summary>
+    /// Gets all augmentations compatible with a creature category.
+    /// </summary>
+    public static IEnumerable<AugmentationDefinition> GetCompatibleWith(CreatureCategory category) =>
+        _augmentations.Values.Where(a => a.IsCompatibleWith(category));
+
+    /// <summary>
+    /// Gets all augmentations that can be equipped to a slot for a specific category.
+    /// </summary>
+    public static IEnumerable<AugmentationDefinition> GetForSlotAndCategory(SlotReference slot, CreatureCategory category) =>
+        _augmentations.Values.Where(a => a.CanEquipToSlot(slot, category));
 
     /// <summary>
     /// Registers an augmentation.
@@ -307,22 +291,51 @@ public static class Augmentations
         _augmentations[augmentation.Id] = augmentation;
     }
 
-    static Augmentations()
+    /// <summary>
+    /// Initializes all augmentations.
+    /// </summary>
+    public static void Initialize()
     {
-        RegisterHeadAugmentations();
-        RegisterTorsoAugmentations();
-        RegisterLimbAugmentations();
-        RegisterAppendageAugmentations();
+        if (_initialized) return;
+        _initialized = true;
+
+        RegisterUniversalAugmentations();
+        RegisterCategoryAugmentations();
     }
 
-    private static void RegisterHeadAugmentations()
+    private static void RegisterUniversalAugmentations()
     {
+        // Dermis slot augmentations
+        Register(new AugmentationDefinition
+        {
+            Id = "basic_dermis",
+            Name = "Basic Dermis Plating",
+            Description = "Simple armor plating. Increases defense.",
+            Slot = new SlotReference(UniversalSlot.Dermis),
+            Rarity = ItemRarity.Common,
+            StatBonuses = new() { { "Defense", 10 } },
+            PlaceholderColor = Color.Gray
+        });
+
+        Register(new AugmentationDefinition
+        {
+            Id = "reinforced_hide",
+            Name = "Reinforced Hide",
+            Description = "Advanced armor plating. High defense boost.",
+            Slot = new SlotReference(UniversalSlot.Dermis),
+            Rarity = ItemRarity.Rare,
+            StatBonuses = new() { { "Defense", 25 } },
+            MinLevel = 10,
+            PlaceholderColor = Color.SteelBlue
+        });
+
+        // Optics slot augmentations
         Register(new AugmentationDefinition
         {
             Id = "basic_optics",
             Name = "Basic Optics",
             Description = "Simple optical sensors. Improves accuracy.",
-            Slot = AugmentationSlot.Head,
+            Slot = new SlotReference(UniversalSlot.Optics),
             Rarity = ItemRarity.Common,
             StatBonuses = new() { { "Accuracy", 5 } },
             PlaceholderColor = Color.LightBlue
@@ -330,144 +343,74 @@ public static class Augmentations
 
         Register(new AugmentationDefinition
         {
-            Id = "advanced_processor",
-            Name = "Advanced Processor",
-            Description = "Enhanced neural processor. Increases Special.",
-            Slot = AugmentationSlot.Head,
-            Rarity = ItemRarity.Uncommon,
-            StatBonuses = new() { { "Special", 10 } },
-            MinLevel = 5,
-            PlaceholderColor = Color.Cyan
-        });
-
-        Register(new AugmentationDefinition
-        {
             Id = "targeting_array",
             Name = "Targeting Array",
             Description = "Military-grade targeting. Critical hit bonus.",
-            Slot = AugmentationSlot.Head,
+            Slot = new SlotReference(UniversalSlot.Optics),
             Rarity = ItemRarity.Rare,
             StatBonuses = new() { { "Accuracy", 10 }, { "CritChance", 15 } },
             MinLevel = 10,
             PlaceholderColor = Color.Red
         });
 
+        // Core slot augmentations
         Register(new AugmentationDefinition
         {
-            Id = "psionic_amplifier",
-            Name = "Psionic Amplifier",
-            Description = "Amplifies mental abilities. Grants Mind Blast.",
-            Slot = AugmentationSlot.Head,
-            Rarity = ItemRarity.Epic,
-            StatBonuses = new() { { "Special", 20 } },
-            GrantsAbility = "mind_blast",
-            MinLevel = 15,
-            PlaceholderColor = Color.Magenta
-        });
-
-        Register(new AugmentationDefinition
-        {
-            Id = "nimdok_cortex",
-            Name = "NIMDOK Cortex",
-            Description = "A fragment of NIMDOK's consciousness. Dangerous power.",
-            Slot = AugmentationSlot.Head,
-            Rarity = ItemRarity.Corrupted,
-            StatBonuses = new() { { "Special", 30 }, { "Attack", 15 } },
-            StatMultipliers = new() { { "MaxHp", 0.9f } },
-            GrantsAbility = "corrupted_strike",
-            CanTriggerEvolution = true,
-            MinLevel = 20,
-            PlaceholderColor = Color.DarkMagenta
-        });
-    }
-
-    private static void RegisterTorsoAugmentations()
-    {
-        Register(new AugmentationDefinition
-        {
-            Id = "reinforced_chassis",
-            Name = "Reinforced Chassis",
-            Description = "Strengthened body frame. Increases HP.",
-            Slot = AugmentationSlot.Torso,
+            Id = "reinforced_core",
+            Name = "Reinforced Core",
+            Description = "Strengthened vital systems. Increases HP.",
+            Slot = new SlotReference(UniversalSlot.Core),
             Rarity = ItemRarity.Common,
             StatBonuses = new() { { "MaxHp", 20 } },
-            PlaceholderColor = Color.Gray
-        });
-
-        Register(new AugmentationDefinition
-        {
-            Id = "power_core",
-            Name = "Power Core",
-            Description = "Enhanced power supply. Boosts all stats slightly.",
-            Slot = AugmentationSlot.Torso,
-            Rarity = ItemRarity.Uncommon,
-            StatBonuses = new() { { "MaxHp", 10 }, { "Attack", 5 }, { "Defense", 5 } },
-            MinLevel = 5,
-            PlaceholderColor = Color.Orange
-        });
-
-        Register(new AugmentationDefinition
-        {
-            Id = "ablative_plating",
-            Name = "Ablative Plating",
-            Description = "Damage-absorbing armor. High defense boost.",
-            Slot = AugmentationSlot.Torso,
-            Rarity = ItemRarity.Rare,
-            StatBonuses = new() { { "Defense", 25 } },
-            StatMultipliers = new() { { "Speed", 0.9f } },
-            ElementResistance = Combat.Element.Kinetic,
-            MinLevel = 10,
-            PlaceholderColor = Color.SteelBlue
+            PlaceholderColor = Color.DarkRed
         });
 
         Register(new AugmentationDefinition
         {
             Id = "reactor_heart",
             Name = "Reactor Heart",
-            Description = "Miniature fusion reactor. Massive stat boost.",
-            Slot = AugmentationSlot.Torso,
+            Description = "Miniature power reactor. Massive stat boost.",
+            Slot = new SlotReference(UniversalSlot.Core),
             Rarity = ItemRarity.Legendary,
-            StatMultipliers = new() { { "MaxHp", 1.25f }, { "Attack", 1.15f }, { "Special", 1.15f } },
+            StatMultipliers = new() { { "MaxHp", 1.25f }, { "Attack", 1.15f } },
             MinLevel = 25,
             PlaceholderColor = Color.Gold
         });
-    }
 
-    private static void RegisterLimbAugmentations()
-    {
+        // Neural slot augmentations
         Register(new AugmentationDefinition
         {
-            Id = "servo_leg",
-            Name = "Servo Leg",
-            Description = "Basic mechanical leg. Slight speed boost.",
-            Slot = AugmentationSlot.FrontLeft,
+            Id = "basic_reflexes",
+            Name = "Basic Reflex Booster",
+            Description = "Enhanced reaction time. Increases speed.",
+            Slot = new SlotReference(UniversalSlot.Neural),
             Rarity = ItemRarity.Common,
-            StatBonuses = new() { { "Speed", 5 } },
-            PlaceholderColor = Color.Silver
+            StatBonuses = new() { { "Speed", 8 } },
+            PlaceholderColor = Color.LightGreen
         });
 
         Register(new AugmentationDefinition
         {
-            Id = "hydraulic_leg",
-            Name = "Hydraulic Leg",
-            Description = "Powerful hydraulic leg. Attack and speed.",
-            Slot = AugmentationSlot.FrontRight,
-            Rarity = ItemRarity.Uncommon,
-            StatBonuses = new() { { "Attack", 8 }, { "Speed", 8 } },
-            MinLevel = 5,
-            PlaceholderColor = Color.DarkGray
-        });
-
-        Register(new AugmentationDefinition
-        {
-            Id = "combat_claw",
-            Name = "Combat Claw",
-            Description = "Razor-sharp combat appendage. High attack.",
-            Slot = AugmentationSlot.FrontLeft,
+            Id = "neural_accelerator",
+            Name = "Neural Accelerator",
+            Description = "Advanced neural processing. Major speed boost.",
+            Slot = new SlotReference(UniversalSlot.Neural),
             Rarity = ItemRarity.Rare,
-            StatBonuses = new() { { "Attack", 20 }, { "CritChance", 10 } },
-            MinLevel = 10,
-            PlaceholderColor = Color.Crimson
+            StatBonuses = new() { { "Speed", 20 } },
+            MinLevel = 12,
+            PlaceholderColor = Color.Cyan
+        });
+
+        // Locomotion slot augmentations
+        Register(new AugmentationDefinition
+        {
+            Id = "servo_legs",
+            Name = "Servo Legs",
+            Description = "Basic mechanical legs. Speed boost.",
+            Slot = new SlotReference(UniversalSlot.Locomotion),
+            Rarity = ItemRarity.Common,
+            StatBonuses = new() { { "Speed", 10 } },
+            PlaceholderColor = Color.Silver
         });
 
         Register(new AugmentationDefinition
@@ -475,76 +418,118 @@ public static class Augmentations
             Id = "sprint_actuators",
             Name = "Sprint Actuators",
             Description = "High-speed leg system. Major speed boost.",
-            Slot = AugmentationSlot.RearLeft,
+            Slot = new SlotReference(UniversalSlot.Locomotion),
             Rarity = ItemRarity.Rare,
             StatBonuses = new() { { "Speed", 25 } },
             MinLevel = 12,
-            PlaceholderColor = Color.LightGreen
+            PlaceholderColor = Color.LimeGreen
         });
 
+        // Respiratory slot augmentations
         Register(new AugmentationDefinition
         {
-            Id = "shock_absorbers",
-            Name = "Shock Absorbers",
-            Description = "Impact-dampening legs. Defense boost.",
-            Slot = AugmentationSlot.RearRight,
-            Rarity = ItemRarity.Uncommon,
-            StatBonuses = new() { { "Defense", 12 } },
-            MinLevel = 8,
-            PlaceholderColor = Color.SlateGray
+            Id = "basic_respirator",
+            Name = "Basic Respirator",
+            Description = "Enhanced breathing system. Stamina boost.",
+            Slot = new SlotReference(UniversalSlot.Respiratory),
+            Rarity = ItemRarity.Common,
+            StatBonuses = new() { { "MaxHp", 15 } },
+            PlaceholderColor = Color.LightBlue
+        });
+
+        // CNS slot augmentations
+        Register(new AugmentationDefinition
+        {
+            Id = "basic_cns",
+            Name = "Basic CNS Booster",
+            Description = "Enhanced central nervous system. Improves reactions.",
+            Slot = new SlotReference(UniversalSlot.CNS),
+            Rarity = ItemRarity.Common,
+            StatBonuses = new() { { "Speed", 5 }, { "Special", 5 } },
+            PlaceholderColor = Color.Purple
+        });
+
+        // Aural slot augmentations
+        Register(new AugmentationDefinition
+        {
+            Id = "enhanced_hearing",
+            Name = "Enhanced Hearing",
+            Description = "Improved auditory sensors. Detection boost.",
+            Slot = new SlotReference(UniversalSlot.Aural),
+            Rarity = ItemRarity.Common,
+            StatBonuses = new() { { "Detection", 10 } },
+            PlaceholderColor = Color.LightYellow
+        });
+
+        // OlfactoryChem slot augmentations
+        Register(new AugmentationDefinition
+        {
+            Id = "chemical_analyzer",
+            Name = "Chemical Analyzer",
+            Description = "Advanced scent/chemical detection.",
+            Slot = new SlotReference(UniversalSlot.OlfactoryChem),
+            Rarity = ItemRarity.Common,
+            StatBonuses = new() { { "Detection", 8 } },
+            PlaceholderColor = Color.LightPink
         });
     }
 
-    private static void RegisterAppendageAugmentations()
+    private static void RegisterCategoryAugmentations()
     {
+        // Predatoria category-specific augmentations
         Register(new AugmentationDefinition
         {
-            Id = "sensor_tail",
-            Name = "Sensor Tail",
-            Description = "Tail with environmental sensors. Evasion boost.",
-            Slot = AugmentationSlot.Appendage,
-            Rarity = ItemRarity.Common,
-            StatBonuses = new() { { "Evasion", 5 } },
-            PlaceholderColor = Color.Teal
-        });
-
-        Register(new AugmentationDefinition
-        {
-            Id = "blade_tail",
-            Name = "Blade Tail",
-            Description = "Weaponized tail appendage. Attack boost.",
-            Slot = AugmentationSlot.Appendage,
-            Rarity = ItemRarity.Uncommon,
-            StatBonuses = new() { { "Attack", 15 } },
-            MinLevel = 7,
-            PlaceholderColor = Color.Silver
-        });
-
-        Register(new AugmentationDefinition
-        {
-            Id = "glider_wings",
-            Name = "Glider Wings",
-            Description = "Lightweight wings. Major speed and evasion.",
-            Slot = AugmentationSlot.Appendage,
+            Id = "predator_clamp",
+            Name = "Predator Clamp Module",
+            Description = "Enhanced grip for holding prey.",
+            Slot = new SlotReference(CategorySlot.ClampModule),
             Rarity = ItemRarity.Rare,
-            StatBonuses = new() { { "Speed", 15 }, { "Evasion", 15 } },
-            StatMultipliers = new() { { "Defense", 0.9f } },
-            MinLevel = 15,
-            PlaceholderColor = Color.SkyBlue
+            StatBonuses = new() { { "Attack", 20 } },
+            CompatibleCategories = new() { CreatureCategory.Predatoria },
+            MinLevel = 10,
+            PlaceholderColor = Color.Crimson
         });
 
+        // Colossomammalia category-specific augmentations
         Register(new AugmentationDefinition
         {
-            Id = "tesla_coil",
-            Name = "Tesla Coil",
-            Description = "Electric discharge appendage. Grants Shock.",
-            Slot = AugmentationSlot.Appendage,
-            Rarity = ItemRarity.Epic,
-            StatBonuses = new() { { "Special", 15 } },
-            GrantsAbility = "shock",
-            ElementResistance = Combat.Element.Electric,
-            MinLevel = 18,
-            PlaceholderColor = Color.Yellow
+            Id = "siege_harness",
+            Name = "Siege Harness",
+            Description = "Heavy mount system for massive creatures.",
+            Slot = new SlotReference(CategorySlot.SiegeHarness),
+            Rarity = ItemRarity.Rare,
+            StatBonuses = new() { { "Defense", 30 }, { "MaxHp", 40 } },
+            CompatibleCategories = new() { CreatureCategory.Colossomammalia },
+            MinLevel = 10,
+            PlaceholderColor = Color.DarkGray
+        });
+
+        // Exoskeletalis category-specific augmentations
+        Register(new AugmentationDefinition
+        {
+            Id = "carapace_segment",
+            Name = "Reinforced Carapace",
+            Description = "Hardened shell plating for arthropods.",
+            Slot = new SlotReference(CategorySlot.CarapaceSegmentBus),
+            Rarity = ItemRarity.Rare,
+            StatBonuses = new() { { "Defense", 25 } },
+            CompatibleCategories = new() { CreatureCategory.Exoskeletalis },
+            MinLevel = 8,
+            PlaceholderColor = Color.Brown
+        });
+
+        // Octomorpha category-specific augmentations
+        Register(new AugmentationDefinition
+        {
+            Id = "multi_arm_tools",
+            Name = "Multi-Arm Toolbus",
+            Description = "Enhanced manipulation systems.",
+            Slot = new SlotReference(CategorySlot.MultiArmToolbus),
+            Rarity = ItemRarity.Rare,
+            StatBonuses = new() { { "Attack", 15 }, { "Special", 15 } },
+            CompatibleCategories = new() { CreatureCategory.Octomorpha },
+            MinLevel = 10,
+            PlaceholderColor = Color.DarkMagenta
         });
     }
 }
