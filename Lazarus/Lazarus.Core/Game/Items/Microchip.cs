@@ -219,17 +219,7 @@ public class MicrochipDefinition
     public ChipElement Element { get; init; } = ChipElement.None;
 
     /// <summary>
-    /// Stat bonuses provided (for Driver chips). Legacy - use StatModifiers for new code.
-    /// </summary>
-    public Dictionary<string, int> StatBonuses { get; init; } = new();
-
-    /// <summary>
-    /// Stat multipliers provided (for Driver chips). Legacy - use StatModifiers for new code.
-    /// </summary>
-    public Dictionary<string, float> StatMultipliers { get; init; } = new();
-
-    /// <summary>
-    /// Stat modifiers using the new comprehensive stat system.
+    /// Stat modifiers provided by this chip (primarily for Driver chips).
     /// </summary>
     public List<StatModifier> StatModifiers { get; init; } = new();
 
@@ -439,25 +429,6 @@ public class Microchip
     public float GetEffectMultiplier()
     {
         return Definition.GetFirmwareMultiplier(FirmwareLevel);
-    }
-
-    /// <summary>
-    /// Gets the stat bonus from this chip, scaled by firmware.
-    /// </summary>
-    public int GetStatBonus(string stat)
-    {
-        if (!Definition.StatBonuses.TryGetValue(stat, out int bonus))
-            return 0;
-
-        return (int)(bonus * GetEffectMultiplier());
-    }
-
-    /// <summary>
-    /// Gets the stat multiplier from this chip.
-    /// </summary>
-    public float GetStatMultiplier(string stat)
-    {
-        return Definition.StatMultipliers.TryGetValue(stat, out float mult) ? mult : 1f;
     }
 
     /// <summary>
@@ -1255,7 +1226,7 @@ public static class Microchips
             Description = "Increases maximum energy by 30.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Common,
-            StatBonuses = new() { { "MaxEnergy", 30 } },
+            StatModifiers = new() { new() { Stat = StatType.ENMax, Value = 30 } },
             PlaceholderColor = Color.Yellow
         });
 
@@ -1266,7 +1237,7 @@ public static class Microchips
             Description = "Increases maximum energy by 60.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Uncommon,
-            StatBonuses = new() { { "MaxEnergy", 60 } },
+            StatModifiers = new() { new() { Stat = StatType.ENMax, Value = 60 } },
             MinLevel = 8,
             PlaceholderColor = Color.Gold
         });
@@ -1278,7 +1249,7 @@ public static class Microchips
             Description = "Increases energy regeneration by 3 per ATB tick.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Common,
-            StatBonuses = new() { { "EnergyRegen", 3 } },
+            StatModifiers = new() { new() { Stat = StatType.ENRegen, Value = 3 } },
             PlaceholderColor = Color.LightYellow
         });
 
@@ -1289,7 +1260,7 @@ public static class Microchips
             Description = "Increases energy regeneration by 6 per ATB tick.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Uncommon,
-            StatBonuses = new() { { "EnergyRegen", 6 } },
+            StatModifiers = new() { new() { Stat = StatType.ENRegen, Value = 6 } },
             MinLevel = 10,
             PlaceholderColor = Color.Orange
         });
@@ -1301,7 +1272,7 @@ public static class Microchips
             Description = "Increases base heat dissipation rate by 25%.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Uncommon,
-            StatMultipliers = new() { { "HeatDissipation", 1.25f } },
+            StatModifiers = new() { new() { Stat = StatType.HeatDissipationMod, Value = 25, IsPercent = true } },
             PlaceholderColor = Color.SkyBlue
         });
 
@@ -1313,7 +1284,7 @@ public static class Microchips
             Description = "Increases Speed by 8.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Common,
-            StatBonuses = new() { { "Speed", 8 } },
+            StatModifiers = new() { new() { Stat = StatType.Speed, Value = 8 } },
             PlaceholderColor = Color.LightGreen
         });
 
@@ -1324,7 +1295,7 @@ public static class Microchips
             Description = "Increases Speed by 15.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Uncommon,
-            StatBonuses = new() { { "Speed", 15 } },
+            StatModifiers = new() { new() { Stat = StatType.Speed, Value = 15 } },
             MinLevel = 8,
             PlaceholderColor = Color.Green
         });
@@ -1336,19 +1307,24 @@ public static class Microchips
             Description = "Start combat with 50% ATB filled.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Rare,
-            StatBonuses = new() { { "InitialAtb", 50 } },
+            StatModifiers = new() { new() { Stat = StatType.ATBStartPercent, Value = 50 } },
             PlaceholderColor = Color.Turquoise
         });
 
-        // Offense
+        // Offense - boost all physical attack types
         Register(new MicrochipDefinition
         {
             Id = "drv_attack_1",
             Name = "Power Core I",
-            Description = "Increases Attack by 8.",
+            Description = "Increases physical Attack by 8.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Common,
-            StatBonuses = new() { { "Attack", 8 } },
+            StatModifiers = new()
+            {
+                new() { Stat = StatType.ATK_Impact, Value = 8 },
+                new() { Stat = StatType.ATK_Piercing, Value = 8 },
+                new() { Stat = StatType.ATK_Slashing, Value = 8 }
+            },
             PlaceholderColor = Color.Red
         });
 
@@ -1356,10 +1332,15 @@ public static class Microchips
         {
             Id = "drv_attack_2",
             Name = "Power Core II",
-            Description = "Increases Attack by 15.",
+            Description = "Increases physical Attack by 15.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Uncommon,
-            StatBonuses = new() { { "Attack", 15 } },
+            StatModifiers = new()
+            {
+                new() { Stat = StatType.ATK_Impact, Value = 15 },
+                new() { Stat = StatType.ATK_Piercing, Value = 15 },
+                new() { Stat = StatType.ATK_Slashing, Value = 15 }
+            },
             MinLevel = 8,
             PlaceholderColor = Color.DarkRed
         });
@@ -1368,10 +1349,16 @@ public static class Microchips
         {
             Id = "drv_special_1",
             Name = "Amplifier I",
-            Description = "Increases Special by 8.",
+            Description = "Increases elemental Attack by 8.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Common,
-            StatBonuses = new() { { "Special", 8 } },
+            StatModifiers = new()
+            {
+                new() { Stat = StatType.ATK_Thermal, Value = 8 },
+                new() { Stat = StatType.ATK_Cryo, Value = 8 },
+                new() { Stat = StatType.ATK_Electric, Value = 8 },
+                new() { Stat = StatType.ATK_Corrosive, Value = 8 }
+            },
             PlaceholderColor = Color.Purple
         });
 
@@ -1382,19 +1369,28 @@ public static class Microchips
             Description = "Increases critical hit chance by 10%.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Uncommon,
-            StatBonuses = new() { { "CritChance", 10 } },
+            StatModifiers = new()
+            {
+                new() { Stat = StatType.MeleeCritChance, Value = 10 },
+                new() { Stat = StatType.RangedCritChance, Value = 10 }
+            },
             PlaceholderColor = Color.Crimson
         });
 
-        // Defense
+        // Defense - boost all physical mitigation types
         Register(new MicrochipDefinition
         {
             Id = "drv_defense_1",
             Name = "Armor Plate I",
-            Description = "Increases Defense by 8.",
+            Description = "Increases physical Defense by 8.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Common,
-            StatBonuses = new() { { "Defense", 8 } },
+            StatModifiers = new()
+            {
+                new() { Stat = StatType.MIT_Impact, Value = 8 },
+                new() { Stat = StatType.MIT_Piercing, Value = 8 },
+                new() { Stat = StatType.MIT_Slashing, Value = 8 }
+            },
             PlaceholderColor = Color.SlateGray
         });
 
@@ -1402,10 +1398,15 @@ public static class Microchips
         {
             Id = "drv_defense_2",
             Name = "Armor Plate II",
-            Description = "Increases Defense by 15.",
+            Description = "Increases physical Defense by 15.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Uncommon,
-            StatBonuses = new() { { "Defense", 15 } },
+            StatModifiers = new()
+            {
+                new() { Stat = StatType.MIT_Impact, Value = 15 },
+                new() { Stat = StatType.MIT_Piercing, Value = 15 },
+                new() { Stat = StatType.MIT_Slashing, Value = 15 }
+            },
             MinLevel = 8,
             PlaceholderColor = Color.DarkSlateGray
         });
@@ -1417,7 +1418,7 @@ public static class Microchips
             Description = "Increases maximum HP by 15.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Common,
-            StatBonuses = new() { { "MaxHp", 15 } },
+            StatModifiers = new() { new() { Stat = StatType.HPMax, Value = 15 } },
             PlaceholderColor = Color.Pink
         });
 
@@ -1428,7 +1429,7 @@ public static class Microchips
             Description = "Increases maximum HP by 35.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Uncommon,
-            StatBonuses = new() { { "MaxHp", 35 } },
+            StatModifiers = new() { new() { Stat = StatType.HPMax, Value = 35 } },
             MinLevel = 8,
             PlaceholderColor = Color.HotPink
         });
@@ -1438,10 +1439,10 @@ public static class Microchips
         {
             Id = "drv_thermal_resist",
             Name = "Heat Shield",
-            Description = "Reduces Thermal damage by 25%.",
+            Description = "Increases Thermal mitigation by 25.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Uncommon,
-            StatBonuses = new() { { "ThermalResist", 25 } },
+            StatModifiers = new() { new() { Stat = StatType.MIT_Thermal, Value = 25 } },
             PlaceholderColor = Color.OrangeRed
         });
 
@@ -1449,10 +1450,10 @@ public static class Microchips
         {
             Id = "drv_cryo_resist",
             Name = "Antifreeze Module",
-            Description = "Reduces Cryo damage by 25%.",
+            Description = "Increases Cryo mitigation by 25.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Uncommon,
-            StatBonuses = new() { { "CryoResist", 25 } },
+            StatModifiers = new() { new() { Stat = StatType.MIT_Cryo, Value = 25 } },
             PlaceholderColor = Color.LightBlue
         });
 
@@ -1460,10 +1461,10 @@ public static class Microchips
         {
             Id = "drv_electric_resist",
             Name = "Insulation Layer",
-            Description = "Reduces Electric damage by 25%.",
+            Description = "Increases Electric mitigation by 25.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Uncommon,
-            StatBonuses = new() { { "ElectricResist", 25 } },
+            StatModifiers = new() { new() { Stat = StatType.MIT_Electric, Value = 25 } },
             PlaceholderColor = Color.Yellow
         });
     }
@@ -1829,8 +1830,18 @@ public static class Microchips
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Legendary,
             IsUnique = true,
-            StatMultipliers = new() { { "Special", 1.5f }, { "MaxEnergy", 1.3f } },
-            StatBonuses = new() { { "EnergyRegen", 5 } },
+            StatModifiers = new()
+            {
+                // +50% elemental attack
+                new() { Stat = StatType.ATK_Thermal, Value = 50, IsPercent = true },
+                new() { Stat = StatType.ATK_Cryo, Value = 50, IsPercent = true },
+                new() { Stat = StatType.ATK_Electric, Value = 50, IsPercent = true },
+                new() { Stat = StatType.ATK_Corrosive, Value = 50, IsPercent = true },
+                // +30% max energy
+                new() { Stat = StatType.ENMax, Value = 30, IsPercent = true },
+                // +5 energy regen
+                new() { Stat = StatType.ENRegen, Value = 5 }
+            },
             MinLevel = 20,
             PlaceholderColor = Color.DarkMagenta
         });
@@ -1860,15 +1871,28 @@ public static class Microchips
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Legendary,
             IsUnique = true,
-            StatBonuses = new()
+            StatModifiers = new()
             {
-                { "MaxHp", 25 },
-                { "Attack", 10 },
-                { "Defense", 10 },
-                { "Speed", 10 },
-                { "Special", 10 },
-                { "MaxEnergy", 40 },
-                { "EnergyRegen", 4 }
+                // HP
+                new() { Stat = StatType.HPMax, Value = 25 },
+                // Physical attack
+                new() { Stat = StatType.ATK_Impact, Value = 10 },
+                new() { Stat = StatType.ATK_Piercing, Value = 10 },
+                new() { Stat = StatType.ATK_Slashing, Value = 10 },
+                // Physical defense
+                new() { Stat = StatType.MIT_Impact, Value = 10 },
+                new() { Stat = StatType.MIT_Piercing, Value = 10 },
+                new() { Stat = StatType.MIT_Slashing, Value = 10 },
+                // Speed
+                new() { Stat = StatType.Speed, Value = 10 },
+                // Elemental attack
+                new() { Stat = StatType.ATK_Thermal, Value = 10 },
+                new() { Stat = StatType.ATK_Cryo, Value = 10 },
+                new() { Stat = StatType.ATK_Electric, Value = 10 },
+                new() { Stat = StatType.ATK_Corrosive, Value = 10 },
+                // Energy
+                new() { Stat = StatType.ENMax, Value = 40 },
+                new() { Stat = StatType.ENRegen, Value = 4 }
             },
             MinLevel = 25,
             PlaceholderColor = Color.White

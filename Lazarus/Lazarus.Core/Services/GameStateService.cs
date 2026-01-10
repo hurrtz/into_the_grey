@@ -526,7 +526,7 @@ public class GameStateService
             CompanionPresent = true,
             GravitationStage = GravitationStage.Normal,
             SaveTimestamp = DateTime.UtcNow.ToString("O"),
-            Currency = 1000 // Starting currency for testing
+            Currency = 5000 // Starting currency
         };
 
         // Reset faction reputation

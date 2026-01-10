@@ -405,30 +405,30 @@ public static class Evolutions
 
     private static void RegisterStarterEvolutions()
     {
-        // Echo Pup evolution chain
+        // Audax evolution chain (starter Kyn)
         Register(new EvolutionDefinition
         {
-            Id = "echo_pup_evolve",
-            FromKynId = "echo_pup",
-            ToKynId = "echo_hound",
+            Id = "audax_evolve",
+            FromKynId = "audax",
+            ToKynId = "resonator_hound",
             Trigger = EvolutionTrigger.Level,
-            RequiredLevel = 15,
-            StatMultipliers = new() { { "MaxHp", 1.3f }, { "Attack", 1.25f }, { "Speed", 1.2f } },
-            UnlockedAbilities = new() { "power_strike", "overclock" },
-            Description = "Echo Pup has grown into Echo Hound!"
+            RequiredLevel = 16,
+            StatMultipliers = new() { { "MaxHp", 1.3f }, { "Attack", 1.25f }, { "Speed", 1.15f }, { "Special", 1.35f } },
+            UnlockedAbilities = new() { "resonance_howl", "data_stream" },
+            Description = "Audax has evolved into Resonator Hound!"
         });
 
         Register(new EvolutionDefinition
         {
-            Id = "echo_hound_evolve",
-            FromKynId = "echo_hound",
-            ToKynId = "echo_alpha",
+            Id = "resonator_hound_evolve",
+            FromKynId = "resonator_hound",
+            ToKynId = "resonator_hound", // No further evolution currently defined
             Trigger = EvolutionTrigger.Level,
-            RequiredLevel = 30,
+            RequiredLevel = 99, // Effectively disabled until further evolution is defined
             StatMultipliers = new() { { "MaxHp", 1.4f }, { "Attack", 1.35f }, { "Speed", 1.25f }, { "Special", 1.2f } },
             UnlockedAbilities = new() { "multi_strike", "thunderbolt" },
             NewColor = Color.DarkGoldenrod,
-            Description = "Echo Hound has evolved into the mighty Echo Alpha!"
+            Description = "Resonator Hound has reached its full potential!"
         });
 
         // Rust Rat evolution

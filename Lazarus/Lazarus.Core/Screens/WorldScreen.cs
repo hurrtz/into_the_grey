@@ -109,11 +109,11 @@ public class WorldScreen : GameScreen
             _gameState.HasExoskeleton = true; // For testing, give exoskeleton immediately
             _gameState.ExoskeletonPowered = true; // And power it
 
-            // Create a starter Kyn (Echo Pup)
-            var echoPup = Kyn.Create("echo_pup", 5);
-            if (echoPup != null)
+            // Create a starter Kyn (Audax)
+            var starterKyn = Kyn.Create("audax", 5);
+            if (starterKyn != null)
             {
-                _roster.AddKyn(echoPup);
+                _roster.AddKyn(starterKyn);
             }
 
             // Trigger awakening dialog on first play

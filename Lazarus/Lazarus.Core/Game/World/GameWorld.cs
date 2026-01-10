@@ -623,21 +623,9 @@ public class GameWorld
                 LevelRange = levelRange
             };
 
-            // Add native Kyns from biome
-            foreach (var kyn in biomeDef.NativeKyns)
-            {
-                encounter.PossibleKyns.Add(kyn);
-            }
-
-            // Small chance to add rare Kyns
-            if (_random.NextDouble() < 0.1)
-            {
-                foreach (var rareKyn in biomeDef.RareKyns)
-                {
-                    encounter.PossibleKyns.Add(rareKyn);
-                }
-            }
-
+            // Note: Kyns are not part of regular encounters in this stage of the game.
+            // They only appear as wild Kyns that can be recruited.
+            // Encounters are reserved for other enemy types (humans, robots, sentinels).
             chunk.AddEncounter(encounter);
         }
 
@@ -665,19 +653,9 @@ public class GameWorld
             );
 
             // Select a Kyn type from biome's native list
-            string kynDefId = "echo_pup"; // Default fallback
-            if (biomeDef.NativeKyns.Count > 0)
-            {
-                // 20% chance for rare Kyns if available
-                if (biomeDef.RareKyns.Count > 0 && _random.NextDouble() < 0.2)
-                {
-                    kynDefId = biomeDef.RareKyns[_random.Next(biomeDef.RareKyns.Count)];
-                }
-                else
-                {
-                    kynDefId = biomeDef.NativeKyns[_random.Next(biomeDef.NativeKyns.Count)];
-                }
-            }
+            string kynDefId = biomeDef.NativeKyns.Count > 0
+                ? biomeDef.NativeKyns[_random.Next(biomeDef.NativeKyns.Count)]
+                : "audax"; // Default fallback to starter Kyn
 
             var wildKyn = WildKyn.CreateInChunk(
                 $"wild_{chunk.Id}_{i}",

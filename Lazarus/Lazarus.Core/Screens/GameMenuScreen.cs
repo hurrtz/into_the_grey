@@ -67,6 +67,9 @@ public class GameMenuScreen : GameScreen
     private InventoryTab _inventorySubTab = InventoryTab.Microchips;
     private int _inventorySelectedIndex = 0;
     private int _inventoryScroll = 0;
+    private bool _inventoryAssignMode = false;
+    private string? _inventorySelectedItemId = null;
+    private int _inventoryKynSelectIndex = 0;
 
     // Factions tab state
     private int _factionSelectedIndex = 0;
@@ -304,6 +307,38 @@ public class GameMenuScreen : GameScreen
         {
             ToggleKynPosition();
         }
+        else if (input.IsNewKeyPress(Keys.E, ControllingPlayer, out _))
+        {
+            OpenEquipmentScreen();
+        }
+    }
+
+    private void OpenEquipmentScreen()
+    {
+        Kyn? selectedKyn = null;
+
+        if (_partyInRoster)
+        {
+            var stored = _roster.Storage.ToList();
+            if (_partySelectedIndex < stored.Count)
+            {
+                selectedKyn = stored[_partySelectedIndex];
+            }
+        }
+        else
+        {
+            var party = _roster.Party.ToList();
+            if (_partySelectedIndex < party.Count)
+            {
+                selectedKyn = party[_partySelectedIndex];
+            }
+        }
+
+        if (selectedKyn != null)
+        {
+            var equipmentScreen = new EquipmentScreen(selectedKyn, _gameState);
+            ScreenManager.AddScreen(equipmentScreen, ControllingPlayer);
+        }
     }
 
     private void UpdatePartyScroll()
@@ -392,6 +427,13 @@ public class GameMenuScreen : GameScreen
 
     private void HandleInventoryInput(InputState input)
     {
+        // Handle Kyn selection mode for item assignment
+        if (_inventoryAssignMode)
+        {
+            HandleInventoryAssignInput(input);
+            return;
+        }
+
         var items = GetCurrentInventoryItems();
         int maxIndex = Math.Max(0, items.Count - 1);
 
@@ -417,6 +459,50 @@ public class GameMenuScreen : GameScreen
         {
             _inventorySelectedIndex = Math.Min(maxIndex, _inventorySelectedIndex + 1);
             UpdateInventoryScroll();
+        }
+        else if (input.IsMenuSelect(ControllingPlayer, out _))
+        {
+            // Start assign mode for augmentations and microchips
+            if ((_inventorySubTab == InventoryTab.Augmentations || _inventorySubTab == InventoryTab.Microchips)
+                && items.Count > 0 && _inventorySelectedIndex < items.Count)
+            {
+                _inventorySelectedItemId = items[_inventorySelectedIndex];
+                _inventoryAssignMode = true;
+                _inventoryKynSelectIndex = 0;
+            }
+        }
+    }
+
+    private void HandleInventoryAssignInput(InputState input)
+    {
+        var party = _roster.Party.ToList();
+        int maxIndex = Math.Max(0, party.Count - 1);
+
+        if (input.IsMenuCancel(ControllingPlayer, out _))
+        {
+            _inventoryAssignMode = false;
+            _inventorySelectedItemId = null;
+        }
+        else if (input.IsMenuUp(ControllingPlayer))
+        {
+            _inventoryKynSelectIndex = Math.Max(0, _inventoryKynSelectIndex - 1);
+        }
+        else if (input.IsMenuDown(ControllingPlayer))
+        {
+            _inventoryKynSelectIndex = Math.Min(maxIndex, _inventoryKynSelectIndex + 1);
+        }
+        else if (input.IsMenuSelect(ControllingPlayer, out _))
+        {
+            // Open equipment screen for selected Kyn
+            if (_inventoryKynSelectIndex < party.Count && _inventorySelectedItemId != null)
+            {
+                var selectedKyn = party[_inventoryKynSelectIndex];
+                var equipmentScreen = new EquipmentScreen(selectedKyn, _gameState);
+                ScreenManager.AddScreen(equipmentScreen, ControllingPlayer);
+
+                _inventoryAssignMode = false;
+                _inventorySelectedItemId = null;
+            }
         }
     }
 
@@ -701,8 +787,12 @@ public class GameMenuScreen : GameScreen
         string hint = _currentTab switch
         {
             MenuTab.Party => _partySwapMode ? "[Enter] Swap target | [Esc] Cancel" :
-                "[Up/Down] Select | [Left/Right] Panel | [Enter] Swap | [P] Position | [Q/E] Tab",
-            MenuTab.Inventory => "[Up/Down] Select | [Left/Right] Category | [Q/E] Tab",
+                "[Up/Down] Select | [Left/Right] Panel | [Enter] Swap | [P] Position | [E] Equipment",
+            MenuTab.Inventory => _inventoryAssignMode
+                ? "[Up/Down] Select | [Enter] Open Equipment | [Esc] Cancel"
+                : (_inventorySubTab == InventoryTab.Microchips || _inventorySubTab == InventoryTab.Augmentations)
+                    ? "[Up/Down] Select | [Left/Right] Category | [Enter] Assign | [Q/E] Tab"
+                    : "[Up/Down] Select | [Left/Right] Category | [Q/E] Tab",
             MenuTab.Factions => "[Up/Down] Select | [Q/E] Tab",
             MenuTab.Map => "[Arrows] Navigate | [Enter] Travel | [Q/E] Tab",
             MenuTab.Codex => "[Up/Down] Select | [Q/E] Tab",
@@ -899,6 +989,77 @@ public class GameMenuScreen : GameScreen
 
             y += 40;
         }
+
+        // Draw Kyn selector overlay when in assign mode
+        if (_inventoryAssignMode)
+        {
+            DrawInventoryAssignOverlay(bounds);
+        }
+    }
+
+    private void DrawInventoryAssignOverlay(Rectangle bounds)
+    {
+        // Darken background
+        DrawRect(bounds, new Color(0, 0, 0, 180));
+
+        // Draw modal panel
+        int panelWidth = 300;
+        int panelHeight = 250;
+        var panelRect = new Rectangle(
+            bounds.X + (bounds.Width - panelWidth) / 2,
+            bounds.Y + (bounds.Height - panelHeight) / 2,
+            panelWidth,
+            panelHeight
+        );
+
+        DrawRect(panelRect, PanelColor);
+        DrawBorder(panelRect, AccentColor);
+
+        // Title
+        string itemName = _inventorySelectedItemId != null ? GetItemDisplayName(_inventorySelectedItemId) : "Item";
+        string title = $"Assign: {itemName}";
+        var titleSize = _font!.MeasureString(title);
+        _spriteBatch!.DrawString(_font, title,
+            new Vector2(panelRect.X + (panelRect.Width - titleSize.X) / 2, panelRect.Y + 10),
+            AccentColor);
+
+        // Subtitle
+        _spriteBatch.DrawString(_font, "Select a Kyn:",
+            new Vector2(panelRect.X + 10, panelRect.Y + 35),
+            DimColor);
+
+        // Party list
+        var party = _roster.Party.ToList();
+        int y = panelRect.Y + 60;
+
+        if (party.Count == 0)
+        {
+            _spriteBatch.DrawString(_font, "No Kyns in party",
+                new Vector2(panelRect.X + 20, y), DimColor);
+        }
+        else
+        {
+            for (int i = 0; i < party.Count; i++)
+            {
+                var kyn = party[i];
+                var rect = new Rectangle(panelRect.X + 10, y, panelWidth - 20, 30);
+                bool selected = i == _inventoryKynSelectIndex;
+
+                DrawRect(rect, selected ? SelectColor : new Color(40, 45, 55));
+                DrawBorder(rect, selected ? AccentColor : DimColor * 0.3f);
+
+                _spriteBatch.DrawString(_font, $"{kyn.Definition.Name} Lv.{kyn.Level}",
+                    new Vector2(rect.X + 10, rect.Y + 6),
+                    selected ? TextColor : DimColor);
+
+                y += 35;
+            }
+        }
+
+        // Instructions
+        _spriteBatch.DrawString(_font, "[Enter] Open Equipment | [Esc] Cancel",
+            new Vector2(panelRect.X + 10, panelRect.Bottom - 25),
+            DimColor * 0.8f);
     }
 
     private string GetItemDisplayName(string itemId)

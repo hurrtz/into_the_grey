@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="1">
  <tileset firstgid="1" source="../tilesets/sidewalk_64.tsx"/>
- <tileset firstgid="51" name="Buildings" tilewidth="512" tileheight="512" tilecount="3" columns="0">
+ <tileset firstgid="51" name="Buildings" tilewidth="512" tileheight="512" tilecount="1" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
-  <tile id="0">
-   <image source="../../../../Downloads/512_one_single_colonial_house_two_story_626115310838566_00001_.png" width="512" height="512"/>
-  </tile>
   <tile id="1">
    <image source="../../../../Downloads/512_one_single_small_apartment_building_three_story_62863362405861_00001_.png" width="512" height="512"/>
-  </tile>
-  <tile id="2">
-   <image source="../../../../Downloads/512_one_single_small_cottage_suburban_house_626115310838566_00003_.png" width="512" height="512"/>
   </tile>
  </tileset>
  <layer id="1" name="Tile Layer 1" width="25" height="25">
@@ -62,7 +56,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,51,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,52,0,0,0,0,0,0,

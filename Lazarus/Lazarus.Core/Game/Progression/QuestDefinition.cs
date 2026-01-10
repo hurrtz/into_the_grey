@@ -463,13 +463,13 @@ public static class QuestDefinitions
                 Flags = new List<string> { StoryFlags.CompletedTutorialBattle }
             },
             SetsFlags = new List<string> { StoryFlags.CompletedTutorialBattle },
-            NextQuestId = "main_05_echo_pup"
+            NextQuestId = "main_05_audax"
         });
 
-        // Quest 5: Echo Pup
+        // Quest 5: First Recruitment
         Register(new QuestDefinition
         {
-            Id = "main_05_echo_pup",
+            Id = "main_05_audax",
             Name = "A New Friend",
             Description = "A small Kyn with unusual abilities watches you from the fog. It seems... curious rather than hostile.",
             Summary = "Recruit your first Kyn",
@@ -481,14 +481,14 @@ public static class QuestDefinitions
             SortOrder = 5,
             Objectives = new List<QuestObjective>
             {
-                new() { Id = "approach", Description = "Approach the curious Kyn", Type = ObjectiveType.ReachLocation, TargetId = "loc_echo_pup" },
-                new() { Id = "recruit", Description = "Recruit Echo Pup", Type = ObjectiveType.RecruitKyn, TargetId = "echo_pup" }
+                new() { Id = "approach", Description = "Approach the curious Kyn", Type = ObjectiveType.ReachLocation, TargetId = "loc_first_kyn" },
+                new() { Id = "recruit", Description = "Recruit Audax", Type = ObjectiveType.RecruitKyn, TargetId = "audax" }
             },
             Reward = new QuestReward
             {
                 Experience = 150,
                 Flags = new List<string> { StoryFlags.RecruitedEchoPup },
-                UnlockedKynIds = new List<string> { "echo_pup" }
+                UnlockedKynIds = new List<string> { "audax" }
             },
             SetsFlags = new List<string> { StoryFlags.RecruitedEchoPup },
             NextQuestId = "main_06_power_source"
@@ -499,12 +499,12 @@ public static class QuestDefinitions
         {
             Id = "main_06_power_source",
             Name = "Power Source",
-            Description = "Your exoskeleton needs power to function properly. Echo Pup senses energy signatures nearby - perhaps from a crashed drone.",
+            Description = "Your exoskeleton needs power to function properly. Audax senses energy signatures nearby - perhaps from a crashed drone.",
             Summary = "Find a power source for the exoskeleton",
             Type = QuestType.Main,
             Act = ActState.Act1_Denial,
             BiomeId = "fringe",
-            Prerequisites = new List<string> { "main_05_echo_pup" },
+            Prerequisites = new List<string> { "main_05_audax" },
             CanAbandon = false,
             SortOrder = 6,
             Objectives = new List<QuestObjective>

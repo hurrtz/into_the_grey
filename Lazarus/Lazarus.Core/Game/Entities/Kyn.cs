@@ -723,14 +723,13 @@ public class Kyn
         // Add microchip modifiers (from Driver chips)
         foreach (var chip in GetEquippedChips())
         {
-            // Add stat modifiers from microchip definition
             foreach (var statMod in chip.Definition.StatModifiers)
             {
                 // Scale by firmware level for Driver chips
                 float value = statMod.Value;
                 if (chip.Definition.Category == MicrochipCategory.Driver)
                 {
-                    value *= 1f + ((int)chip.FirmwareLevel - 1) * 0.1f;
+                    value *= chip.GetEffectMultiplier();
                 }
 
                 _stats.AddModifier(new StatModifier
@@ -767,67 +766,6 @@ public class Kyn
             "CritDamage" => StatType.CritSeverity,
             _ => null
         };
-    }
-
-    /// <summary>
-    /// Calculates a stat value based on level and augmentations.
-    /// Deprecated: Use Stats.GetTotal(StatType) instead.
-    /// </summary>
-    [Obsolete("Use Stats.GetTotal(StatType) instead")]
-    private int CalculateStat(int baseStat, string statName = "")
-    {
-        // Scale by level (10% per level)
-        float levelMultiplier = 1f + (Level - 1) * 0.1f;
-        float scaledStat = baseStat * levelMultiplier;
-
-        // Add augmentation bonuses
-        int flatBonus = 0;
-        float multiplier = 1f;
-
-        foreach (var kvp in EquippedAugmentations)
-        {
-            var augId = kvp.Value;
-            if (augId == null)
-                continue;
-
-            var augDef = Augmentations.Get(augId);
-            if (augDef == null)
-                continue;
-
-            // Flat bonuses
-            if (!string.IsNullOrEmpty(statName) && augDef.StatBonuses.TryGetValue(statName, out var bonus))
-            {
-                flatBonus += bonus;
-            }
-
-            // Multipliers
-            if (!string.IsNullOrEmpty(statName) && augDef.StatMultipliers.TryGetValue(statName, out var mult))
-            {
-                multiplier *= mult;
-            }
-        }
-
-        // Add microchip bonuses (from Driver chips)
-        foreach (var chip in GetEquippedChips())
-        {
-            if (chip.Definition.Category != MicrochipCategory.Driver)
-                continue;
-
-            // Flat bonuses (scaled by firmware level)
-            if (!string.IsNullOrEmpty(statName))
-            {
-                flatBonus += chip.GetStatBonus(statName);
-            }
-
-            // Multipliers
-            var chipMult = chip.GetStatMultiplier(statName);
-            if (chipMult != 1f)
-            {
-                multiplier *= chipMult;
-            }
-        }
-
-        return (int)((scaledStat + flatBonus) * multiplier);
     }
 
     /// <summary>

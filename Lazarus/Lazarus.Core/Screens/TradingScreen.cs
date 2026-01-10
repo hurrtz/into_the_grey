@@ -532,9 +532,10 @@ public class TradingScreen : GameScreen
                     yOffset += 20;
                 }
 
-                foreach (var bonus in chip.StatBonuses)
+                foreach (var mod in chip.StatModifiers)
                 {
-                    spriteBatch.DrawString(_smallFont!, $"{bonus.Key}: +{bonus.Value}", new Vector2(detailX + 15, detailY + yOffset), Color.LimeGreen);
+                    string modText = mod.IsPercent ? $"{mod.Stat}: +{mod.Value:F0}%" : $"{mod.Stat}: +{mod.Value:F0}";
+                    spriteBatch.DrawString(_smallFont!, modText, new Vector2(detailX + 15, detailY + yOffset), Color.LimeGreen);
                     yOffset += 18;
                 }
             }

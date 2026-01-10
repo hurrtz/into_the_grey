@@ -212,9 +212,6 @@ public class BiomeDefinition
 
     // Content
     public List<string> NativeKyns { get; init; } = new();
-    public List<string> RareKyns { get; init; } = new();
-    public List<string> NightOnlyKyns { get; init; } = new();
-    public List<string> BossKyns { get; init; } = new();
     public List<BiomeLandmark> Landmarks { get; init; } = new();
 
     // Environment
@@ -305,12 +302,8 @@ public static class BiomeData
 
             NativeKyns = new()
             {
-                "echo_pup", "circuit_crow", "relay_rodent", "rust_rat", "glitch_moth",
-                "pod_slug", "wire_worm", "static_sparrow", "blank_hare"
+                "audax", "corvus", "capax", "umbra", "beorgan"
             },
-            RareKyns = new() { "circuit_cat", "scrap_hound", "genesis_kyn" },
-            NightOnlyKyns = new() { "nightmare_pup", "void_crow" },
-            BossKyns = new() { "awakened_prototype" },
 
             Landmarks = new()
             {
@@ -430,12 +423,8 @@ public static class BiomeData
 
             NativeKyns = new()
             {
-                "rust_rat", "scrap_hound", "gear_beetle", "piston_snake", "forge_spider",
-                "conveyor_centipede", "press_crab", "welding_wasp", "pipe_python"
+                "rust_rat", "scrap_hound", "gear_beetle", "piston_snake", "forge_spider"
             },
-            RareKyns = new() { "crane_raptor", "furnace_golem", "assembly_angel" },
-            NightOnlyKyns = new() { "night_shift_specter", "overtime_owl" },
-            BossKyns = new() { "the_foreman", "production_line_prime" },
 
             Landmarks = new()
             {
@@ -568,12 +557,8 @@ public static class BiomeData
 
             NativeKyns = new()
             {
-                "vine_serpent", "bloom_moth", "moss_bear", "thorn_cat", "spore_toad",
-                "root_hound", "canopy_monkey", "petal_butterfly", "bark_beetle", "sap_slime"
+                "vine_serpent", "bloom_moth", "moss_bear", "thorn_cat", "spore_toad"
             },
-            RareKyns = new() { "ancient_oak_deer", "chloro_phoenix", "garden_guardian" },
-            NightOnlyKyns = new() { "moonflower_moth", "nocturnal_prowler", "fungal_horror" },
-            BossKyns = new() { "the_overgrowth", "mother_tree" },
 
             Landmarks = new()
             {
@@ -706,12 +691,8 @@ public static class BiomeData
 
             NativeKyns = new()
             {
-                "house_cat", "lawn_drone", "sprinkler_serpent", "mailbox_mimic", "garage_guardian",
-                "pool_lurker", "garden_gnome", "porch_prowler", "attic_specter"
+                "house_cat", "lawn_drone", "sprinkler_serpent", "mailbox_mimic", "garage_guardian"
             },
-            RareKyns = new() { "suburb_sentinel", "perfect_pet", "homeowner_horror" },
-            NightOnlyKyns = new() { "neighborhood_watch", "curfew_enforcer" },
-            BossKyns = new() { "the_hoa_president", "model_home" },
 
             Landmarks = new()
             {
@@ -844,12 +825,8 @@ public static class BiomeData
 
             NativeKyns = new()
             {
-                "turret_hawk", "razor_hound", "bunker_bear", "wall_crawler", "sentry_spider",
-                "barricade_beetle", "patrol_panther", "minefield_mouse", "tripwire_serpent"
+                "turret_hawk", "razor_hound", "bunker_bear", "wall_crawler", "sentry_spider"
             },
-            RareKyns = new() { "fortress_titan", "siege_wyrm", "general_hound" },
-            NightOnlyKyns = new() { "infiltrator_cat", "night_ops_owl" },
-            BossKyns = new() { "the_final_defense", "automated_general" },
 
             Landmarks = new()
             {
@@ -983,12 +960,8 @@ public static class BiomeData
 
             NativeKyns = new()
             {
-                "server_sprite", "data_worm", "cache_cat", "firewall_fox", "bandwidth_bat",
-                "cooling_serpent", "process_spider", "memory_moth", "core_hound", "algorithm_ant"
+                "server_sprite", "data_worm", "cache_cat", "firewall_fox", "bandwidth_bat"
             },
-            RareKyns = new() { "kernel_dragon", "root_access_bear", "admin_angel" },
-            NightOnlyKyns = new() { "batch_job_horror", "defrag_demon" },
-            BossKyns = new() { "lazarus_avatar", "the_update" },
 
             Landmarks = new()
             {
@@ -1124,12 +1097,8 @@ public static class BiomeData
 
             NativeKyns = new()
             {
-                "memory_ghost", "deleted_dog", "corrupted_cat", "null_serpent", "void_moth",
-                "echo_hound", "fragment_fox", "paradox_parrot", "glitch_gecko", "timeline_tortoise"
+                "memory_ghost", "deleted_dog", "corrupted_cat", "null_serpent", "void_moth"
             },
-            RareKyns = new() { "ancient_backup", "original_instance", "the_undeleted" },
-            NightOnlyKyns = new() { "nightmare_version", "what_could_have_been" },
-            BossKyns = new() { "the_deleted_one", "memory_of_lazarus" },
 
             Landmarks = new()
             {
@@ -1256,21 +1225,6 @@ public static class BiomeData
     /// Gets native Kyns that commonly appear in a biome.
     /// </summary>
     public static List<string> GetNativeKyns(BiomeType biome) => GetDefinition(biome).NativeKyns;
-
-    /// <summary>
-    /// Gets rare Kyns that can appear in a biome.
-    /// </summary>
-    public static List<string> GetRareKyns(BiomeType biome) => GetDefinition(biome).RareKyns;
-
-    /// <summary>
-    /// Gets Kyns that only appear at night in a biome.
-    /// </summary>
-    public static List<string> GetNightOnlyKyns(BiomeType biome) => GetDefinition(biome).NightOnlyKyns;
-
-    /// <summary>
-    /// Gets boss Kyns for a biome.
-    /// </summary>
-    public static List<string> GetBossKyns(BiomeType biome) => GetDefinition(biome).BossKyns;
 
     /// <summary>
     /// Gets possible weather types for a biome.

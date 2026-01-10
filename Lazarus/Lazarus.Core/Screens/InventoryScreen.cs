@@ -483,14 +483,12 @@ public class InventoryScreen : GameScreen
             var chip = Microchips.Get(itemId);
             if (chip != null)
             {
-                foreach (var bonus in chip.StatBonuses)
+                foreach (var mod in chip.StatModifiers)
                 {
-                    effects.Add($"{bonus.Key} +{bonus.Value}");
-                }
-                foreach (var mult in chip.StatMultipliers)
-                {
-                    var percent = (mult.Value - 1f) * 100f;
-                    effects.Add($"{mult.Key} {(percent >= 0 ? "+" : "")}{percent:F0}%");
+                    if (mod.IsPercent)
+                        effects.Add($"{mod.Stat} +{mod.Value:F0}%");
+                    else
+                        effects.Add($"{mod.Stat} +{mod.Value:F0}");
                 }
                 if (!string.IsNullOrEmpty(chip.GrantsAbility))
                     effects.Add($"Grants: {chip.GrantsAbility}");
