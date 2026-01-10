@@ -118,32 +118,14 @@ Lazarus uses an Active Time Battle (ATB) system where turn order is determined b
 
 ### Combat Phases
 
-```
-┌─────────────┐
-│   Setup     │ ← Initialize combatants, apply entry effects
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│  ATB Tick   │ ← Charge ATB gauges based on Speed
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│ Action      │ ← Player/AI selects action when ATB full
-│ Selection   │
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│  Execute    │ ← Perform action, calculate damage/effects
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│  Resolution │ ← Apply results, check KO states
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│ Victory/    │ ← End combat, distribute rewards
-│ Defeat      │
-└─────────────┘
+```mermaid
+flowchart TD
+    S[Setup<br/>Initialize combatants, apply entry effects] --> ATB[ATB Tick<br/>Charge ATB gauges based on Speed]
+    ATB --> AS[Action Selection<br/>Player/AI selects action when ATB full]
+    AS --> EX[Execute<br/>Perform action, calculate damage/effects]
+    EX --> RES[Resolution<br/>Apply results, check KO states]
+    RES --> ATB
+    RES --> VD[Victory/Defeat<br/>End combat, distribute rewards]
 ```
 
 ### ATB (Active Time Battle) Mechanics
@@ -338,19 +320,14 @@ Dungeons are self-contained exploration areas with procedural elements.
 
 ### Dungeon Structure
 
-```
-┌─────────────────────────────────────────┐
-│            Dungeon Instance             │
-│  ┌─────┐  ┌─────┐  ┌─────┐  ┌─────┐   │
-│  │Room │──│Room │──│Room │──│Boss │   │
-│  │ 1   │  │ 2   │  │ 3   │  │Room │   │
-│  └─────┘  └──┬──┘  └─────┘  └─────┘   │
-│              │                          │
-│           ┌──┴──┐                       │
-│           │Room │                       │
-│           │ 2b  │                       │
-│           └─────┘                       │
-└─────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph DI[Dungeon Instance]
+        R1[Room 1] --> R2[Room 2]
+        R2 --> R3[Room 3]
+        R3 --> BR[Boss Room]
+        R2 --> R2b[Room 2b]
+    end
 ```
 
 ### Room Types
@@ -409,10 +386,11 @@ Completion rewards include:
 
 #### Quest States
 
-```
-Available → Active → Completed
-              ↓
-           Failed
+```mermaid
+stateDiagram-v2
+    Available --> Active
+    Active --> Completed
+    Active --> Failed
 ```
 
 ### Faction System
@@ -437,8 +415,9 @@ Available → Active → Completed
 
 #### Reputation Levels
 
-```
-Hostile → Unfriendly → Neutral → Friendly → Honored → Revered
+```mermaid
+flowchart LR
+    Hostile --> Unfriendly --> Neutral --> Friendly --> Honored --> Revered
 ```
 
 Reputation affects:
@@ -716,40 +695,58 @@ Corruption/influence mechanic:
 
 ### Save Data Contents
 
-```csharp
-GameSaveData
-├── Player State
-│   ├── Position
-│   ├── Current Biome
-│   ├── Stats
-│   └── Inventory
-├── Stray Roster
-│   ├── Active Party
-│   └── Storage
-├── Progression
-│   ├── Quest States
-│   ├── Faction Standings
-│   ├── Achievements
-│   └── Bestiary Data
-├── World State
-│   ├── Visited Locations
-│   ├── NPC States
-│   └── Event Flags
-└── Settings Reference
+```mermaid
+classDiagram
+    class GameSaveData {
+        +PlayerState
+        +StrayRoster
+        +Progression
+        +WorldState
+        +SettingsReference
+    }
+
+    class PlayerState {
+        +Position
+        +CurrentBiome
+        +Stats
+        +Inventory
+    }
+
+    class StrayRoster {
+        +ActiveParty
+        +Storage
+    }
+
+    class Progression {
+        +QuestStates
+        +FactionStandings
+        +Achievements
+        +BestiaryData
+    }
+
+    class WorldState {
+        +VisitedLocations
+        +NPCStates
+        +EventFlags
+    }
+
+    GameSaveData *-- PlayerState
+    GameSaveData *-- StrayRoster
+    GameSaveData *-- Progression
+    GameSaveData *-- WorldState
 ```
 
 ### Save/Load Flow
 
-```
-GameStateService.Save()
-    → Serialize GameSaveData
-    → Write to storage
-    → Platform-specific path
+```mermaid
+flowchart LR
+    subgraph Save["GameStateService.Save()"]
+        S1[Serialize GameSaveData] --> S2[Write to storage] --> S3[Platform-specific path]
+    end
 
-GameStateService.Load()
-    → Read from storage
-    → Deserialize GameSaveData
-    → Apply to game state
+    subgraph Load["GameStateService.Load()"]
+        L1[Read from storage] --> L2[Deserialize GameSaveData] --> L3[Apply to game state]
+    end
 ```
 
 **Screen**: `Lazarus.Core/Screens/SaveLoadScreen.cs`
@@ -943,16 +940,18 @@ Manages direction-aware playback.
 
 **File**: `Lazarus.Core/Game/Direction.cs`
 
-```
-         North
-           │
- NorthWest │ NorthEast
-         ╲ │ ╱
-West ─────●───── East
-         ╱ │ ╲
- SouthWest │ SouthEast
-           │
-         South
+```mermaid
+flowchart TB
+    NW[NorthWest] --- N[North] --- NE[NorthEast]
+    NW --- W[West]
+    NE --- E[East]
+    W --- CENTER(( ))
+    E --- CENTER
+    N --- CENTER
+    S --- CENTER
+    SW[SouthWest] --- W
+    SE[SouthEast] --- E
+    SW --- S[South] --- SE
 ```
 
 ---
