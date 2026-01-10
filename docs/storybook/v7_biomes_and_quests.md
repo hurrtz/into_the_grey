@@ -150,7 +150,7 @@ The biome should feel unfinished, like a loading area that never transitioned.
 
 **Secrets:**
 - **The Free Bird:** A rare, unaugmented bird that appears only if the player stands perfectly still for 2 minutes; seeing it grants a permanent "Wonder" buff.
-- **The Underground Server:** A trapdoor hidden under a "Logic Lynx" nest leads to a room filled with high-tier "Microchips" and a dormant Sentinel.
+- **The Underground Server:** A trapdoor hidden under a "Sentio" nest leads to a room filled with high-tier "Microchips" and a dormant Sentinel.
 - **The Coded Tiles:** A section of the pixel-art ground tiles forms a QR code (or binary string) that, when decoded, reveals Lazarus's original resurrection directive.
 - **Pod 101:** Hidden behind a coolant waterfall; contains your "Old Jacket," which increases Companion loyalty.
 - **The Lone Tree:** The only 100% biological tree; standing near it hides your signature from drones.
@@ -173,11 +173,11 @@ The biome should feel unfinished, like a loading area that never transitioned.
 | Relay Rodent | Rabbit/Rat | Static resist; energy regen | Capacitor Hare | 15 | Internal Battery Core | Ears become glowing lightning rods |
 | Static Feline | Cat | Phase-dodge; stealth movement | Phase Panther | 20 | None (Combat Stress) | Semi-transparent during movement |
 | Buffer Badger | Mustelid | Tank; party HP from reserve | Fortress Meles | 18 | Plated Torso Augment | Encased in overlapping steel plates |
-| Ping Pigeon | Avian | Support boost; settlement compass | Relay Raptor | 17 | Signal Antenna (Tail) | Crest becomes satellite array; chrome talons |
-| Cache Coon | Procyonid | Loot drops; salvage rates | Scavenge Shifu | 16 | None (Natural Mutation) | Multi-tool claws; tail holds extra gear |
-| Logic Lynx | Feline | Crit specialist; weakness ID | Analysis Assassin | 19 | Neural Link Processor | Eyes scroll green data; hydraulic limbs |
-| Patch Possum | Marsupial | Auto-reboot; recruitment bonus | Overdrive Opossum | 18 | Emergency Reboot Chip | Wires pulse with orange energy |
-| Signal Hare | Rabbit | High ATB speed; trap detection | Vector Jackrabbit | 17 | None (Natural Mutation) | Legs replaced with spring-struts |
+| Leit | Avian | Support boost; settlement compass | Relay Raptor | 17 | Signal Antenna (Tail) | Crest becomes satellite array; chrome talons |
+| Scrinium | Procyonid | Loot drops; salvage rates | Scavenge Shifu | 16 | None (Natural Mutation) | Multi-tool claws; tail holds extra gear |
+| Sentio | Feline | Crit specialist; weakness ID | Analysis Assassin | 19 | Neural Link Processor | Eyes scroll green data; hydraulic limbs |
+| Hale | Marsupial | Auto-reboot; recruitment bonus | Overdrive Opossum | 18 | Emergency Reboot Chip | Wires pulse with orange energy |
+| Celer | Rabbit | High ATB speed; trap detection | Vector Jackrabbit | 17 | None (Natural Mutation) | Legs replaced with spring-struts |
 
 ---
 
@@ -308,7 +308,7 @@ Strays here are not enemies or allies — they are neighbors.
 - **The Hive Mind:** Destroy a "Signal-Parasite" hive that is confusing local Strays.
 - **Nature's Bounty:** Escort a "Seeker" NPC as they gather bioluminescent fruit.
 - **The Whispering Woods:** Investigate a grove where the "Echoes" of human voices can be heard.
-- **Bridge Over Troubled Water:** Repair a wooden bridge guarded by a territorial "Logic Lynx".
+- **Bridge Over Troubled Water:** Repair a wooden bridge guarded by a territorial "Sentio".
 - **The Lost Botanist:** Find a scientist who went missing while studying the "Pulse" flowers.
 - **Petal to the Metal:** Scavenge tech components tangled in the roots of a "Great Tree."
 

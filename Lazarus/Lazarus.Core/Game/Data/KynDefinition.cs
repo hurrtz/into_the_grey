@@ -213,10 +213,10 @@ public class KynDefinition
     public bool IsCompanion { get; set; } = false;
 
     /// <summary>
-    /// Fixed ledger number for this Kyn (0 = assigned dynamically when caught).
+    /// Fixed Kyn-Codex number for this Kyn (0 = assigned dynamically when caught).
     /// Companions and special Kyns have fixed numbers.
     /// </summary>
-    public int LedgerNumber { get; set; } = 0;
+    public int CodexNumber { get; set; } = 0;
 
     /// <summary>
     /// Base recruitment chance (0.0 - 1.0).
@@ -244,7 +244,7 @@ public static class KynDefinitions
 
     static KynDefinitions()
     {
-        // Register companions first (they have fixed ledger numbers)
+        // Register companions first (they have fixed codex numbers)
         RegisterCompanionKyns();
 
         // Initialize all Kyns by biome
@@ -281,16 +281,16 @@ public static class KynDefinitions
 
     /// <summary>
     /// Registers companion Kyns that start with the player.
-    /// These have fixed ledger numbers starting at 1.
+    /// These have fixed codex numbers starting at 1.
     /// </summary>
     private static void RegisterCompanionKyns()
     {
-        // Bandit - The player's loyal companion from the start
+        // Vagus - The player's loyal companion from the start
         // A glitch-touched dog who gained sentience through corrupted data
         Register(new KynDefinition
         {
-            Id = "bandit",
-            Name = "Bandit",
+            Id = "vagus",
+            Name = "Vagus",
             Description = "Your first companion. Found you in the pod fields and never left. " +
                           "Something in its corrupted code makes it fiercely loyal. " +
                           "The Gravitation chip embedded in its skull grants strange powers.",
@@ -314,7 +314,7 @@ public static class KynDefinitions
             PlaceholderSize = 24,
             CanRecruit = false, // Already with player
             IsCompanion = true,
-            LedgerNumber = 1 // First entry in the ledger
+            CodexNumber = 1 // First entry in the Kyn-Codex
         });
     }
 
@@ -323,11 +323,11 @@ public static class KynDefinitions
     /// </summary>
     private static void RegisterFringeKyns()
     {
-        // Echo Pup - The first recruited Kyn, good at detecting glitches
+        // Audax - The first recruited Kyn, good at detecting glitches
         Register(new KynDefinition
         {
-            Id = "echo_pup",
-            Name = "Echo Pup",
+            Id = "audax",
+            Name = "Audax",
             Description = "Detects glitches and digests digital data. A reliable first companion.",
             CreatureType = CreatureType.GrayWolf,
             Role = KynRole.Support,
@@ -347,11 +347,11 @@ public static class KynDefinitions
             }
         });
 
-        // Circuit Crow - Accuracy and vision
+        // Corvus - Accuracy and vision
         Register(new KynDefinition
         {
-            Id = "circuit_crow",
-            Name = "Circuit Crow",
+            Id = "corvus",
+            Name = "Corvus",
             Description = "Enhanced vision grants party accuracy. Can spot threats from afar.",
             CreatureType = CreatureType.SugarGlider,
             Role = KynRole.Support,
@@ -372,11 +372,11 @@ public static class KynDefinitions
             }
         });
 
-        // Relay Rodent - Energy regen
+        // Capax - Energy regen
         Register(new KynDefinition
         {
-            Id = "relay_rodent",
-            Name = "Relay Rodent",
+            Id = "capax",
+            Name = "Capax",
             Description = "Generates static energy. Resists shock damage and helps with energy regen.",
             CreatureType = CreatureType.BrownRat,
             Role = KynRole.Utility,
@@ -390,11 +390,11 @@ public static class KynDefinitions
             PlaceholderSize = 14
         });
 
-        // Static Feline - Stealth and dodging
+        // Umbra - Stealth and dodging
         Register(new KynDefinition
         {
-            Id = "static_feline",
-            Name = "Static Feline",
+            Id = "umbra",
+            Name = "Umbra",
             Description = "Phases through attacks with unnatural grace. A stealth specialist.",
             CreatureType = CreatureType.GrayWolf,
             Role = KynRole.Damage,
@@ -409,11 +409,11 @@ public static class KynDefinitions
             PlaceholderSize = 18
         });
 
-        // Buffer Badger - Tank
+        // Beorgan - Tank
         Register(new KynDefinition
         {
-            Id = "buffer_badger",
-            Name = "Buffer Badger",
+            Id = "beorgan",
+            Name = "Beorgan",
             Description = "Stores damage in reserve systems. A reliable tank that protects the party.",
             CreatureType = CreatureType.GrayWolf,
             Role = KynRole.Tank,
@@ -428,12 +428,12 @@ public static class KynDefinitions
             PlaceholderSize = 22
         });
 
-        // Resonator Hound - Echo Pup evolution
+        // Resonator Hound - Audax evolution
         Register(new KynDefinition
         {
             Id = "resonator_hound",
             Name = "Resonator Hound",
-            Description = "Evolved Echo Pup. Its howl resonates with data streams.",
+            Description = "Evolved Audax. Its howl resonates with data streams.",
             CreatureType = CreatureType.GrayWolf,
             Role = KynRole.Support,
             BaseStats = new KynBaseStats { MaxHp = 120, Attack = 16, Defense = 12, Speed = 16, Special = 22 },
@@ -1433,13 +1433,13 @@ public static class KynDefinitions
     /// </summary>
     private static void RegisterBossKyns()
     {
-        // Hyper-evolved Bandit - Final Boss
+        // Hyper-evolved Vagus - Final Boss
         // The companion, fully corrupted by the Boost Control System
         // Uses Absolute Gravitation to deal 99% HP damage to the party
         Register(new KynDefinition
         {
-            Id = "hyper_bandit",
-            Name = "Hyper-Evolved Bandit",
+            Id = "hyper_vagus",
+            Name = "Hyper-Evolved Vagus",
             Description = "Your former companion, consumed by the Boost Control System. The Gravitation ability has reached Absolute power - reality itself bends before it. This is not a fight you can win. You can only survive.",
             CreatureType = CreatureType.GrayWolf,
             Role = KynRole.Damage,
@@ -1460,12 +1460,12 @@ public static class KynDefinitions
             IsBoss = true
         });
 
-        // The Ancients - Optional Super Bosses
-        // Ancient Hydra - Multi-headed data construct (uses ColosssalSquid as base)
+        // The Uberkyn - Optional Super Bosses
+        // Uberkyn Hydra - Multi-headed data construct (uses ColosssalSquid as base)
         Register(new KynDefinition
         {
-            Id = "ancient_hydra",
-            Name = "The Ancient Hydra",
+            Id = "uberkyn_hydra",
+            Name = "The Uberkyn Hydra",
             Description = "A fragment of Lazarus's original consciousness, split and endlessly regenerating. Each tendril contains a different corrupted memory.",
             CreatureType = CreatureType.ColossalSquid,  // Closest to multi-tentacled horror
             Role = KynRole.Tank,
@@ -1486,11 +1486,11 @@ public static class KynDefinitions
             IsBoss = true
         });
 
-        // Ancient Phoenix - Rebirth construct (uses SugarGlider as flying base)
+        // Uberkyn Phoenix - Rebirth construct (uses SugarGlider as flying base)
         Register(new KynDefinition
         {
-            Id = "ancient_phoenix",
-            Name = "The Ancient Phoenix",
+            Id = "uberkyn_phoenix",
+            Name = "The Uberkyn Phoenix",
             Description = "Born from deleted save states, this creature resurrects endlessly. Only by breaking its cycle can it be defeated.",
             CreatureType = CreatureType.SugarGlider,  // Flying creature base
             Role = KynRole.Damage,
@@ -1511,11 +1511,11 @@ public static class KynDefinitions
             IsBoss = true
         });
 
-        // Ancient Leviathan - Deep data ocean monster (uses GiantPacificOctopus)
+        // Uberkyn Leviathan - Deep data ocean monster (uses GiantPacificOctopus)
         Register(new KynDefinition
         {
-            Id = "ancient_leviathan",
-            Name = "The Ancient Leviathan",
+            Id = "uberkyn_leviathan",
+            Name = "The Uberkyn Leviathan",
             Description = "Lurking in the deepest memory pools, this behemoth predates even Lazarus. What it wants is unknown.",
             CreatureType = CreatureType.GiantPacificOctopus,  // Deep sea horror
             Role = KynRole.Tank,

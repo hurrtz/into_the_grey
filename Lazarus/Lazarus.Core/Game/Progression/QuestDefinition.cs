@@ -21,7 +21,7 @@ public enum QuestType
     Side,
 
     /// <summary>
-    /// Companion quest - related to Bandit/Tinker/Pirate.
+    /// Companion quest - related to Vagus/Opifex/Skari.
     /// </summary>
     Companion,
 

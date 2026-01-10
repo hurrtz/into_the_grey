@@ -43,8 +43,8 @@ class CompanionSelectScreen : GameScreen
             new CompanionOption
             {
                 Type = CompanionType.Dog,
-                Name = "Bandit",
-                Description = "A loyal dog with fierce determination. Bandit was your first friend in the wasteland.",
+                Name = "Vagus",
+                Description = "A loyal dog with fierce determination. Vagus was your first friend in the wasteland.",
                 Personality = "Loyal, protective, brave",
                 Ability = "Gravitation - Deals heavy damage to enemies (may misfire as corruption grows)",
                 Color = Color.Orange
@@ -52,8 +52,8 @@ class CompanionSelectScreen : GameScreen
             new CompanionOption
             {
                 Type = CompanionType.Cat,
-                Name = "Tinker",
-                Description = "A clever cat with sharp instincts. Tinker found you wandering and decided you needed help.",
+                Name = "Opifex",
+                Description = "A clever cat with sharp instincts. Opifex found you wandering and decided you needed help.",
                 Personality = "Curious, independent, cunning",
                 Ability = "Gravitation - Deals heavy damage to enemies (may misfire as corruption grows)",
                 Color = Color.Gray
@@ -61,8 +61,8 @@ class CompanionSelectScreen : GameScreen
             new CompanionOption
             {
                 Type = CompanionType.Rabbit,
-                Name = "Pirate",
-                Description = "A quick rabbit with boundless energy. Pirate thinks you're the key to something important.",
+                Name = "Skari",
+                Description = "A quick rabbit with boundless energy. Skari thinks you're the key to something important.",
                 Personality = "Energetic, optimistic, fast",
                 Ability = "Gravitation - Deals heavy damage to enemies (may misfire as corruption grows)",
                 Color = Color.White

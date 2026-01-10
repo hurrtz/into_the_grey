@@ -7,19 +7,19 @@ namespace Lazarus.Core.Game.Data;
 public enum CompanionType
 {
     /// <summary>
-    /// Dog - Bandit. Named in tribute to We3.
+    /// Dog - Vagus. Named in tribute to We3.
     /// The default choice, referencing Seymour from Futurama.
     /// </summary>
     Dog,
 
     /// <summary>
-    /// Cat - Tinker.
+    /// Cat - Opifex.
     /// References Jonesy from Alien.
     /// </summary>
     Cat,
 
     /// <summary>
-    /// Rabbit - Pirate.
+    /// Rabbit - Skari.
     /// References Hazel from Watership Down.
     /// </summary>
     Rabbit
@@ -35,10 +35,10 @@ public static class CompanionTypeExtensions
     /// </summary>
     public static string GetCompanionName(this CompanionType type) => type switch
     {
-        CompanionType.Dog => "Bandit",
-        CompanionType.Cat => "Tinker",
-        CompanionType.Rabbit => "Pirate",
-        _ => "Bandit"
+        CompanionType.Dog => "Vagus",
+        CompanionType.Cat => "Opifex",
+        CompanionType.Rabbit => "Skari",
+        _ => "Vagus"
     };
 
     /// <summary>

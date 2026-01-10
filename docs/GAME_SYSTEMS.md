@@ -436,7 +436,7 @@ Tracks player accomplishments:
 - Exploration progress
 - Story completions
 
-### Bestiary (Ledger)
+### Bestiary (Kyn-Codex)
 
 **File**: `Lazarus.Core/Game/Progression/Bestiary.cs`
 

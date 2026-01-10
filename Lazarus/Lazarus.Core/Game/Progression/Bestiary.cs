@@ -99,9 +99,9 @@ public class BestiaryEntry
     public DateTime? FirstEncounter { get; set; }
 
     /// <summary>
-    /// Ledger number (order caught). 0 = not yet in ledger.
+    /// Kyn-Codex number (order caught). 0 = not yet in codex.
     /// </summary>
-    public int LedgerNumber { get; set; } = 0;
+    public int CodexNumber { get; set; } = 0;
 
     /// <summary>
     /// Biomes where this Kyn has been encountered.
@@ -172,7 +172,7 @@ public class Bestiary
 {
     private readonly Dictionary<string, BestiaryEntry> _entries = new();
     private readonly List<BestiaryCategory> _categories = new();
-    private int _nextLedgerNumber = 1;
+    private int _nextCodexNumber = 1;
 
     /// <summary>
     /// All bestiary entries.
@@ -200,9 +200,9 @@ public class Bestiary
     public int MasteredCount => _entries.Values.Count(e => e.Status >= DiscoveryStatus.Mastered);
 
     /// <summary>
-    /// Number of entries in the ledger (caught/recruited).
+    /// Number of entries in the Kyn-Codex (caught/recruited).
     /// </summary>
-    public int LedgerCount => _entries.Values.Count(e => e.LedgerNumber > 0);
+    public int CodexCount => _entries.Values.Count(e => e.CodexNumber > 0);
 
     /// <summary>
     /// Overall completion percentage.
@@ -242,19 +242,19 @@ public class Bestiary
                 DefinitionId = def.Id
             };
 
-            // Pre-register companions with their fixed ledger numbers
-            if (def.IsCompanion && def.LedgerNumber > 0)
+            // Pre-register companions with their fixed codex numbers
+            if (def.IsCompanion && def.CodexNumber > 0)
             {
-                entry.LedgerNumber = def.LedgerNumber;
+                entry.CodexNumber = def.CodexNumber;
                 entry.Status = DiscoveryStatus.Recruited;
                 entry.RecruitCount = 1;
                 entry.EncounterCount = 1;
                 entry.FirstEncounter = DateTime.Now;
 
-                // Track highest ledger number for next assignment
-                if (def.LedgerNumber >= _nextLedgerNumber)
+                // Track highest codex number for next assignment
+                if (def.CodexNumber >= _nextCodexNumber)
                 {
-                    _nextLedgerNumber = def.LedgerNumber + 1;
+                    _nextCodexNumber = def.CodexNumber + 1;
                 }
             }
 
@@ -429,10 +429,10 @@ public class Bestiary
         bool isFirstRecruit = entry.RecruitCount == 0;
         entry.RecruitCount++;
 
-        // Assign ledger number on first recruitment
-        if (isFirstRecruit && entry.LedgerNumber == 0)
+        // Assign codex number on first recruitment
+        if (isFirstRecruit && entry.CodexNumber == 0)
         {
-            entry.LedgerNumber = _nextLedgerNumber++;
+            entry.CodexNumber = _nextCodexNumber++;
         }
 
         if (entry.Status < DiscoveryStatus.Recruited)
@@ -510,14 +510,14 @@ public class Bestiary
     }
 
     /// <summary>
-    /// Gets all entries that have been added to the ledger (recruited),
-    /// ordered by their ledger number.
+    /// Gets all entries that have been added to the Kyn-Codex (recruited),
+    /// ordered by their codex number.
     /// </summary>
-    public IEnumerable<BestiaryEntry> GetLedgerEntries()
+    public IEnumerable<BestiaryEntry> GetCodexEntries()
     {
         return _entries.Values
-            .Where(e => e.LedgerNumber > 0)
-            .OrderBy(e => e.LedgerNumber);
+            .Where(e => e.CodexNumber > 0)
+            .OrderBy(e => e.CodexNumber);
     }
 
     /// <summary>
@@ -651,7 +651,7 @@ public class Bestiary
     {
         return new BestiarySaveData
         {
-            NextLedgerNumber = _nextLedgerNumber,
+            NextCodexNumber = _nextCodexNumber,
             Entries = _entries.Values.Select(e => new BestiaryEntrySaveData
             {
                 DefinitionId = e.DefinitionId,
@@ -659,7 +659,7 @@ public class Bestiary
                 EncounterCount = e.EncounterCount,
                 DefeatCount = e.DefeatCount,
                 RecruitCount = e.RecruitCount,
-                LedgerNumber = e.LedgerNumber,
+                CodexNumber = e.CodexNumber,
                 FirstEncounter = e.FirstEncounter,
                 EncounteredBiomes = e.EncounteredBiomes.ToList(),
                 PlayerNotes = e.PlayerNotes
@@ -672,7 +672,7 @@ public class Bestiary
     /// </summary>
     public void Import(BestiarySaveData data)
     {
-        _nextLedgerNumber = data.NextLedgerNumber > 0 ? data.NextLedgerNumber : 1;
+        _nextCodexNumber = data.NextCodexNumber > 0 ? data.NextCodexNumber : 1;
 
         foreach (var entryData in data.Entries)
         {
@@ -682,15 +682,15 @@ public class Bestiary
                 entry.EncounterCount = entryData.EncounterCount;
                 entry.DefeatCount = entryData.DefeatCount;
                 entry.RecruitCount = entryData.RecruitCount;
-                entry.LedgerNumber = entryData.LedgerNumber;
+                entry.CodexNumber = entryData.CodexNumber;
                 entry.FirstEncounter = entryData.FirstEncounter;
                 entry.EncounteredBiomes = new HashSet<string>(entryData.EncounteredBiomes);
                 entry.PlayerNotes = entryData.PlayerNotes ?? "";
 
-                // Update next ledger number if needed
-                if (entry.LedgerNumber >= _nextLedgerNumber)
+                // Update next codex number if needed
+                if (entry.CodexNumber >= _nextCodexNumber)
                 {
-                    _nextLedgerNumber = entry.LedgerNumber + 1;
+                    _nextCodexNumber = entry.CodexNumber + 1;
                 }
             }
         }
@@ -744,7 +744,7 @@ public class BestiaryMilestone
 /// </summary>
 public class BestiarySaveData
 {
-    public int NextLedgerNumber { get; set; } = 1;
+    public int NextCodexNumber { get; set; } = 1;
     public List<BestiaryEntrySaveData> Entries { get; set; } = new();
 }
 
@@ -758,7 +758,7 @@ public class BestiaryEntrySaveData
     public int EncounterCount { get; set; }
     public int DefeatCount { get; set; }
     public int RecruitCount { get; set; }
-    public int LedgerNumber { get; set; }
+    public int CodexNumber { get; set; }
     public DateTime? FirstEncounter { get; set; }
     public List<string> EncounteredBiomes { get; set; } = new();
     public string? PlayerNotes { get; set; }

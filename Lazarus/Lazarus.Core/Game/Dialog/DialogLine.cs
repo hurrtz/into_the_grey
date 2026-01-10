@@ -33,7 +33,7 @@ public enum SpeakerType
     Protagonist,
 
     /// <summary>
-    /// The companion (Bandit/Tinker/Pirate).
+    /// The companion (Vagus/Opifex/Skari).
     /// </summary>
     Companion,
 

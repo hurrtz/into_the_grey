@@ -26,7 +26,7 @@ public enum MenuTab
     Inventory,
     Factions,
     Map,
-    Ledger,
+    Codex,
     Game
 }
 
@@ -76,10 +76,10 @@ public class GameMenuScreen : GameScreen
     private BiomeType _mapSelectedBiome;
     private Dictionary<BiomeType, Vector2> _biomePositions = new();
 
-    // Ledger tab state
-    private int _ledgerEntryIndex = 0;
-    private int _ledgerScroll = 0;
-    private List<BestiaryEntry> _ledgerEntries = new();
+    // Codex tab state
+    private int _codexEntryIndex = 0;
+    private int _codexScroll = 0;
+    private List<BestiaryEntry> _codexEntries = new();
 
     // Game tab state
     private int _gameOptionIndex = 0;
@@ -130,8 +130,8 @@ public class GameMenuScreen : GameScreen
             InitializeBiomePositions();
         }
 
-        // Initialize ledger
-        RefreshLedger();
+        // Initialize codex
+        RefreshCodex();
     }
 
     private void InitializeBiomePositions()
@@ -149,12 +149,12 @@ public class GameMenuScreen : GameScreen
         _biomePositions[BiomeType.ArchiveScar] = new Vector2(cx + spacing, cy - spacing);
     }
 
-    private void RefreshLedger()
+    private void RefreshCodex()
     {
-        // Get ledger entries ordered by ledger number (catch order)
-        _ledgerEntries = _bestiary.GetLedgerEntries().ToList();
-        _ledgerEntryIndex = Math.Min(_ledgerEntryIndex, Math.Max(0, _ledgerEntries.Count - 1));
-        _ledgerScroll = 0;
+        // Get codex entries ordered by codex number (catch order)
+        _codexEntries = _bestiary.GetCodexEntries().ToList();
+        _codexEntryIndex = Math.Min(_codexEntryIndex, Math.Max(0, _codexEntries.Count - 1));
+        _codexScroll = 0;
     }
 
     public override void LoadContent()
@@ -228,8 +228,8 @@ public class GameMenuScreen : GameScreen
             case MenuTab.Map:
                 HandleMapInput(input);
                 break;
-            case MenuTab.Ledger:
-                HandleLedgerInput(input);
+            case MenuTab.Codex:
+                HandleCodexInput(input);
                 break;
             case MenuTab.Game:
                 HandleGameInput(input);
@@ -527,29 +527,29 @@ public class GameMenuScreen : GameScreen
 
     #endregion
 
-    #region Ledger Tab
+    #region Codex Tab
 
-    private void HandleLedgerInput(InputState input)
+    private void HandleCodexInput(InputState input)
     {
         // Simple up/down navigation through the numbered list
         if (input.IsMenuUp(ControllingPlayer))
         {
-            _ledgerEntryIndex = Math.Max(0, _ledgerEntryIndex - 1);
-            UpdateLedgerScroll();
+            _codexEntryIndex = Math.Max(0, _codexEntryIndex - 1);
+            UpdateCodexScroll();
         }
         else if (input.IsMenuDown(ControllingPlayer))
         {
-            _ledgerEntryIndex = Math.Min(_ledgerEntries.Count - 1, _ledgerEntryIndex + 1);
-            UpdateLedgerScroll();
+            _codexEntryIndex = Math.Min(_codexEntries.Count - 1, _codexEntryIndex + 1);
+            UpdateCodexScroll();
         }
     }
 
-    private void UpdateLedgerScroll()
+    private void UpdateCodexScroll()
     {
-        if (_ledgerEntryIndex < _ledgerScroll)
-            _ledgerScroll = _ledgerEntryIndex;
-        else if (_ledgerEntryIndex >= _ledgerScroll + MaxVisibleItems)
-            _ledgerScroll = _ledgerEntryIndex - MaxVisibleItems + 1;
+        if (_codexEntryIndex < _codexScroll)
+            _codexScroll = _codexEntryIndex;
+        else if (_codexEntryIndex >= _codexScroll + MaxVisibleItems)
+            _codexScroll = _codexEntryIndex - MaxVisibleItems + 1;
     }
 
     #endregion
@@ -647,8 +647,8 @@ public class GameMenuScreen : GameScreen
             case MenuTab.Map:
                 DrawMapTab(contentBounds);
                 break;
-            case MenuTab.Ledger:
-                DrawLedgerTab(contentBounds);
+            case MenuTab.Codex:
+                DrawCodexTab(contentBounds);
                 break;
             case MenuTab.Game:
                 DrawGameTab(contentBounds);
@@ -680,7 +680,7 @@ public class GameMenuScreen : GameScreen
                 MenuTab.Inventory => "INVENTORY",
                 MenuTab.Factions => "FACTIONS",
                 MenuTab.Map => "MAP",
-                MenuTab.Ledger => "THE LEDGER",
+                MenuTab.Codex => "KYN-CODEX",
                 MenuTab.Game => "GAME",
                 _ => tab.ToString()
             };
@@ -705,7 +705,7 @@ public class GameMenuScreen : GameScreen
             MenuTab.Inventory => "[Up/Down] Select | [Left/Right] Category | [Q/E] Tab",
             MenuTab.Factions => "[Up/Down] Select | [Q/E] Tab",
             MenuTab.Map => "[Arrows] Navigate | [Enter] Travel | [Q/E] Tab",
-            MenuTab.Ledger => "[Up/Down] Select | [Q/E] Tab",
+            MenuTab.Codex => "[Up/Down] Select | [Q/E] Tab",
             MenuTab.Game => "[Up/Down] Select | [Enter] Confirm | [Q/E] Tab",
             _ => "[Q/E] Switch Tab | [Esc] Close"
         };
@@ -1094,12 +1094,12 @@ public class GameMenuScreen : GameScreen
 
     #endregion
 
-    #region Ledger Tab Drawing
+    #region Codex Tab Drawing
 
-    private void DrawLedgerTab(Rectangle bounds)
+    private void DrawCodexTab(Rectangle bounds)
     {
         // Title with count (Pokédex style)
-        string title = $"THE LEDGER - {_bestiary.LedgerCount} / {_bestiary.TotalEntries} Caught";
+        string title = $"KYN-CODEX - {_bestiary.CodexCount} / {_bestiary.TotalEntries} Caught";
         _spriteBatch!.DrawString(_titleFont!, title, new Vector2(bounds.X + 10, bounds.Y + 5), AccentColor * _transitionAlpha);
 
         int y = bounds.Y + 40;
@@ -1109,34 +1109,34 @@ public class GameMenuScreen : GameScreen
         var listBounds = new Rectangle(bounds.X, y, listWidth, bounds.Height - (y - bounds.Y));
         var detailBounds = new Rectangle(bounds.X + listWidth + 10, y, bounds.Width - listWidth - 10, bounds.Height - (y - bounds.Y));
 
-        DrawLedgerList(listBounds);
-        DrawLedgerDetails(detailBounds);
+        DrawCodexList(listBounds);
+        DrawCodexDetails(detailBounds);
     }
 
-    private void DrawLedgerList(Rectangle bounds)
+    private void DrawCodexList(Rectangle bounds)
     {
         DrawPanel(bounds, true);
 
-        if (_ledgerEntries.Count == 0)
+        if (_codexEntries.Count == 0)
         {
             _spriteBatch!.DrawString(_font!, "No Kyns caught yet", new Vector2(bounds.X + 10, bounds.Y + 10), DimColor * _transitionAlpha);
             _spriteBatch.DrawString(_font!, "Recruit Kyns to add", new Vector2(bounds.X + 10, bounds.Y + 30), DimColor * _transitionAlpha);
-            _spriteBatch.DrawString(_font!, "them to your Ledger.", new Vector2(bounds.X + 10, bounds.Y + 50), DimColor * _transitionAlpha);
+            _spriteBatch.DrawString(_font!, "them to your Kyn-Codex.", new Vector2(bounds.X + 10, bounds.Y + 50), DimColor * _transitionAlpha);
             return;
         }
 
         int y = bounds.Y + 5;
-        for (int i = 0; i < MaxVisibleItems && i + _ledgerScroll < _ledgerEntries.Count; i++)
+        for (int i = 0; i < MaxVisibleItems && i + _codexScroll < _codexEntries.Count; i++)
         {
-            int idx = i + _ledgerScroll;
-            var entry = _ledgerEntries[idx];
-            bool selected = idx == _ledgerEntryIndex;
+            int idx = i + _codexScroll;
+            var entry = _codexEntries[idx];
+            bool selected = idx == _codexEntryIndex;
 
             var rect = new Rectangle(bounds.X + 3, y, bounds.Width - 6, 32);
             if (selected) DrawRect(rect, SelectColor * _transitionAlpha);
 
-            // Ledger number (Pokédex style)
-            string number = $"#{entry.LedgerNumber:D3}";
+            // Codex number (Pokédex style)
+            string number = $"#{entry.CodexNumber:D3}";
             _spriteBatch!.DrawString(_font!, number, new Vector2(rect.X + 5, rect.Y + 6),
                 DimColor * _transitionAlpha);
 
@@ -1149,32 +1149,32 @@ public class GameMenuScreen : GameScreen
         }
 
         // Scroll indicator
-        if (_ledgerEntries.Count > MaxVisibleItems)
+        if (_codexEntries.Count > MaxVisibleItems)
         {
-            string scrollInfo = $"{_ledgerScroll + 1}-{Math.Min(_ledgerScroll + MaxVisibleItems, _ledgerEntries.Count)} of {_ledgerEntries.Count}";
+            string scrollInfo = $"{_codexScroll + 1}-{Math.Min(_codexScroll + MaxVisibleItems, _codexEntries.Count)} of {_codexEntries.Count}";
             _spriteBatch!.DrawString(_font!, scrollInfo,
                 new Vector2(bounds.X + 5, bounds.Y + bounds.Height - 20),
                 DimColor * 0.7f * _transitionAlpha);
         }
     }
 
-    private void DrawLedgerDetails(Rectangle bounds)
+    private void DrawCodexDetails(Rectangle bounds)
     {
         DrawPanel(bounds, false);
 
-        if (_ledgerEntries.Count == 0 || _ledgerEntryIndex >= _ledgerEntries.Count)
+        if (_codexEntries.Count == 0 || _codexEntryIndex >= _codexEntries.Count)
         {
             _spriteBatch!.DrawString(_font!, "Catch Kyns to view", new Vector2(bounds.X + 10, bounds.Y + 10), DimColor * _transitionAlpha);
             _spriteBatch.DrawString(_font!, "their details here.", new Vector2(bounds.X + 10, bounds.Y + 30), DimColor * _transitionAlpha);
             return;
         }
 
-        var entry = _ledgerEntries[_ledgerEntryIndex];
+        var entry = _codexEntries[_codexEntryIndex];
         var def = KynDefinitions.Get(entry.DefinitionId);
         int y = bounds.Y + 10;
 
-        // Ledger number and name
-        string header = $"#{entry.LedgerNumber:D3} - {_bestiary.GetDisplayName(entry.DefinitionId)}";
+        // Codex number and name
+        string header = $"#{entry.CodexNumber:D3} - {_bestiary.GetDisplayName(entry.DefinitionId)}";
         _spriteBatch!.DrawString(_titleFont!, header, new Vector2(bounds.X + 10, y), AccentColor * _transitionAlpha);
         y += 35;
 

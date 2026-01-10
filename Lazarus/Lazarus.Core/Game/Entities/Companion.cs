@@ -7,7 +7,7 @@ using Lazarus.Core.Services;
 namespace Lazarus.Core.Game.Entities;
 
 /// <summary>
-/// The companion Kyn - Bandit (dog), Tinker (cat), or Pirate (rabbit).
+/// The companion Kyn - Vagus (dog), Opifex (cat), or Skari (rabbit).
 /// Follows the protagonist on the overworld and can intervene in combat.
 /// Named in tribute to We3 by Grant Morrison.
 /// </summary>
@@ -37,7 +37,7 @@ public class Companion
     public CompanionType Type { get; }
 
     /// <summary>
-    /// The companion's name (Bandit, Tinker, or Pirate).
+    /// The companion's name (Vagus, Opifex, or Skari).
     /// </summary>
     public string Name => Type.GetCompanionName();
 
@@ -67,7 +67,7 @@ public class Companion
 
     /// <summary>
     /// Whether the companion is present with the party.
-    /// In Act 3, Bandit leaves to protect the protagonist.
+    /// In Act 3, Vagus leaves to protect the protagonist.
     /// </summary>
     public bool IsPresent => _gameState?.CompanionPresent ?? true;
 
@@ -234,9 +234,9 @@ public class Companion
     {
         return Type switch
         {
-            CompanionType.Dog => Color.Orange,        // Bandit
-            CompanionType.Cat => Color.Purple,        // Tinker
-            CompanionType.Rabbit => Color.LightGray,  // Pirate
+            CompanionType.Dog => Color.Orange,        // Vagus
+            CompanionType.Cat => Color.Purple,        // Opifex
+            CompanionType.Rabbit => Color.LightGray,  // Skari
             _ => Color.Orange
         };
     }

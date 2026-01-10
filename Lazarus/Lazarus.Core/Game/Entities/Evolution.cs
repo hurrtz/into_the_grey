@@ -461,7 +461,7 @@ public static class Evolutions
 
     private static void RegisterCompanionEvolutions()
     {
-        // Bandit's evolution through Gravitation stress
+        // Vagus's evolution through Gravitation stress
         Register(new EvolutionDefinition
         {
             Id = "bandit_stress_evolve",
@@ -472,13 +472,13 @@ public static class Evolutions
             StatMultipliers = new() { { "Attack", 1.5f }, { "Special", 1.5f }, { "Defense", 0.9f } },
             UnlockedAbilities = new() { "corrupted_strike" },
             NewColor = Color.DarkOrange,
-            Description = "Bandit's power is growing... but at what cost?"
+            Description = "Vagus's power is growing... but at what cost?"
         });
 
-        // Tinker's evolution
+        // Opifex's evolution
         Register(new EvolutionDefinition
         {
-            Id = "tinker_stress_evolve",
+            Id = "opifex_stress_evolve",
             FromKynId = "companion_cat",
             ToKynId = "companion_cat_evolved",
             Trigger = EvolutionTrigger.Stress,
@@ -486,20 +486,20 @@ public static class Evolutions
             StatMultipliers = new() { { "Special", 1.6f }, { "Speed", 1.3f } },
             UnlockedAbilities = new() { "mind_blast" },
             NewElement = Element.Psionic,
-            Description = "Tinker's mind expands beyond normal limits..."
+            Description = "Opifex's mind expands beyond normal limits..."
         });
 
-        // Pirate's evolution
+        // Skari's evolution
         Register(new EvolutionDefinition
         {
-            Id = "pirate_stress_evolve",
+            Id = "skari_stress_evolve",
             FromKynId = "companion_rabbit",
             ToKynId = "companion_rabbit_evolved",
             Trigger = EvolutionTrigger.Stress,
             RequiredStress = 80,
             StatMultipliers = new() { { "Speed", 1.7f }, { "Attack", 1.3f } },
             UnlockedAbilities = new() { "multi_strike" },
-            Description = "Pirate becomes a blur of motion and fury..."
+            Description = "Skari becomes a blur of motion and fury..."
         });
     }
 
@@ -522,7 +522,7 @@ public static class Evolutions
             Description = "Lazarus's corruption consumes the Kyn..."
         });
 
-        // Special: Bandit's final corrupted form (Act 3)
+        // Special: Vagus's final corrupted form (Act 3)
         Register(new EvolutionDefinition
         {
             Id = "bandit_hyper_evolved",
@@ -535,7 +535,7 @@ public static class Evolutions
             NewElement = Element.Corruption,
             NewColor = Color.Black,
             IsCorruptedEvolution = true,
-            Description = "Bandit has become something terrifying... and sad."
+            Description = "Vagus has become something terrifying... and sad."
         });
     }
 }
