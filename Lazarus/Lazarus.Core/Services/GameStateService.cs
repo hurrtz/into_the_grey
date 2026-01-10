@@ -458,6 +458,56 @@ public class GameStateService
 
     #endregion
 
+    #region Wild Kyn Management
+
+    /// <summary>
+    /// Marks a wild Kyn as defeated. Defeated wild Kyns can be
+    /// approached for recruitment without fighting again.
+    /// </summary>
+    /// <param name="wildKynId">Unique identifier of the wild Kyn.</param>
+    public void DefeatWildKyn(string wildKynId)
+    {
+        _currentData.DefeatedWildKyns.Add(wildKynId);
+        System.Diagnostics.Debug.WriteLine($"[WildKyn] Marked '{wildKynId}' as defeated.");
+    }
+
+    /// <summary>
+    /// Checks if a wild Kyn has been defeated.
+    /// </summary>
+    /// <param name="wildKynId">Unique identifier of the wild Kyn.</param>
+    /// <returns>True if the wild Kyn has been defeated.</returns>
+    public bool IsWildKynDefeated(string wildKynId)
+    {
+        return _currentData.DefeatedWildKyns.Contains(wildKynId);
+    }
+
+    /// <summary>
+    /// Recruits a wild Kyn, removing it from the world.
+    /// This is called after successful recruitment.
+    /// </summary>
+    /// <param name="wildKynId">Unique identifier of the wild Kyn.</param>
+    public void RecruitWildKyn(string wildKynId)
+    {
+        // The wild Kyn stays in DefeatedWildKyns to track it was recruited
+        // (prevents it from respawning). WorldScreen will handle visual removal.
+        _currentData.DefeatedWildKyns.Add(wildKynId);
+        SetFlag($"recruited_wild_kyn_{wildKynId}");
+        RecordKynRecruited();
+        System.Diagnostics.Debug.WriteLine($"[WildKyn] Recruited '{wildKynId}'.");
+    }
+
+    /// <summary>
+    /// Checks if a wild Kyn has been recruited (no longer on map).
+    /// </summary>
+    /// <param name="wildKynId">Unique identifier of the wild Kyn.</param>
+    /// <returns>True if the wild Kyn has been recruited.</returns>
+    public bool IsWildKynRecruited(string wildKynId)
+    {
+        return HasFlag($"recruited_wild_kyn_{wildKynId}");
+    }
+
+    #endregion
+
     #region Save/Load
 
     /// <summary>

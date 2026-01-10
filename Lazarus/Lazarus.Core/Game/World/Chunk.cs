@@ -43,9 +43,14 @@ public class Chunk
     public TiledMap? Map { get; private set; }
 
     /// <summary>
-    /// Encounters in this chunk.
+    /// Encounters (hostile enemies) in this chunk.
     /// </summary>
     public List<Encounter> Encounters { get; } = new();
+
+    /// <summary>
+    /// Wild Kyns (recruitable creatures) in this chunk.
+    /// </summary>
+    public List<WildKyn> WildKyns { get; } = new();
 
     /// <summary>
     /// Path to the .tmx file for this chunk.
@@ -213,5 +218,21 @@ public class Chunk
     public void RemoveEncounter(Encounter encounter)
     {
         Encounters.Remove(encounter);
+    }
+
+    /// <summary>
+    /// Adds a wild Kyn to this chunk.
+    /// </summary>
+    public void AddWildKyn(WildKyn wildKyn)
+    {
+        WildKyns.Add(wildKyn);
+    }
+
+    /// <summary>
+    /// Removes a wild Kyn from this chunk.
+    /// </summary>
+    public void RemoveWildKyn(WildKyn wildKyn)
+    {
+        WildKyns.Remove(wildKyn);
     }
 }

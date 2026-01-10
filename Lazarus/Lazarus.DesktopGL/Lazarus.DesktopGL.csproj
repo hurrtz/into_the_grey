@@ -20,6 +20,13 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
+    <!-- Copy wild kyn sprites -->
+    <ItemGroup>
+        <Content Include="..\Lazarus.Core\Content\Sprites\DefaultKyn\**\*">
+            <Link>Content\Sprites\DefaultKyn\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Lazarus.Core\Lazarus.Core.csproj"/>
     </ItemGroup>

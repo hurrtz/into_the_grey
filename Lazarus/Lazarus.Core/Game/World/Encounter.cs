@@ -56,8 +56,10 @@ public class Encounter
 
     /// <summary>
     /// Whether this encounter can result in recruitment after victory.
+    /// Encounters are hostile enemies - they don't offer recruitment.
+    /// For recruitable creatures, use WildKyn instead.
     /// </summary>
-    public bool CanRecruit { get; set; } = true;
+    public bool CanRecruit { get; set; } = false;
 
     /// <summary>
     /// Bounding rectangle for collision detection.

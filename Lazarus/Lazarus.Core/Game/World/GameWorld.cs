@@ -640,6 +640,65 @@ public class GameWorld
 
             chunk.AddEncounter(encounter);
         }
+
+        // Also add wild Kyns (recruitable creatures)
+        AddBiomeWildKyns(chunk);
+    }
+
+    /// <summary>
+    /// Adds wild Kyns (recruitable creatures) to a chunk.
+    /// Wild Kyns are separate from encounters - they can be recruited after being defeated.
+    /// </summary>
+    private void AddBiomeWildKyns(Chunk chunk)
+    {
+        var biomeDef = BiomeData.GetDefinition(chunk.Biome);
+
+        // Fewer wild Kyns than encounters (they're special)
+        int wildKynCount = Math.Max(1, (int)(3 * biomeDef.EncounterRate));
+
+        for (int i = 0; i < wildKynCount; i++)
+        {
+            // Position in chunk (avoid edges)
+            var position = new Vector2(
+                200 + _random.Next((int)chunk.Size.X - 400),
+                200 + _random.Next((int)chunk.Size.Y - 400)
+            );
+
+            // Select a Kyn type from biome's native list
+            string kynDefId = "echo_pup"; // Default fallback
+            if (biomeDef.NativeKyns.Count > 0)
+            {
+                // 20% chance for rare Kyns if available
+                if (biomeDef.RareKyns.Count > 0 && _random.NextDouble() < 0.2)
+                {
+                    kynDefId = biomeDef.RareKyns[_random.Next(biomeDef.RareKyns.Count)];
+                }
+                else
+                {
+                    kynDefId = biomeDef.NativeKyns[_random.Next(biomeDef.NativeKyns.Count)];
+                }
+            }
+
+            var wildKyn = WildKyn.CreateInChunk(
+                $"wild_{chunk.Id}_{i}",
+                kynDefId,
+                chunk.Biome,
+                chunk.Bounds,
+                _random
+            );
+
+            // Restore defeated/recruited state from save
+            if (_gameState.IsWildKynRecruited(wildKyn.Id))
+            {
+                wildKyn.IsRecruited = true;
+            }
+            else if (_gameState.IsWildKynDefeated(wildKyn.Id))
+            {
+                wildKyn.IsDefeated = true;
+            }
+
+            chunk.AddWildKyn(wildKyn);
+        }
     }
 
     /// <summary>
@@ -869,6 +928,61 @@ public class GameWorld
     }
 
     /// <summary>
+    /// Gets all wild Kyns that collide with a bounding box.
+    /// </summary>
+    public IEnumerable<WildKyn> GetCollidingWildKyns(Rectangle bounds)
+    {
+        foreach (var chunk in LoadedChunks)
+        {
+            foreach (var wildKyn in chunk.WildKyns)
+            {
+                if (wildKyn.CheckCollision(bounds))
+                    yield return wildKyn;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets a wild Kyn by its ID.
+    /// </summary>
+    public WildKyn? GetWildKyn(string wildKynId)
+    {
+        foreach (var chunk in _chunks.Values)
+        {
+            var wildKyn = chunk.WildKyns.FirstOrDefault(w => w.Id == wildKynId);
+            if (wildKyn != null)
+                return wildKyn;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Marks a wild Kyn as defeated.
+    /// </summary>
+    public void DefeatWildKyn(string wildKynId)
+    {
+        var wildKyn = GetWildKyn(wildKynId);
+        if (wildKyn != null)
+        {
+            wildKyn.IsDefeated = true;
+            _gameState.DefeatWildKyn(wildKynId);
+        }
+    }
+
+    /// <summary>
+    /// Marks a wild Kyn as recruited (removes from world).
+    /// </summary>
+    public void RecruitWildKyn(string wildKynId)
+    {
+        var wildKyn = GetWildKyn(wildKynId);
+        if (wildKyn != null)
+        {
+            wildKyn.IsRecruited = true;
+            _gameState.RecruitWildKyn(wildKynId);
+        }
+    }
+
+    /// <summary>
     /// Marks an encounter as cleared.
     /// </summary>
     public void ClearEncounter(string encounterId)
@@ -914,12 +1028,28 @@ public class GameWorld
                 chunk.DrawPlaceholder(spriteBatch, pixelTexture, _cameraPosition);
             }
 
-            // Draw encounters
+            // Draw encounters (hostile enemies)
             foreach (var encounter in chunk.Encounters)
             {
                 encounter.Draw(spriteBatch, pixelTexture, font, _cameraPosition);
             }
+
+            // Draw wild Kyns (recruitable creatures)
+            foreach (var wildKyn in chunk.WildKyns)
+            {
+                wildKyn.Draw(spriteBatch, pixelTexture, font, _cameraPosition);
+            }
         }
+    }
+
+    /// <summary>
+    /// Loads the wild Kyn sprite texture.
+    /// Call this after graphics device is ready.
+    /// </summary>
+    /// <param name="contentPath">Path to the Content folder.</param>
+    public void LoadWildKynSprite(string contentPath)
+    {
+        WildKyn.LoadContent(_graphicsDevice, contentPath);
     }
 
     /// <summary>

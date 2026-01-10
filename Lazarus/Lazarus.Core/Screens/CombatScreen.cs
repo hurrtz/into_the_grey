@@ -245,23 +245,20 @@ public class CombatScreen : GameScreen
 
     private void OnCombatStateEnded(object? sender, CombatPhase phase)
     {
-        // Wait a moment before closing
-        System.Threading.Tasks.Task.Delay(1500).ContinueWith(_ =>
+        // Fire event immediately - caller (WorldScreen) will show VictoryScreen
+        var args = new CombatEndedEventArgs
         {
-            var args = new CombatEndedEventArgs
-            {
-                Victory = phase == CombatPhase.Victory,
-                Defeat = phase == CombatPhase.Defeat,
-                Fled = phase == CombatPhase.Fled,
-                ExperienceEarned = _combatState.ExperienceEarned,
-                CurrencyEarned = _combatState.CurrencyEarned,
-                TelemetryUnitsEarned = _combatState.TelemetryUnitsEarned,
-                RecruitedKyn = _combatState.RecruitableKyn
-            };
+            Victory = phase == CombatPhase.Victory,
+            Defeat = phase == CombatPhase.Defeat,
+            Fled = phase == CombatPhase.Fled,
+            ExperienceEarned = _combatState.ExperienceEarned,
+            CurrencyEarned = _combatState.CurrencyEarned,
+            TelemetryUnitsEarned = _combatState.TelemetryUnitsEarned,
+            RecruitedKyn = _combatState.RecruitableKyn
+        };
 
-            CombatEnded?.Invoke(this, args);
-            ExitScreen();
-        });
+        CombatEnded?.Invoke(this, args);
+        ExitScreen();
     }
 
     private void OnCompanionIntervened(object? sender, GravitationInterventionEventArgs e)

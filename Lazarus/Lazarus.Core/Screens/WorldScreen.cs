@@ -45,9 +45,11 @@ public class WorldScreen : GameScreen
 
     // State
     private Encounter? _triggeredEncounter;
+    private WildKyn? _triggeredWildKyn;
     private NPC? _nearbyNPC;
     private Settlement? _currentSettlement;
     private Kyn? _pendingRecruitment;
+    private WildKyn? _pendingWildKynRecruitment;
 
     // Biome transition state
     private BiomeType _previousBiome;
@@ -66,6 +68,9 @@ public class WorldScreen : GameScreen
     private BuildingPortal? _nearbyBuildingPortal;
     private InteriorInstance? _currentInterior;
     private bool _isInInterior = false;
+
+    // Wild kyn proximity (for manual interaction)
+    private WildKyn? _nearbyWildKyn;
 
     // Weather particles
     private List<WeatherParticle> _weatherParticles = new();
@@ -139,6 +144,9 @@ public class WorldScreen : GameScreen
         _world = new GameWorld(ScreenManager.GraphicsDevice, _gameState);
         _world.SetViewportSize(new Vector2(ScreenManager.BaseScreenSize.X, ScreenManager.BaseScreenSize.Y));
         _world.Initialize();
+
+        // Load wild kyn sprites
+        _world.LoadWildKynSprite(contentPath);
 
         // Subscribe to world events
         _world.BiomeChanged += OnBiomeChanged;
@@ -621,6 +629,13 @@ public class WorldScreen : GameScreen
             return;
         }
 
+        // Check for nearby wild kyn
+        if (_nearbyWildKyn != null)
+        {
+            InteractWithWildKyn(_nearbyWildKyn);
+            return;
+        }
+
         // Check for nearby NPC
         if (_nearbyNPC != null)
         {
@@ -916,6 +931,9 @@ public class WorldScreen : GameScreen
             CheckEncounters();
         }
 
+        // Update nearby wild kyn for interaction prompt (always check, but interaction requires E key)
+        UpdateNearbyWildKyn();
+
         // Update biome transition
         if (_biomeTransitionAlpha > 0)
         {
@@ -1203,6 +1221,163 @@ public class WorldScreen : GameScreen
     }
 
     /// <summary>
+    /// Updates the nearby wild kyn reference for interaction prompts.
+    /// Does NOT automatically trigger interaction - player must press E.
+    /// </summary>
+    private void UpdateNearbyWildKyn()
+    {
+        _nearbyWildKyn = null;
+
+        if (_triggeredWildKyn != null || _triggeredEncounter != null)
+            return; // Already in combat or interacting
+
+        var collidingWildKyns = _world.GetCollidingWildKyns(_protagonist.BoundingBox);
+        var wildKyn = collidingWildKyns.FirstOrDefault();
+
+        if (wildKyn != null && !_gameState.IsWildKynRecruited(wildKyn.Id))
+        {
+            _nearbyWildKyn = wildKyn;
+        }
+    }
+
+    /// <summary>
+    /// Initiates interaction with a wild kyn (called when player presses E).
+    /// </summary>
+    private void InteractWithWildKyn(WildKyn wildKyn)
+    {
+        _triggeredWildKyn = wildKyn;
+
+        if (wildKyn.IsDefeated || _gameState.IsWildKynDefeated(wildKyn.Id))
+        {
+            // Already defeated - go directly to recruitment
+            wildKyn.IsDefeated = true;
+            ShowWildKynRecruitment(wildKyn);
+        }
+        else
+        {
+            // First encounter - must fight
+            StartWildKynCombat(wildKyn);
+        }
+    }
+
+    /// <summary>
+    /// Starts combat with a wild kyn.
+    /// </summary>
+    private void StartWildKynCombat(WildKyn wildKyn)
+    {
+        // Create enemy kyn for combat
+        var enemyKyn = wildKyn.CreateKynForCombat();
+        if (enemyKyn == null)
+        {
+            _triggeredWildKyn = null;
+            return;
+        }
+
+        var enemies = new List<Kyn> { enemyKyn };
+
+        // Create and add combat screen (no encounter, combat is with wild kyn)
+        var combatScreen = new CombatScreen(_roster.Party.ToList(), enemies, null, _companion, _gameState);
+        combatScreen.CombatEnded += OnWildKynCombatEnded;
+        ScreenManager.AddScreen(combatScreen, ControllingPlayer);
+    }
+
+    /// <summary>
+    /// Called when combat with a wild kyn ends.
+    /// </summary>
+    private void OnWildKynCombatEnded(object? sender, CombatEndedEventArgs e)
+    {
+        if (e.Victory && _triggeredWildKyn != null)
+        {
+            // Mark wild kyn as defeated
+            _triggeredWildKyn.IsDefeated = true;
+            _gameState.DefeatWildKyn(_triggeredWildKyn.Id);
+            _world.DefeatWildKyn(_triggeredWildKyn.Id);
+
+            // Award experience
+            _roster.AwardExperience(e.ExperienceEarned);
+
+            // Award currency
+            _gameState.AddCurrency(e.CurrencyEarned);
+
+            // Track battle won
+            _gameState.RecordBattleWon();
+
+            // Show victory screen
+            var entityName = _triggeredWildKyn.KynDefinitionId;
+            ShowVictoryScreen(e.ExperienceEarned, e.CurrencyEarned, e.TelemetryUnitsEarned, entityName);
+        }
+        else if (e.Fled)
+        {
+            // Move protagonist away
+            _protagonist.ApplyCollisionPush(new Vector2(0, -50));
+            _triggeredWildKyn = null;
+        }
+        else if (e.Defeat)
+        {
+            // Game over handling - heal and respawn
+            _roster.HealParty();
+            _roster.ReviveParty();
+            _triggeredWildKyn = null;
+        }
+    }
+
+    /// <summary>
+    /// Shows the victory screen after combat.
+    /// </summary>
+    private void ShowVictoryScreen(int experience, int currency, int telemetryUnits, string? entityName = null)
+    {
+        var victoryScreen = new VictoryScreen(experience, currency, telemetryUnits, entityName);
+        victoryScreen.Dismissed += OnVictoryScreenDismissed;
+        ScreenManager.AddScreen(victoryScreen, ControllingPlayer);
+    }
+
+    /// <summary>
+    /// Called when the victory screen is dismissed.
+    /// </summary>
+    private void OnVictoryScreenDismissed(object? sender, EventArgs e)
+    {
+        // For wild kyns, don't auto-show recruitment - player must re-approach
+        _triggeredWildKyn = null;
+        _triggeredEncounter = null;
+    }
+
+    /// <summary>
+    /// Shows the recruitment screen for a defeated wild kyn.
+    /// </summary>
+    private void ShowWildKynRecruitment(WildKyn wildKyn)
+    {
+        var kyn = wildKyn.CreateKynForRecruitment();
+        if (kyn == null)
+        {
+            _triggeredWildKyn = null;
+            return;
+        }
+
+        _pendingWildKynRecruitment = wildKyn;
+        var recruitScreen = new RecruitmentScreen(kyn, _recruitmentManager);
+        recruitScreen.RecruitmentComplete += OnWildKynRecruitmentComplete;
+        ScreenManager.AddScreen(recruitScreen, ControllingPlayer);
+    }
+
+    /// <summary>
+    /// Called when wild kyn recruitment completes.
+    /// </summary>
+    private void OnWildKynRecruitmentComplete(object? sender, RecruitmentResult result)
+    {
+        if (result == RecruitmentResult.Success && _pendingWildKynRecruitment != null)
+        {
+            // Mark as recruited - remove from world
+            _gameState.RecruitWildKyn(_pendingWildKynRecruitment.Id);
+            _world.RecruitWildKyn(_pendingWildKynRecruitment.Id);
+            _questLog.NotifyRecruitedKyn(_pendingWildKynRecruitment.KynDefinitionId);
+        }
+
+        // Clear state - if refused, player can re-approach
+        _pendingWildKynRecruitment = null;
+        _triggeredWildKyn = null;
+    }
+
+    /// <summary>
     /// Starts combat with an encounter.
     /// </summary>
     private void StartCombat(Encounter encounter)
@@ -1235,7 +1410,7 @@ public class WorldScreen : GameScreen
     }
 
     /// <summary>
-    /// Called when combat ends.
+    /// Called when combat with an encounter ends.
     /// </summary>
     private void OnCombatEnded(object? sender, CombatEndedEventArgs e)
     {
@@ -1248,7 +1423,7 @@ public class WorldScreen : GameScreen
             _questLog.NotifyDefeatedEncounter(_triggeredEncounter.Id);
 
             // Award experience
-            var leveledUp = _roster.AwardExperience(e.ExperienceEarned);
+            _roster.AwardExperience(e.ExperienceEarned);
 
             // Award currency
             _gameState.AddCurrency(e.CurrencyEarned);
@@ -1256,26 +1431,22 @@ public class WorldScreen : GameScreen
             // Track battle won
             _gameState.RecordBattleWon();
 
-            // Check for recruitment opportunity
-            if (e.RecruitedKyn != null && e.RecruitedKyn.Definition.CanRecruit)
-            {
-                _pendingRecruitment = e.RecruitedKyn;
-                ShowRecruitmentScreen(e.RecruitedKyn);
-            }
+            // Show victory screen (encounters are hostile enemies - no recruitment)
+            ShowVictoryScreen(e.ExperienceEarned, e.CurrencyEarned, e.TelemetryUnitsEarned, "Enemy");
         }
         else if (e.Fled)
         {
             // Move protagonist away from encounter
             _protagonist.ApplyCollisionPush(new Vector2(0, -50));
+            _triggeredEncounter = null;
         }
         else if (e.Defeat)
         {
             // Game over handling - for now, just heal and respawn
             _roster.HealParty();
             _roster.ReviveParty();
+            _triggeredEncounter = null;
         }
-
-        _triggeredEncounter = null;
     }
 
     /// <summary>
@@ -1732,6 +1903,23 @@ public class WorldScreen : GameScreen
                 ScreenManager.BaseScreenSize.Y - 100
             );
             spriteBatch.DrawString(_font, dungeonText, dungeonPos, dungeonColor);
+        }
+
+        // Draw wild kyn interaction prompt
+        bool canInteractWildKyn = _nearbyWildKyn != null;
+        if (canInteractWildKyn)
+        {
+            var isDefeated = _nearbyWildKyn!.IsDefeated || _gameState.IsWildKynDefeated(_nearbyWildKyn.Id);
+            var wildKynText = isDefeated
+                ? $"[E] Talk to {_nearbyWildKyn.KynDefinitionId} (Recruit)"
+                : $"[E] Challenge {_nearbyWildKyn.KynDefinitionId} (Lv.{_nearbyWildKyn.Level})";
+            var wildKynColor = isDefeated ? Color.LightGreen : Color.Orange;
+            var wildKynSize = _font.MeasureString(wildKynText);
+            var wildKynPos = new Vector2(
+                ScreenManager.BaseScreenSize.X / 2 - wildKynSize.X / 2,
+                ScreenManager.BaseScreenSize.Y - 80
+            );
+            spriteBatch.DrawString(_font, wildKynText, wildKynPos, wildKynColor);
         }
 
         if (canInteractNPC)

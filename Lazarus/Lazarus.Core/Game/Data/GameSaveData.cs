@@ -82,6 +82,12 @@ public class GameSaveData
     public HashSet<string> ClearedEncounters { get; set; } = new();
 
     /// <summary>
+    /// IDs of wild Kyns that have been defeated in combat.
+    /// Defeated wild Kyns can be approached for recruitment without fighting again.
+    /// </summary>
+    public HashSet<string> DefeatedWildKyns { get; set; } = new();
+
+    /// <summary>
     /// IDs of quests that are currently active.
     /// </summary>
     public HashSet<string> ActiveQuests { get; set; } = new();
