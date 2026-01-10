@@ -1413,7 +1413,7 @@ public static class StrayDefinitions
         {
             Id = "ancient_hydra",
             Name = "The Ancient Hydra",
-            Description = "A fragment of NIMDOK's original consciousness, split and endlessly regenerating. Each tendril contains a different corrupted memory.",
+            Description = "A fragment of Lazarus's original consciousness, split and endlessly regenerating. Each tendril contains a different corrupted memory.",
             CreatureType = CreatureType.ColossalSquid,  // Closest to multi-tentacled horror
             Role = StrayRole.Tank,
             BaseStats = new StrayBaseStats
@@ -1463,7 +1463,7 @@ public static class StrayDefinitions
         {
             Id = "ancient_leviathan",
             Name = "The Ancient Leviathan",
-            Description = "Lurking in the deepest memory pools, this behemoth predates even NIMDOK. What it wants is unknown.",
+            Description = "Lurking in the deepest memory pools, this behemoth predates even Lazarus. What it wants is unknown.",
             CreatureType = CreatureType.GiantPacificOctopus,  // Deep sea horror
             Role = StrayRole.Tank,
             BaseStats = new StrayBaseStats

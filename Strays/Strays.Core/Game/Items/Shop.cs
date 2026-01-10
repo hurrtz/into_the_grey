@@ -475,7 +475,7 @@ public static class Shops
             Name = "Admin Access",
             OwnerName = "Root",
             Greeting = "sudo access granted. What do you need?",
-            Faction = FactionType.NIMDOK,
+            Faction = FactionType.Lazarus,
             Biome = BiomeType.Glow,
             BuysItems = false, // Doesn't buy, only sells
             Inventory = new List<ShopItem>

@@ -120,7 +120,7 @@ public static class DungeonRewardGenerator
         ["quiet"] = new[] { "Silent Crystal", "Dampened Node", "Echo Fragment", "Null Essence" },
         ["teeth"] = new[] { "Bone Shard", "Calcified Shell", "Fang Fragment", "Marrow Extract" },
         ["glow"] = new[] { "Radiant Dust", "Glow Essence", "Charged Crystal", "Luminous Core" },
-        ["archive"] = new[] { "Data Fragment", "Memory Chip", "Archive Core", "NIMDOK Shard" }
+        ["archive"] = new[] { "Data Fragment", "Memory Chip", "Archive Core", "Lazarus Shard" }
     };
 
     /// <summary>

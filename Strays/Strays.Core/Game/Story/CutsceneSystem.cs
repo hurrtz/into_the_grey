@@ -943,7 +943,7 @@ public class CutsceneSystem
             {
                 float blink = (float)Math.Sin(State.ElementTimer * 6) > 0 ? 1f : 0.3f;
                 var indicatorPos = new Vector2(boxRect.Right - 30, boxRect.Bottom - 25);
-                spriteBatch.DrawString(font, "▼", indicatorPos, Color.White * blink);
+                spriteBatch.DrawString(font, "v", indicatorPos, Color.White * blink);
             }
         }
     }

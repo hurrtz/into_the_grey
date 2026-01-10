@@ -13,6 +13,13 @@
             <Link>Content\Strays.mgcb</Link>
         </MonoGameContentReference>
     </ItemGroup>
+    <!-- Copy protagonist sprite sheets -->
+    <ItemGroup>
+        <Content Include="..\Strays.Core\Content\Sprites\DefaultMale\spritesheets\**\*">
+            <Link>Content\Sprites\DefaultMale\spritesheets\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Strays.Core\Strays.Core.csproj"/>
     </ItemGroup>

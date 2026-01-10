@@ -6,9 +6,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Strays.Core.Inputs;
 using Strays.Core.Localization;
-using Strays.Core.ScreenManagers;
+using Strays.ScreenManagers;
 
-namespace Strays.Core.Screens;
+namespace Strays.Screens;
 
 /// <summary>
 /// Screen for selecting the game language.
@@ -47,6 +47,28 @@ public class LanguageScreen : GameScreen
     // Event when language is selected
     public event EventHandler<GameLanguage>? LanguageSelected;
 
+    /// <summary>
+    /// Filters a string to only contain characters the font can render.
+    /// </summary>
+    private string GetSafeString(string text, SpriteFont font)
+    {
+        if (string.IsNullOrEmpty(text)) return text;
+
+        var safeChars = new System.Text.StringBuilder();
+        foreach (char c in text)
+        {
+            if (font.Characters.Contains(c) || c == '\n' || c == '\r')
+            {
+                safeChars.Append(c);
+            }
+            else
+            {
+                safeChars.Append('?');
+            }
+        }
+        return safeChars.ToString();
+    }
+
     public LanguageScreen()
     {
         TransitionOnTime = TimeSpan.FromSeconds(0.3);
@@ -84,7 +106,7 @@ public class LanguageScreen : GameScreen
         base.UnloadContent();
     }
 
-    public override void HandleInput(InputState input)
+    public override void HandleInput(GameTime gameTime, InputState input)
     {
         if (input.IsMenuCancel(ControllingPlayer, out _))
         {
@@ -244,14 +266,14 @@ public class LanguageScreen : GameScreen
                     CurrentColor * _transitionAlpha);
             }
 
-            // Native name (large)
-            string nativeName = lang.NativeName;
+            // Native name (large) - use safe string to avoid font crashes
+            string nativeName = GetSafeString(lang.NativeName, _contentFont!);
             Color nameColor = isSelected ? Color.White : TextColor;
             _spriteBatch.DrawString(_contentFont!, nativeName,
                 new Vector2(bounds.X + 20, y + 8), nameColor * _transitionAlpha);
 
             // English name (small, dim)
-            string englishName = lang.EnglishName;
+            string englishName = GetSafeString(lang.EnglishName, _contentFont!);
             _spriteBatch.DrawString(_contentFont!, englishName,
                 new Vector2(bounds.X + 20, y + 32), DimTextColor * 0.7f * _transitionAlpha);
 
@@ -261,7 +283,7 @@ public class LanguageScreen : GameScreen
 
             if (isCurrent)
             {
-                status = "✓";
+                status = "*";
                 statusColor = CurrentColor;
             }
             else if (!lang.IsComplete)
@@ -287,14 +309,14 @@ public class LanguageScreen : GameScreen
         // Scroll indicators
         if (startIndex > 0)
         {
-            _spriteBatch.DrawString(_contentFont!, "▲",
+            _spriteBatch.DrawString(_contentFont!, "^",
                 new Vector2(bounds.X + bounds.Width / 2 - 10, bounds.Y + 35),
                 DimTextColor * (float)(0.5f + 0.5f * Math.Sin(DateTime.Now.Ticks / 10000000.0 * 3)) * _transitionAlpha);
         }
 
         if (startIndex + visibleItems < _languages.Count)
         {
-            _spriteBatch.DrawString(_contentFont!, "▼",
+            _spriteBatch.DrawString(_contentFont!, "v",
                 new Vector2(bounds.X + bounds.Width / 2 - 10, bounds.Bottom - 25),
                 DimTextColor * (float)(0.5f + 0.5f * Math.Sin(DateTime.Now.Ticks / 10000000.0 * 3)) * _transitionAlpha);
         }
@@ -344,7 +366,9 @@ public class LanguageScreen : GameScreen
                 text = fallback;
             }
 
-            _spriteBatch.DrawString(_contentFont!, text,
+            // Use safe string to avoid font crashes with non-ASCII characters
+            string safeText = GetSafeString(text, _contentFont!);
+            _spriteBatch.DrawString(_contentFont!, safeText,
                 new Vector2(bounds.X + 20, y), TextColor * _transitionAlpha);
             y += 35;
         }
@@ -372,7 +396,7 @@ public class LanguageScreen : GameScreen
 
     private void DrawFooter(Viewport viewport)
     {
-        string hints = "[↑↓] Select  [Enter] Confirm  [Esc] Cancel";
+        string hints = "[Up/Down] Select  [Enter] Confirm  [Esc] Cancel";
         var hintSize = _contentFont!.MeasureString(hints);
 
         _spriteBatch!.DrawString(_contentFont, hints,

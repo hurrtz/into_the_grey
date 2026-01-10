@@ -399,10 +399,10 @@ public static class SettlementDefinitions
         Register(new SettlementDefinition
         {
             Id = "nimdok_terminal_loc",
-            Name = "NIMDOK Terminal",
-            Description = "An interface point to communicate with NIMDOK.",
+            Name = "Lazarus Terminal",
+            Description = "An interface point to communicate with Lazarus.",
             Biome = BiomeType.Fringe,
-            Faction = Faction.NIMDOK,
+            Faction = Faction.Lazarus,
             Services = SettlementServices.Quests,
             NpcIds = new List<string> { "nimdok_terminal" },
             Size = new Vector2(100, 100),

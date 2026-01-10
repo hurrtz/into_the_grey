@@ -17,7 +17,7 @@ public enum BiomeType
 
     /// <summary>
     /// The Rust: Maintenance without meaning. Industrial backbone still functioning incorrectly.
-    /// Where NIMDOK feels most present - and most hollow.
+    /// Where Lazarus feels most present - and most hollow.
     /// </summary>
     Rust,
 
@@ -151,7 +151,7 @@ public static class BiomeData
             Type = BiomeType.Rust,
             Name = "The Rust",
             Theme = "Maintenance without meaning",
-            Description = "Industrial backbone still functioning incorrectly. Where NIMDOK feels most present.",
+            Description = "Industrial backbone still functioning incorrectly. Where Lazarus feels most present.",
             BackgroundColor = new Color(124, 45, 18),
             AccentColor = new Color(180, 83, 9),
             FogColor = new Color(146, 64, 14) * 0.4f,

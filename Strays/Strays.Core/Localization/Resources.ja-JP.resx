@@ -209,7 +209,7 @@
   <data name="Biome_ArchiveDesc" xml:space="preserve"><value>現実が崩壊する傷跡。</value></data>
 
   <!-- Factions -->
-  <data name="Faction_NIMDOK" xml:space="preserve"><value>NIMDOK</value></data>
+  <data name="Faction_Lazarus" xml:space="preserve"><value>Lazarus</value></data>
   <data name="Faction_Independents" xml:space="preserve"><value>独立派</value></data>
   <data name="Faction_Scavengers" xml:space="preserve"><value>スカベンジャー</value></data>
   <data name="Faction_Archive" xml:space="preserve"><value>アーカイブ管理者</value></data>

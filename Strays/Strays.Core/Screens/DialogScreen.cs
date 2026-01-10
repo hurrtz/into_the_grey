@@ -386,7 +386,7 @@ public class DialogScreen : GameScreen
             SpeakerType.Protagonist => "You",
             SpeakerType.Companion => _gameState?.CompanionType.GetCompanionName() ?? "Companion",
             SpeakerType.System => "",
-            SpeakerType.AI => "NIMDOK",
+            SpeakerType.AI => "Lazarus",
             _ => line.SpeakerId ?? "???"
         };
     }

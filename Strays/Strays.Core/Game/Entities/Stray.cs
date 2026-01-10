@@ -27,7 +27,7 @@ public enum CombatRow
 
 /// <summary>
 /// Represents an individual Stray instance - a recruited or wild cybernetic creature.
-/// Strays are half-biological, half-cybernetic animals created by NIMDOK.
+/// Strays are half-biological, half-cybernetic animals created by Lazarus.
 /// </summary>
 public class Stray
 {

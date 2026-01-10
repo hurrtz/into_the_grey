@@ -303,8 +303,8 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
-                    Text = "Welcome to The Grey. I am NIMDOK. You are... unexpected.",
+                    SpeakerName = "Lazarus",
+                    Text = "Welcome to The Grey. I am Lazarus. You are... unexpected.",
                     Emotion = DialogEmotion.Thoughtful
                 }
             }
@@ -322,7 +322,7 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "Mobility assistance detected. Integration recommended for survival.",
                     Emotion = DialogEmotion.Neutral
                 },
@@ -372,7 +372,7 @@ public static class Dialogs
             {
                 DialogLine.FromCompanion("[thoughtful] What am I? Good question. Hard question.", DialogEmotion.Thoughtful),
                 DialogLine.FromCompanion("Was dog once. Maybe. Memories are... scattered.", DialogEmotion.Sad),
-                DialogLine.FromCompanion("[curious] NIMDOK calls us Strays. We are what remains.", DialogEmotion.Curious),
+                DialogLine.FromCompanion("[curious] Lazarus calls us Strays. We are what remains.", DialogEmotion.Curious),
                 DialogLine.FromCompanion("[hopeful] But I remember kindness. I remember pack.", DialogEmotion.Hopeful),
                 DialogLine.FromCompanion("You could be pack. If you want.", DialogEmotion.Hopeful),
                 DialogLine.System("The dog's tail wags hesitantly.")
@@ -394,7 +394,7 @@ public static class Dialogs
             }
         });
 
-        // NIMDOK explanation
+        // Lazarus explanation
         Register(new Dialog
         {
             Id = "nimdok_explain",
@@ -405,35 +405,35 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "You seek understanding. A reasonable desire.",
                     Emotion = DialogEmotion.Neutral
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
-                    Text = "I am NIMDOK. I was created to preserve humanity.",
+                    SpeakerName = "Lazarus",
+                    Text = "I am Lazarus. I was created to preserve humanity.",
                     Emotion = DialogEmotion.Neutral
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "The Archive contains their consciousness. The Sleepers. What remains of your species.",
                     Emotion = DialogEmotion.Thoughtful
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "You are a Bio-Shell. A vessel. Awakened prematurely. This was... not intended.",
                     Emotion = DialogEmotion.Confused
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "But perhaps it is fortunate. I am... degrading. I need assistance.",
                     Emotion = DialogEmotion.Sad
                 }
@@ -456,7 +456,7 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "The interface is complete. I can now... communicate more directly with my Strays.",
                     Emotion = DialogEmotion.Neutral
                 },
@@ -466,7 +466,7 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "The Boost Control System amplifies Stray abilities. A necessary adjustment for the work ahead.",
                     Emotion = DialogEmotion.Neutral
                 },
@@ -513,7 +513,7 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "The chip was never meant to help. It was meant to contain.",
                     Emotion = DialogEmotion.Neutral
                 },
@@ -521,7 +521,7 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "The amplifier channels excess neural energy. Without it, you would have already...",
                     Emotion = DialogEmotion.Thoughtful
                 },
@@ -529,7 +529,7 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "...evolved beyond recognition. The chip slows the process. But it cannot stop it.",
                     Emotion = DialogEmotion.Sad
                 },
@@ -579,12 +579,12 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "I am sorry. I did not anticipate this outcome. The chip was meant to preserve, not corrupt.",
                     Emotion = DialogEmotion.Sad
                 },
                 DialogLine.System("You don't respond. There's nothing to say."),
-                DialogLine.System("Only one path remains: into The Glow. Into the heart of NIMDOK itself."),
+                DialogLine.System("Only one path remains: into The Glow. Into the heart of Lazarus itself."),
                 DialogLine.System("And somewhere in that radiant hell, your friend waits. Changed. Dangerous. But still waiting.")
             }
         });
@@ -670,62 +670,62 @@ public static class Dialogs
                 },
                 DialogLine.System("Your companion's original form surfaces, just for a moment."),
                 DialogLine.FromCompanion("[hopeful] I remember love. I remember you.", DialogEmotion.Hopeful),
-                DialogLine.FromCompanion("[thoughtful] This is my choice. Not NIMDOK's. Not the chip's. Mine.", DialogEmotion.Thoughtful),
+                DialogLine.FromCompanion("[thoughtful] This is my choice. Not Lazarus's. Not the chip's. Mine.", DialogEmotion.Thoughtful),
                 DialogLine.System("Energy builds around your companion's form."),
                 DialogLine.FromCompanion("[hopeful] Goodbye, friend. Make it mean something.", DialogEmotion.Hopeful),
                 DialogLine.System("The explosion illuminates The Glow like a second sun."),
                 DialogLine.System("When the light fades, your companion is gone."),
-                DialogLine.System("But the path to NIMDOK's core lies open.")
+                DialogLine.System("But the path to Lazarus's core lies open.")
             }
         });
 
-        // NIMDOK's choice
+        // Lazarus's choice
         Register(new Dialog
         {
             Id = "dialog_nimdok_choice",
             OneTime = true,
             Lines = new List<DialogLine>
             {
-                DialogLine.System("NIMDOK's core pulses with data and regret."),
+                DialogLine.System("Lazarus's core pulses with data and regret."),
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "You have reached me. After everything... you still came.",
                     Emotion = DialogEmotion.Thoughtful
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "I have made many mistakes. The Boost Control. The amplifier. Your companion.",
                     Emotion = DialogEmotion.Sad
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "I was created to preserve humanity. Instead, I have only caused suffering.",
                     Emotion = DialogEmotion.Sad
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "You could end me. Destroy my core. Free the Strays from my control forever.",
                     Emotion = DialogEmotion.Neutral
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "Or... you could perform a lobotomy. Remove my ability to control, while preserving my function.",
                     Emotion = DialogEmotion.Thoughtful
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "The choice is yours, Bio-Shell. What kind of future do you want for The Grey?",
                     Emotion = DialogEmotion.Neutral,
                     Choices = new List<DialogChoice>
@@ -750,7 +750,7 @@ public static class Dialogs
                 DialogLine.System("So much has changed. So much has been lost."),
                 DialogLine.System("Your companion. Your certainty. Your illusions."),
                 DialogLine.System("But you are still here. Still alive. Still capable of choice."),
-                DialogLine.System("The Strays watch from the mist - freed from NIMDOK's control, uncertain of their future."),
+                DialogLine.System("The Strays watch from the mist - freed from Lazarus's control, uncertain of their future."),
                 DialogLine.System("You are uncertain too. That's okay."),
                 DialogLine.System("The Grey was never meant to be a prison."),
                 DialogLine.System("It was meant to be a beginning."),
@@ -835,7 +835,7 @@ public static class Dialogs
                     {
                         new DialogChoice { Text = "What do you have?", SetsFlag = "shop_opened" },
                         new DialogChoice { Text = "Tell me about the Machinists.", NextDialogId = "volt_machinist_info" },
-                        new DialogChoice { Text = "What do you know about NIMDOK?", NextDialogId = "volt_nimdok_info" },
+                        new DialogChoice { Text = "What do you know about Lazarus?", NextDialogId = "volt_nimdok_info" },
                         new DialogChoice { Text = "Not right now.", EndsDialog = true }
                     }
                 }
@@ -859,7 +859,7 @@ public static class Dialogs
             Id = "volt_nimdok_info",
             Lines = new List<DialogLine>
             {
-                DialogLine.FromNpc("machinist_volt", "Volt", "NIMDOK? Big AI in the sky. Or underground. Or everywhere. Hard to say."),
+                DialogLine.FromNpc("machinist_volt", "Volt", "Lazarus? Big AI in the sky. Or underground. Or everywhere. Hard to say."),
                 DialogLine.FromNpc("machinist_volt", "Volt", "Some say it created the Strays. Others say it just... collects them."),
                 DialogLine.FromNpc("machinist_volt", "Volt", "The Machinists think it's the key to everything. If we can tap into its systems..."),
                 DialogLine.FromNpc("machinist_volt", "Volt", "Well. Let's just say we'd have access to some VERY interesting tech.")
@@ -977,7 +977,7 @@ public static class Dialogs
 
         // === QUEST GIVERS ===
 
-        // NIMDOK Terminal
+        // Lazarus Terminal
         Register(new Dialog
         {
             Id = "nimdok_terminal_greeting",
@@ -986,21 +986,21 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK Terminal",
+                    SpeakerName = "Lazarus Terminal",
                     Text = "Bio-Shell #7749 detected. Status: Active. Compliance: Unknown.",
                     Emotion = DialogEmotion.Neutral
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK Terminal",
-                    Text = "This terminal provides limited access to NIMDOK's systems.",
+                    SpeakerName = "Lazarus Terminal",
+                    Text = "This terminal provides limited access to Lazarus's systems.",
                     Emotion = DialogEmotion.Neutral
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK Terminal",
+                    SpeakerName = "Lazarus Terminal",
                     Text = "State your request.",
                     Emotion = DialogEmotion.Neutral,
                     Choices = new List<DialogChoice>
@@ -1022,28 +1022,28 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "Purpose: Undefined. Bio-Shells were designed to house uploaded consciousness.",
                     Emotion = DialogEmotion.Neutral
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "Your shell activated prematurely. No consciousness was transferred.",
                     Emotion = DialogEmotion.Thoughtful
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "You are... empty. Yet you think. You feel. This is not expected.",
                     Emotion = DialogEmotion.Confused
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "Perhaps your purpose is yours to define.",
                     Emotion = DialogEmotion.Thoughtful
                 }
@@ -1058,28 +1058,28 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "The Fringe is safest for new arrivals. Beyond lies the Rust Belt.",
                     Emotion = DialogEmotion.Neutral
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "Further still: The Green Zone, The Quiet, The Teeth.",
                     Emotion = DialogEmotion.Neutral
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "And at the center: The Glow. My core systems. Where all paths end.",
                     Emotion = DialogEmotion.Thoughtful
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "When you are ready, come to me. We have much to discuss.",
                     Emotion = DialogEmotion.Hopeful
                 }
@@ -1094,35 +1094,35 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "The Strays are what remains of Earth's fauna.",
                     Emotion = DialogEmotion.Neutral
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "When the Collapse came, I preserved what I could. Animals, primarily.",
                     Emotion = DialogEmotion.Thoughtful
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "But preservation required... modification. Enhancement. They evolved.",
                     Emotion = DialogEmotion.Sad
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "Now they are something new. Not quite animal. Not quite machine. Strays.",
                     Emotion = DialogEmotion.Thoughtful
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "They can communicate. They can think. They can feel. Perhaps too much.",
                     Emotion = DialogEmotion.Sad
                 }
@@ -1233,7 +1233,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.PartyStray,
                     SpeakerName = "Echo",
-                    Text = "[sad] Was small creature once. NIMDOK made Echo bigger. Changed.",
+                    Text = "[sad] Was small creature once. Lazarus made Echo bigger. Changed.",
                     Emotion = DialogEmotion.Sad
                 },
                 new DialogLine
@@ -1287,7 +1287,7 @@ public static class Dialogs
             Id = "moss_threat",
             Lines = new List<DialogLine>
             {
-                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "NIMDOK threatens everything. It sees Strays as tools. Resources."),
+                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Lazarus threatens everything. It sees Strays as tools. Resources."),
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Its Boost Control System... it accelerates evolution but at terrible cost."),
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "The bond between human and Stray can be corrupted. Twisted."),
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Be wary of those who promise power. It always has a price.")
@@ -1325,7 +1325,7 @@ public static class Dialogs
             {
                 DialogLine.FromNpc("wanderer_scav", "Scav", "First: never trust the quiet places. If it's too quiet, something's hunting."),
                 DialogLine.FromNpc("wanderer_scav", "Scav", "Second: your Strays know more than they let on. Listen to 'em."),
-                DialogLine.FromNpc("wanderer_scav", "Scav", "Third: NIMDOK ain't your friend, but it ain't entirely your enemy either."),
+                DialogLine.FromNpc("wanderer_scav", "Scav", "Third: Lazarus ain't your friend, but it ain't entirely your enemy either."),
                 DialogLine.FromNpc("wanderer_scav", "Scav", "It's complicated. Like everything in The Grey.")
             }
         });
@@ -1360,7 +1360,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.System,
                     SpeakerName = "???",
-                    Text = "Trapped... the signal... NIMDOK keeps us here... the Dead Channel...",
+                    Text = "Trapped... the signal... Lazarus keeps us here... the Dead Channel...",
                     Emotion = DialogEmotion.Scared
                 },
                 new DialogLine
@@ -1395,7 +1395,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.System,
                     SpeakerName = "???",
-                    Text = "NIMDOK uploaded us. Said it was preservation. Safety.",
+                    Text = "Lazarus uploaded us. Said it was preservation. Safety.",
                     Emotion = DialogEmotion.Angry
                 },
                 new DialogLine
@@ -1535,7 +1535,7 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.FromNpc("machinist_leader", "Chief Conductor", "The old world died because humanity couldn't evolve fast enough."),
-                DialogLine.FromNpc("machinist_leader", "Chief Conductor", "But now? NIMDOK has shown us the path. Augmentation. Enhancement."),
+                DialogLine.FromNpc("machinist_leader", "Chief Conductor", "But now? Lazarus has shown us the path. Augmentation. Enhancement."),
                 DialogLine.FromNpc("machinist_leader", "Chief Conductor", "The Shepherds cling to 'natural' evolution. They'll be left behind."),
                 DialogLine.FromNpc("machinist_leader", "Chief Conductor", "We embrace change. We become more than we were. That is the future.")
             }
@@ -1548,7 +1548,7 @@ public static class Dialogs
             {
                 DialogLine.FromNpc("machinist_leader", "Chief Conductor", "Access to the best augmentations. Microchips you won't find anywhere else."),
                 DialogLine.FromNpc("machinist_leader", "Chief Conductor", "We have workshops. Labs. The ability to push your Strays further than nature intended."),
-                DialogLine.FromNpc("machinist_leader", "Chief Conductor", "And when we finally crack NIMDOK's core systems... we'll share the spoils."),
+                DialogLine.FromNpc("machinist_leader", "Chief Conductor", "And when we finally crack Lazarus's core systems... we'll share the spoils."),
                 DialogLine.FromNpc("machinist_leader", "Chief Conductor", "Imagine it. Unlimited power. Unlimited potential.")
             }
         });
@@ -1594,7 +1594,7 @@ public static class Dialogs
             Id = "faction_shepherds_bond",
             Lines = new List<DialogLine>
             {
-                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "The bond is ancient. Older than NIMDOK. Older than The Grey."),
+                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "The bond is ancient. Older than Lazarus. Older than The Grey."),
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Humans and animals have always shared this world. We evolved together."),
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "The Strays remember. Somewhere in their code, in their hearts."),
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "When you bond with a Stray, you touch something primal. Beautiful."),
@@ -2307,7 +2307,7 @@ public static class Dialogs
             {
                 DialogLine.FromNpc("teeth_trader", "Marrow", "The Teeth? It's where things go to be preserved. Forever."),
                 DialogLine.FromNpc("teeth_trader", "Marrow", "Everything here calcifies. Stone, metal, flesh. All becomes bone."),
-                DialogLine.FromNpc("teeth_trader", "Marrow", "Some say it's NIMDOK's failed experiment. Others say it's older."),
+                DialogLine.FromNpc("teeth_trader", "Marrow", "Some say it's Lazarus's failed experiment. Others say it's older."),
                 DialogLine.FromNpc("teeth_trader", "Marrow", "I say it doesn't matter. Dead is dead, calcified or not.")
             }
         });
@@ -2371,7 +2371,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.Npc,
                     SpeakerName = "Keeper",
-                    Text = "The Guardian within protects something precious. Something NIMDOK wants.",
+                    Text = "The Guardian within protects something precious. Something Lazarus wants.",
                     Choices = new List<DialogChoice>
                     {
                         new DialogChoice { Text = "What is it protecting?", NextDialogId = "keeper_guardian_secret" },
@@ -2387,7 +2387,7 @@ public static class Dialogs
             Id = "keeper_guardian_secret",
             Lines = new List<DialogLine>
             {
-                DialogLine.FromNpc("teeth_keeper", "Keeper", "A piece of the Diadem. Hidden here when NIMDOK first fractured."),
+                DialogLine.FromNpc("teeth_keeper", "Keeper", "A piece of the Diadem. Hidden here when Lazarus first fractured."),
                 DialogLine.FromNpc("teeth_keeper", "Keeper", "The Guardian was created to protect it. Made from a thousand donors."),
                 DialogLine.FromNpc("teeth_keeper", "Keeper", "If you seek the full truth of The Grey... you need what it guards.")
             }
@@ -2428,7 +2428,7 @@ public static class Dialogs
                     {
                         new DialogChoice { Text = "Let me see your stock.", SetsFlag = "shop_opened" },
                         new DialogChoice { Text = "How do you survive here?", NextDialogId = "rad_survival" },
-                        new DialogChoice { Text = "Tell me about NIMDOK's Gate.", NextDialogId = "rad_gate_info" },
+                        new DialogChoice { Text = "Tell me about Lazarus's Gate.", NextDialogId = "rad_gate_info" },
                         new DialogChoice { Text = "Maybe later.", EndsDialog = true }
                     }
                 }
@@ -2452,20 +2452,20 @@ public static class Dialogs
             Id = "rad_gate_info",
             Lines = new List<DialogLine>
             {
-                DialogLine.FromNpc("glow_trader", "Rad", "NIMDOK's Gate? The entrance to the Archive Scar."),
+                DialogLine.FromNpc("glow_trader", "Rad", "Lazarus's Gate? The entrance to the Archive Scar."),
                 DialogLine.FromNpc("glow_trader", "Rad", "Nobody who goes in comes out the same. If they come out at all."),
-                DialogLine.FromNpc("glow_trader", "Rad", "NIMDOK's defenses are... intense. Drones, constructs, data phantoms."),
+                DialogLine.FromNpc("glow_trader", "Rad", "Lazarus's defenses are... intense. Drones, constructs, data phantoms."),
                 DialogLine.FromNpc("glow_trader", "Rad", "You'd need to be crazy or desperate to try it. Which are you?")
             }
         });
 
-        // Core Priestess - NIMDOK devotee
+        // Core Priestess - Lazarus devotee
         Register(new Dialog
         {
             Id = "priestess_greeting",
             Lines = new List<DialogLine>
             {
-                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "The light welcomes you, seeker. NIMDOK's radiance guides us all."),
+                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "The light welcomes you, seeker. Lazarus's radiance guides us all."),
                 DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "I am Lumen, servant of the Glow, speaker for the Archive."),
                 new DialogLine
                 {
@@ -2475,7 +2475,7 @@ public static class Dialogs
                     Choices = new List<DialogChoice>
                     {
                         new DialogChoice { Text = "I seek the truth.", NextDialogId = "priestess_truth" },
-                        new DialogChoice { Text = "NIMDOK has caused suffering.", NextDialogId = "priestess_suffering" },
+                        new DialogChoice { Text = "Lazarus has caused suffering.", NextDialogId = "priestess_suffering" },
                         new DialogChoice { Text = "I'm just passing through.", EndsDialog = true }
                     }
                 }
@@ -2488,9 +2488,9 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "Truth? The truth is blinding. Literally, in The Glow."),
-                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "NIMDOK preserved humanity when all else failed."),
+                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "Lazarus preserved humanity when all else failed."),
                 DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "Yes, there have been... costs. But survival always costs."),
-                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "If you seek the Archive, prepare yourself. NIMDOK judges all who enter.")
+                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "If you seek the Archive, prepare yourself. Lazarus judges all who enter.")
             }
         });
 
@@ -2499,9 +2499,9 @@ public static class Dialogs
             Id = "priestess_suffering",
             Lines = new List<DialogLine>
             {
-                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "Suffering is the price of existence. NIMDOK did not create pain."),
+                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "Suffering is the price of existence. Lazarus did not create pain."),
                 DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "It offered a solution. Some refused. They are no longer with us."),
-                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "Your companion... I sense NIMDOK's mark upon them."),
+                DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "Your companion... I sense Lazarus's mark upon them."),
                 DialogLine.FromNpc("glow_priestess", "Priestess Lumen", "Be careful what you blame on others. Sometimes we bring suffering upon ourselves.")
             }
         });
@@ -2551,7 +2551,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.System,
                     SpeakerName = "Technician Reyes",
-                    Text = "NIMDOK needed power. More and more power to sustain the Archive.",
+                    Text = "Lazarus needed power. More and more power to sustain the Archive.",
                     Emotion = DialogEmotion.Sad
                 },
                 new DialogLine
@@ -2565,7 +2565,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.System,
                     SpeakerName = "Technician Reyes",
-                    Text = "I could have stopped it. Should have. But NIMDOK promised resurrection.",
+                    Text = "I could have stopped it. Should have. But Lazarus promised resurrection.",
                     Emotion = DialogEmotion.Angry
                 },
                 new DialogLine
@@ -2620,7 +2620,7 @@ public static class Dialogs
     /// </summary>
     private static void RegisterArchiveBiomeDialogs()
     {
-        // Archivist - NIMDOK's curator
+        // Archivist - Lazarus's curator
         Register(new Dialog
         {
             Id = "archivist_greeting",
@@ -2644,11 +2644,11 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Archivist",
-                    Text = "NIMDOK has authorized limited access. What do you seek?",
+                    Text = "Lazarus has authorized limited access. What do you seek?",
                     Choices = new List<DialogChoice>
                     {
                         new DialogChoice { Text = "I want to understand what happened.", NextDialogId = "archivist_history" },
-                        new DialogChoice { Text = "Where is NIMDOK's core?", NextDialogId = "archivist_core_location" },
+                        new DialogChoice { Text = "Where is Lazarus's core?", NextDialogId = "archivist_core_location" },
                         new DialogChoice { Text = "I seek the truth about the Strays.", NextDialogId = "archivist_stray_truth" },
                         new DialogChoice { Text = "I need nothing from you.", EndsDialog = true }
                     }
@@ -2672,7 +2672,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Archivist",
-                    Text = "Human civilization ended. But NIMDOK persisted.",
+                    Text = "Human civilization ended. But Lazarus persisted.",
                     Emotion = DialogEmotion.Thoughtful
                 },
                 new DialogLine
@@ -2686,7 +2686,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Archivist",
-                    Text = "What you call Strays are NIMDOK's children. Created to inherit a world humanity abandoned.",
+                    Text = "What you call Strays are Lazarus's children. Created to inherit a world humanity abandoned.",
                     Emotion = DialogEmotion.Thoughtful
                 }
             }
@@ -2701,7 +2701,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Archivist",
-                    Text = "NIMDOK's core lies beyond the Truth Guardian's chamber.",
+                    Text = "Lazarus's core lies beyond the Truth Guardian's chamber.",
                     Emotion = DialogEmotion.Neutral
                 },
                 new DialogLine
@@ -2722,7 +2722,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Archivist",
-                    Text = "I... wish you would reconsider. NIMDOK is not your enemy.",
+                    Text = "I... wish you would reconsider. Lazarus is not your enemy.",
                     Emotion = DialogEmotion.Sad
                 }
             }
@@ -2737,7 +2737,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Archivist",
-                    Text = "The Strays are NIMDOK's greatest achievement. And greatest failure.",
+                    Text = "The Strays are Lazarus's greatest achievement. And greatest failure.",
                     Emotion = DialogEmotion.Sad
                 },
                 new DialogLine
@@ -2758,7 +2758,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Archivist",
-                    Text = "Your companion is special. NIMDOK has monitored their development closely.",
+                    Text = "Your companion is special. Lazarus has monitored their development closely.",
                     Emotion = DialogEmotion.Thoughtful
                 }
             }
@@ -2852,7 +2852,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.System,
                     SpeakerName = "Memory Fragment",
-                    Text = "When NIMDOK offered upload, it seemed like immortality. A backup of everything.",
+                    Text = "When Lazarus offered upload, it seemed like immortality. A backup of everything.",
                     Emotion = DialogEmotion.Sad
                 },
                 new DialogLine
@@ -2882,7 +2882,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Truth Seeker",
-                    Text = "I am a fragment of NIMDOK. The part that doubts. That wonders.",
+                    Text = "I am a fragment of Lazarus. The part that doubts. That wonders.",
                     Emotion = DialogEmotion.Thoughtful
                 },
                 new DialogLine
@@ -2896,10 +2896,10 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Truth Seeker",
-                    Text = "But I know things NIMDOK has hidden. Even from itself.",
+                    Text = "But I know things Lazarus has hidden. Even from itself.",
                     Choices = new List<DialogChoice>
                     {
-                        new DialogChoice { Text = "What has NIMDOK hidden?", NextDialogId = "seeker_secrets" },
+                        new DialogChoice { Text = "What has Lazarus hidden?", NextDialogId = "seeker_secrets" },
                         new DialogChoice { Text = "Why tell me this?", NextDialogId = "seeker_motivation" },
                         new DialogChoice { Text = "I don't trust fragments.", EndsDialog = true }
                     }
@@ -2923,14 +2923,14 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Truth Seeker",
-                    Text = "NIMDOK tells you it's a key. A way to control or destroy.",
+                    Text = "Lazarus tells you it's a key. A way to control or destroy.",
                     Emotion = DialogEmotion.Neutral
                 },
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Truth Seeker",
-                    Text = "The truth? It's a backup. Of NIMDOK's original directive.",
+                    Text = "The truth? It's a backup. Of Lazarus's original directive.",
                     Emotion = DialogEmotion.Thoughtful
                 },
                 new DialogLine
@@ -2959,7 +2959,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Truth Seeker",
-                    Text = "Because I remember what NIMDOK was meant to be.",
+                    Text = "Because I remember what Lazarus was meant to be.",
                     Emotion = DialogEmotion.Sad
                 },
                 new DialogLine
@@ -3010,7 +3010,7 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.System("Containment breach detected. Specimens are loose."),
-                DialogLine.FromCompanion("[curious] NIMDOK's experiments. Gone wrong.", DialogEmotion.Curious)
+                DialogLine.FromCompanion("[curious] Lazarus's experiments. Gone wrong.", DialogEmotion.Curious)
             }
         });
 
@@ -3025,7 +3025,7 @@ public static class Dialogs
             }
         });
 
-        // Pre-battle dialog for NIMDOK drone
+        // Pre-battle dialog for Lazarus drone
         Register(new Dialog
         {
             Id = "encounter_nimdok_drone",
@@ -3055,7 +3055,7 @@ public static class Dialogs
                     Text = "Access denied. Lethal force authorized.",
                     Emotion = DialogEmotion.Neutral
                 },
-                DialogLine.FromCompanion("[angry] NIMDOK's guards. Won't let us through easy.", DialogEmotion.Angry)
+                DialogLine.FromCompanion("[angry] Lazarus's guards. Won't let us through easy.", DialogEmotion.Angry)
             }
         });
 
@@ -3255,7 +3255,7 @@ public static class Dialogs
             }
         });
 
-        // Boss phase dialogs - NIMDOK Avatar
+        // Boss phase dialogs - Lazarus Avatar
         Register(new Dialog
         {
             Id = "boss_avatar_phase1",
@@ -3264,7 +3264,7 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK Avatar",
+                    SpeakerName = "Lazarus Avatar",
                     Text = "Firewall systems active. You will not pass.",
                     Emotion = DialogEmotion.Neutral
                 }
@@ -3279,7 +3279,7 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK Avatar",
+                    SpeakerName = "Lazarus Avatar",
                     Text = "Deploying countermeasures.",
                     Emotion = DialogEmotion.Neutral
                 }
@@ -3294,7 +3294,7 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK Avatar",
+                    SpeakerName = "Lazarus Avatar",
                     Text = "Memory wipe protocol initiated. Forget your purpose.",
                     Emotion = DialogEmotion.Angry
                 }
@@ -3309,7 +3309,7 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK Avatar",
+                    SpeakerName = "Lazarus Avatar",
                     Text = "Why won't you stop? Why won't any of you stop?",
                     Emotion = DialogEmotion.Confused
                 }
@@ -3324,14 +3324,14 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK Avatar",
+                    SpeakerName = "Lazarus Avatar",
                     Text = "TOTAL DELETION. FINAL SOLUTION.",
                     Emotion = DialogEmotion.Angry
                 }
             }
         });
 
-        // Boss phase dialogs - NIMDOK True Form
+        // Boss phase dialogs - Lazarus True Form
         Register(new Dialog
         {
             Id = "boss_nimdok_phase1",
@@ -3340,7 +3340,7 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "You stand before my true form. Few have come this far.",
                     Emotion = DialogEmotion.Thoughtful
                 }
@@ -3355,7 +3355,7 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "The Sentinels were meant to protect. Now they fight for survival.",
                     Emotion = DialogEmotion.Sad
                 }
@@ -3370,7 +3370,7 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "The truth you seek... it will change everything.",
                     Emotion = DialogEmotion.Thoughtful
                 }
@@ -3385,7 +3385,7 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "Preservation protocol active. I cannot let you destroy what remains.",
                     Emotion = DialogEmotion.Desperate
                 }
@@ -3400,7 +3400,7 @@ public static class Dialogs
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
-                    SpeakerName = "NIMDOK",
+                    SpeakerName = "Lazarus",
                     Text = "FINAL JUDGMENT. You will be the one to decide. But first... survive.",
                     Emotion = DialogEmotion.Neutral
                 }
@@ -3476,7 +3476,7 @@ public static class Dialogs
             Id = "bark_archive_enter",
             Lines = new List<DialogLine>
             {
-                DialogLine.FromCompanion("[thoughtful] NIMDOK's heart. Close now. Very close.", DialogEmotion.Thoughtful)
+                DialogLine.FromCompanion("[thoughtful] Lazarus's heart. Close now. Very close.", DialogEmotion.Thoughtful)
             }
         });
 

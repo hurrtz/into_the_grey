@@ -209,7 +209,7 @@
   <data name="Biome_ArchiveDesc" xml:space="preserve"><value>Die Wunde, an der die Realität zusammenbricht.</value></data>
 
   <!-- Factions -->
-  <data name="Faction_NIMDOK" xml:space="preserve"><value>NIMDOK</value></data>
+  <data name="Faction_Lazarus" xml:space="preserve"><value>Lazarus</value></data>
   <data name="Faction_Independents" xml:space="preserve"><value>Unabhängige</value></data>
   <data name="Faction_Scavengers" xml:space="preserve"><value>Plünderer</value></data>
   <data name="Faction_Archive" xml:space="preserve"><value>Archivhüter</value></data>

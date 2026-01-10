@@ -1176,16 +1176,16 @@ public static class ControllerGlyphs
     {
         return button switch
         {
-            Buttons.A => "Ⓐ",
-            Buttons.B => "Ⓑ",
-            Buttons.X => "Ⓧ",
-            Buttons.Y => "Ⓨ",
+            Buttons.A => "A",
+            Buttons.B => "B",
+            Buttons.X => "X",
+            Buttons.Y => "Y",
             Buttons.LeftShoulder => "LB",
             Buttons.RightShoulder => "RB",
-            Buttons.DPadUp => "▲",
-            Buttons.DPadDown => "▼",
-            Buttons.DPadLeft => "◀",
-            Buttons.DPadRight => "▶",
+            Buttons.DPadUp => "Up",
+            Buttons.DPadDown => "Down",
+            Buttons.DPadLeft => "Left",
+            Buttons.DPadRight => "Right",
             _ => button.ToString()
         };
     }
@@ -1194,16 +1194,16 @@ public static class ControllerGlyphs
     {
         return button switch
         {
-            Buttons.A => "✕",
-            Buttons.B => "○",
-            Buttons.X => "□",
-            Buttons.Y => "△",
+            Buttons.A => "X",
+            Buttons.B => "O",
+            Buttons.X => "Sq",
+            Buttons.Y => "Tr",
             Buttons.LeftShoulder => "L1",
             Buttons.RightShoulder => "R1",
-            Buttons.DPadUp => "▲",
-            Buttons.DPadDown => "▼",
-            Buttons.DPadLeft => "◀",
-            Buttons.DPadRight => "▶",
+            Buttons.DPadUp => "Up",
+            Buttons.DPadDown => "Down",
+            Buttons.DPadLeft => "Left",
+            Buttons.DPadRight => "Right",
             _ => button.ToString()
         };
     }

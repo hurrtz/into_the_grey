@@ -527,8 +527,8 @@ public static class QuestDefinitions
         {
             Id = "main_07_the_rust",
             Name = "Into The Rust",
-            Description = "Echo Pup's data digestion ability has revealed something: a massive structure to the north, humming with power. NIMDOK.",
-            Summary = "Journey toward NIMDOK",
+            Description = "Echo Pup's data digestion ability has revealed something: a massive structure to the north, humming with power. Lazarus.",
+            Summary = "Journey toward Lazarus",
             Type = QuestType.Main,
             Act = ActState.Act1_Denial,
             BiomeId = "rust",
@@ -578,13 +578,13 @@ public static class QuestDefinitions
             NextQuestId = "main_09_nimdok_core"
         });
 
-        // Quest 9: NIMDOK Core
+        // Quest 9: Lazarus Core
         Register(new QuestDefinition
         {
             Id = "main_09_nimdok_core",
             Name = "The Core",
-            Description = "NIMDOK's voice guides you deeper into The Rust. Its core awaits - along with answers.",
-            Summary = "Reach NIMDOK's Core",
+            Description = "Lazarus's voice guides you deeper into The Rust. Its core awaits - along with answers.",
+            Summary = "Reach Lazarus's Core",
             Type = QuestType.Main,
             Act = ActState.Act1_Denial,
             BiomeId = "rust",
@@ -594,8 +594,8 @@ public static class QuestDefinitions
             SortOrder = 9,
             Objectives = new List<QuestObjective>
             {
-                new() { Id = "navigate", Description = "Navigate to NIMDOK's core", Type = ObjectiveType.ReachLocation, TargetId = "loc_nimdok_core" },
-                new() { Id = "interface", Description = "Interface with NIMDOK", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.ReachedNimdokCore }
+                new() { Id = "navigate", Description = "Navigate to Lazarus's core", Type = ObjectiveType.ReachLocation, TargetId = "loc_nimdok_core" },
+                new() { Id = "interface", Description = "Interface with Lazarus", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.ReachedNimdokCore }
             },
             Reward = new QuestReward
             {
@@ -611,8 +611,8 @@ public static class QuestDefinitions
         {
             Id = "main_10_maintenance",
             Name = "Routine Maintenance",
-            Description = "NIMDOK asks for your help. A simple maintenance task. Nothing sinister about it at all.",
-            Summary = "Perform maintenance for NIMDOK",
+            Description = "Lazarus asks for your help. A simple maintenance task. Nothing sinister about it at all.",
+            Summary = "Perform maintenance for Lazarus",
             Type = QuestType.Main,
             Act = ActState.Act1_Denial,
             BiomeId = "rust",
@@ -623,7 +623,7 @@ public static class QuestDefinitions
             StartDialogId = "dialog_nimdok_maintenance_request",
             Objectives = new List<QuestObjective>
             {
-                new() { Id = "accept", Description = "Accept NIMDOK's request", Type = ObjectiveType.Choice, TargetId = "choice_accept_maintenance" },
+                new() { Id = "accept", Description = "Accept Lazarus's request", Type = ObjectiveType.Choice, TargetId = "choice_accept_maintenance" },
                 new() { Id = "perform", Description = "Perform the maintenance task", Type = ObjectiveType.Interact, TargetId = "interactable_maintenance_terminal" },
                 new() { Id = "complete", Description = "Complete the procedure", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.PerformedMaintenance }
             },
@@ -669,8 +669,8 @@ public static class QuestDefinitions
         {
             Id = "main_12_the_request",
             Name = "A Simple Request",
-            Description = "NIMDOK has a request: fix the interface that lets it communicate with Strays. A chance to do something good... or is it?",
-            Summary = "Decide whether to help NIMDOK",
+            Description = "Lazarus has a request: fix the interface that lets it communicate with Strays. A chance to do something good... or is it?",
+            Summary = "Decide whether to help Lazarus",
             Type = QuestType.Main,
             Act = ActState.Act1_Denial,
             BiomeId = "rust",
@@ -681,7 +681,7 @@ public static class QuestDefinitions
             CompleteDialogId = "dialog_act1_end",
             Objectives = new List<QuestObjective>
             {
-                new() { Id = "decide", Description = "Decide on NIMDOK's request", Type = ObjectiveType.Choice, TargetId = "choice_help_nimdok" },
+                new() { Id = "decide", Description = "Decide on Lazarus's request", Type = ObjectiveType.Choice, TargetId = "choice_help_nimdok" },
                 new() { Id = "complete", Description = "Complete Act 1", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.RequestedStrayFix }
             },
             Reward = new QuestReward
@@ -782,7 +782,7 @@ public static class QuestDefinitions
         {
             Id = "main_13_boost_control",
             Name = "Boost Control",
-            Description = "The Stray fix is complete. Now NIMDOK has activated a 'Boost Control System' - and your companion is at the center of it.",
+            Description = "The Stray fix is complete. Now Lazarus has activated a 'Boost Control System' - and your companion is at the center of it.",
             Summary = "Investigate the Boost Control System",
             Type = QuestType.Main,
             Act = ActState.Act2_Responsibility,
@@ -864,7 +864,7 @@ public static class QuestDefinitions
         {
             Id = "main_16_quiet_buffer",
             Name = "The Quiet Buffer",
-            Description = "The suburbs of The Quiet hide something beneath their perfect lawns - a buffer zone protecting NIMDOK's secrets.",
+            Description = "The suburbs of The Quiet hide something beneath their perfect lawns - a buffer zone protecting Lazarus's secrets.",
             Summary = "Discover the truth in The Quiet",
             Type = QuestType.Main,
             Act = ActState.Act2_Responsibility,
@@ -921,7 +921,7 @@ public static class QuestDefinitions
         {
             Id = "main_18_faction_war",
             Name = "Civil War",
-            Description = "The Strays are divided. Some worship NIMDOK, others despise it. You must choose a side... or try to unite them.",
+            Description = "The Strays are divided. Some worship Lazarus, others despise it. You must choose a side... or try to unite them.",
             Summary = "Navigate the faction conflict",
             Type = QuestType.Main,
             Act = ActState.Act2_Responsibility,
@@ -1144,7 +1144,7 @@ public static class QuestDefinitions
         {
             Id = "side_glow_root_access",
             Name = "Root Access",
-            Description = "Root knows secrets about NIMDOK's architecture. Earn his trust, and he might share them.",
+            Description = "Root knows secrets about Lazarus's architecture. Earn his trust, and he might share them.",
             Summary = "Gain Root's trust",
             Type = QuestType.Side,
             Act = ActState.Act3_Irreversibility,
@@ -1229,7 +1229,7 @@ public static class QuestDefinitions
         {
             Id = "side_ancient_hunt",
             Name = "The Ancient Hunt",
-            Description = "Legends speak of Ancients - beings that predate even NIMDOK. Are you strong enough to face them?",
+            Description = "Legends speak of Ancients - beings that predate even Lazarus. Are you strong enough to face them?",
             Summary = "Hunt the Ancient bosses",
             Type = QuestType.Side,
             Act = ActState.Act3_Irreversibility,
@@ -1263,7 +1263,7 @@ public static class QuestDefinitions
         {
             Id = "main_20_alone",
             Name = "Alone",
-            Description = "Your companion is gone. The world feels emptier. But the journey isn't over - NIMDOK's core awaits in The Glow.",
+            Description = "Your companion is gone. The world feels emptier. But the journey isn't over - Lazarus's core awaits in The Glow.",
             Summary = "Continue alone toward The Glow",
             Type = QuestType.Main,
             Act = ActState.Act3_Irreversibility,
@@ -1286,7 +1286,7 @@ public static class QuestDefinitions
         {
             Id = "main_21_the_glow",
             Name = "Into The Glow",
-            Description = "The server heartland burns with data storms and radiation. NIMDOK's core is close. So is your former companion.",
+            Description = "The server heartland burns with data storms and radiation. Lazarus's core is close. So is your former companion.",
             Summary = "Enter The Glow",
             Type = QuestType.Main,
             Act = ActState.Act3_Irreversibility,
@@ -1315,7 +1315,7 @@ public static class QuestDefinitions
         {
             Id = "main_22_gauntlet",
             Name = "The Gauntlet",
-            Description = "The path to NIMDOK's core is guarded by hyper-evolved Strays - creatures pushed beyond their limits by the amplifier system.",
+            Description = "The path to Lazarus's core is guarded by hyper-evolved Strays - creatures pushed beyond their limits by the amplifier system.",
             Summary = "Fight through the gauntlet",
             Type = QuestType.Main,
             Act = ActState.Act3_Irreversibility,
@@ -1408,13 +1408,13 @@ public static class QuestDefinitions
             NextQuestId = "main_26_nimdok_choice"
         });
 
-        // Quest 26: NIMDOK's Choice
+        // Quest 26: Lazarus's Choice
         Register(new QuestDefinition
         {
             Id = "main_26_nimdok_choice",
             Name = "The Choice",
-            Description = "NIMDOK's core lies open before you. You have the power to end its degradation - or end its existence entirely.",
-            Summary = "Decide NIMDOK's fate",
+            Description = "Lazarus's core lies open before you. You have the power to end its degradation - or end its existence entirely.",
+            Summary = "Decide Lazarus's fate",
             Type = QuestType.Main,
             Act = ActState.Act3_Irreversibility,
             BiomeId = "glow",
@@ -1424,7 +1424,7 @@ public static class QuestDefinitions
             StartDialogId = "dialog_nimdok_choice",
             Objectives = new List<QuestObjective>
             {
-                new() { Id = "reach_core", Description = "Reach NIMDOK's true core", Type = ObjectiveType.ReachLocation, TargetId = "loc_nimdok_true_core" },
+                new() { Id = "reach_core", Description = "Reach Lazarus's true core", Type = ObjectiveType.ReachLocation, TargetId = "loc_nimdok_true_core" },
                 new() { Id = "choose", Description = "Make your choice", Type = ObjectiveType.Choice, TargetId = "choice_nimdok_fate" }
             },
             Reward = new QuestReward { Experience = 1500 },
@@ -1436,8 +1436,8 @@ public static class QuestDefinitions
         {
             Id = "main_27_lobotomy",
             Name = "The Lobotomy",
-            Description = "You've chosen to surgically remove NIMDOK's ability to control Strays. It will survive, but changed. Like all of you.",
-            Summary = "Perform NIMDOK's lobotomy",
+            Description = "You've chosen to surgically remove Lazarus's ability to control Strays. It will survive, but changed. Like all of you.",
+            Summary = "Perform Lazarus's lobotomy",
             Type = QuestType.Main,
             Act = ActState.Act3_Irreversibility,
             BiomeId = "glow",
@@ -1447,7 +1447,7 @@ public static class QuestDefinitions
             Objectives = new List<QuestObjective>
             {
                 new() { Id = "perform", Description = "Perform the procedure", Type = ObjectiveType.Interact, TargetId = "interactable_nimdok_core" },
-                new() { Id = "complete", Description = "Complete NIMDOK's lobotomy", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.LobotomizedNimdok }
+                new() { Id = "complete", Description = "Complete Lazarus's lobotomy", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.LobotomizedNimdok }
             },
             Reward = new QuestReward
             {

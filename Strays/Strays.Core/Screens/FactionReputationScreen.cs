@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Strays.Core.Game.Data;
+using Strays.Core.Game.Progression;
 using Strays.Core.Inputs;
 using Strays.Core.Services;
 using Strays.ScreenManagers;
@@ -60,26 +61,26 @@ public class FactionReputationScreen : GameScreen
     {
         _factionData.Clear();
 
-        // NIMDOK
+        // Lazarus
         _factionData.Add(new FactionDisplayData
         {
-            Type = FactionType.NIMDOK,
-            Name = "NIMDOK",
+            Type = FactionType.Lazarus,
+            Name = "Lazarus",
             Description = "The central AI system that maintains the wasteland. Its intentions remain unclear.",
             IconColor = Color.Cyan,
             ReputationTiers = new[]
             {
-                (-100, "Hostile", "NIMDOK's systems actively hunt you."),
-                (-50, "Untrusted", "NIMDOK monitors your every move."),
-                (0, "Unknown", "NIMDOK observes but does not interfere."),
-                (50, "Recognized", "NIMDOK grants limited system access."),
-                (100, "Integrated", "NIMDOK considers you an extension of itself.")
+                (-100, "Hostile", "Lazarus's systems actively hunt you."),
+                (-50, "Untrusted", "Lazarus monitors your every move."),
+                (0, "Unknown", "Lazarus observes but does not interfere."),
+                (50, "Recognized", "Lazarus grants limited system access."),
+                (100, "Integrated", "Lazarus considers you an extension of itself.")
             },
             Benefits = new Dictionary<int, string>
             {
                 { -50, "Hostile drones patrol nearby areas" },
                 { 0, "Neutral system interactions" },
-                { 50, "Access to NIMDOK terminals" },
+                { 50, "Access to Lazarus terminals" },
                 { 75, "Reduced encounter rates in Glow" },
                 { 100, "Full archive access" }
             }
@@ -90,7 +91,7 @@ public class FactionReputationScreen : GameScreen
         {
             Type = FactionType.Independents,
             Name = "The Independents",
-            Description = "Survivors who live outside NIMDOK's direct control. They value freedom above all.",
+            Description = "Survivors who live outside Lazarus's direct control. They value freedom above all.",
             IconColor = Color.Orange,
             ReputationTiers = new[]
             {
@@ -285,7 +286,7 @@ public class FactionReputationScreen : GameScreen
         {
             var faction = _factionData[i];
             bool isSelected = i == _selectedFactionIndex;
-            int reputation = _gameState.GetFactionReputation(faction.Type);
+            int reputation = _gameState.FactionReputation.GetReputation(faction.Type);
 
             var itemRect = new Rectangle(listX, listY + i * itemHeight, listWidth, itemHeight - 5);
 
@@ -360,7 +361,7 @@ public class FactionReputationScreen : GameScreen
         }
 
         var faction = _factionData[_selectedFactionIndex];
-        int reputation = _gameState.GetFactionReputation(faction.Type);
+        int reputation = _gameState.FactionReputation.GetReputation(faction.Type);
 
         int detailsX = 300;
         int detailsY = 60;
@@ -514,7 +515,7 @@ public class FactionReputationScreen : GameScreen
             return;
         }
 
-        string instructions = "↑↓ Navigate   ESC Close";
+        string instructions = "Up/Down Navigate   ESC Close";
         var instrSize = _font.MeasureString(instructions);
         var instrPos = new Vector2(
             ScreenManager.BaseScreenSize.X / 2f - instrSize.X / 2f,

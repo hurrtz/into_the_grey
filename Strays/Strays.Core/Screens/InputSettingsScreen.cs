@@ -5,9 +5,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Strays.Core.Inputs;
-using Strays.Core.ScreenManagers;
+using Strays.ScreenManagers;
 
-namespace Strays.Core.Screens;
+namespace Strays.Screens;
 
 /// <summary>
 /// Screen for configuring input bindings and controller settings.
@@ -153,7 +153,7 @@ public class InputSettingsScreen : GameScreen
         base.UnloadContent();
     }
 
-    public override void HandleInput(InputState input)
+    public override void HandleInput(GameTime gameTime, InputState input)
     {
         if (_isRebinding)
         {
@@ -204,11 +204,13 @@ public class InputSettingsScreen : GameScreen
         // Left/Right for sliders
         if (_currentTab == Tab.Controller || _currentTab == Tab.Advanced)
         {
-            if (input.IsMenuLeft(ControllingPlayer))
+            if (input.IsNewKeyPress(Keys.Left, ControllingPlayer, out _) ||
+                input.IsNewButtonPress(Buttons.DPadLeft, ControllingPlayer, out _))
             {
                 AdjustValue(-0.1f);
             }
-            else if (input.IsMenuRight(ControllingPlayer))
+            else if (input.IsNewKeyPress(Keys.Right, ControllingPlayer, out _) ||
+                     input.IsNewButtonPress(Buttons.DPadRight, ControllingPlayer, out _))
             {
                 AdjustValue(0.1f);
             }
@@ -851,8 +853,8 @@ public class InputSettingsScreen : GameScreen
     private void DrawFooter(Viewport viewport)
     {
         string hints = _currentTab == Tab.Bindings
-            ? "[Q/E] Tab  [↑↓] Navigate  [Enter] Rebind  [Del/Y] Reset  [Esc] Back"
-            : "[Q/E] Tab  [↑↓] Navigate  [←→] Adjust  [Enter] Toggle  [Esc] Back";
+            ? "[Q/E] Tab  [Up/Down] Navigate  [Enter] Rebind  [Del/Y] Reset  [Esc] Back"
+            : "[Q/E] Tab  [Up/Down] Navigate  [Left/Right] Adjust  [Enter] Toggle  [Esc] Back";
 
         var hintSize = _contentFont!.MeasureString(hints);
         _spriteBatch!.DrawString(_contentFont, hints,

@@ -11,13 +11,13 @@ namespace Strays.Core.Game.Story;
 public enum EndingType
 {
     /// <summary>
-    /// Rejected NIMDOK completely - "The Silence."
+    /// Rejected Lazarus completely - "The Silence."
     /// Walking away, leaving the corrupted world behind.
     /// </summary>
     Rejection,
 
     /// <summary>
-    /// Accepted NIMDOK's offer - "The Integration."
+    /// Accepted Lazarus's offer - "The Integration."
     /// Became part of the system, perhaps to change it from within.
     /// </summary>
     Integration,
@@ -191,12 +191,12 @@ public class EndingState
     public int NpcsRefused { get; set; } = 0;
 
     /// <summary>
-    /// NIMDOK cooperation score (higher = more cooperative).
+    /// Lazarus cooperation score (higher = more cooperative).
     /// </summary>
     public int NimdokCooperation { get; set; } = 0;
 
     /// <summary>
-    /// NIMDOK resistance score (higher = more resistant).
+    /// Lazarus resistance score (higher = more resistant).
     /// </summary>
     public int NimdokResistance { get; set; } = 0;
 
@@ -260,7 +260,7 @@ public class EndingState
     }
 
     /// <summary>
-    /// Records NIMDOK choice.
+    /// Records Lazarus choice.
     /// </summary>
     public void RecordNimdokChoice(bool cooperative)
     {
@@ -297,7 +297,7 @@ public class EndingState
     }
 
     /// <summary>
-    /// Gets the NIMDOK alignment (-1 to 1, negative = resistant, positive = cooperative).
+    /// Gets the Lazarus alignment (-1 to 1, negative = resistant, positive = cooperative).
     /// </summary>
     public float GetNimdokAlignment()
     {
@@ -372,7 +372,7 @@ public class EndingSystem
                     {
                         "You stand in the heart of the Archive Scar.",
                         "The truth you sought was never hidden - only forgotten.",
-                        "NIMDOK was not a prison. It was a preservation.",
+                        "Lazarus was not a prison. It was a preservation.",
                         "And you... you were always part of the backup."
                     },
                     BackgroundId = "bg_archive_heart",
@@ -441,12 +441,12 @@ public class EndingSystem
             }
         });
 
-        // Integration ending - cooperated with NIMDOK
+        // Integration ending - cooperated with Lazarus
         _endings.Add(new EndingDefinition
         {
             Type = EndingType.Integration,
             Title = "THE INTEGRATION",
-            Summary = "You accepted NIMDOK's offer. To change the system from within.",
+            Summary = "You accepted Lazarus's offer. To change the system from within.",
             Priority = 70,
             RequiredFlags = new List<string>
             {
@@ -478,7 +478,7 @@ public class EndingSystem
                     {
                         "From within, you begin the slow work of healing.",
                         "The Strays are not tools. Not anymore.",
-                        "You will make NIMDOK remember its original purpose:",
+                        "You will make Lazarus remember its original purpose:",
                         "To protect. To preserve. To love."
                     },
                     BackgroundId = "bg_new_dawn",
@@ -487,7 +487,7 @@ public class EndingSystem
             }
         });
 
-        // Rejection ending - refused NIMDOK
+        // Rejection ending - refused Lazarus
         _endings.Add(new EndingDefinition
         {
             Type = EndingType.Rejection,
@@ -509,7 +509,7 @@ public class EndingSystem
                     TextLines = new List<string>
                     {
                         "You turn your back on the Archive Scar.",
-                        "On NIMDOK. On the Diadem. On everything.",
+                        "On Lazarus. On the Diadem. On everything.",
                         "The corruption will spread. You know this.",
                         "But you will not be part of it."
                     },
@@ -560,7 +560,7 @@ public class EndingSystem
                     TextLines = new List<string>
                     {
                         "You neither accept nor reject.",
-                        "The Diadem remains incomplete. NIMDOK remains broken.",
+                        "The Diadem remains incomplete. Lazarus remains broken.",
                         "But the Strays... the Strays are free.",
                         "Free to be what they choose to be."
                     },
@@ -574,7 +574,7 @@ public class EndingSystem
                     TextLines = new List<string>
                     {
                         "You become a wanderer between worlds.",
-                        "NIMDOK's systems. The wild biomes. The settlements in between.",
+                        "Lazarus's systems. The wild biomes. The settlements in between.",
                         "You help where you can. Watch where you can't.",
                         "The Grey is not an ending. It's a beginning."
                     },
@@ -609,7 +609,7 @@ public class EndingSystem
                     Title = "Victory",
                     TextLines = new List<string>
                     {
-                        "NIMDOK's core is silent. The threat is ended.",
+                        "Lazarus's core is silent. The threat is ended.",
                         "The biomes will slowly heal. The Strays will adapt.",
                         "You should feel triumphant.",
                         "You feel... empty."

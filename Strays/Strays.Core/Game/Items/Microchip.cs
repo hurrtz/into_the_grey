@@ -1820,12 +1820,12 @@ public static class Microchips
             PlaceholderColor = Color.MediumPurple
         });
 
-        // NIMDOK-related unique chips
+        // Lazarus-related unique chips
         Register(new MicrochipDefinition
         {
             Id = "boost_control_fragment",
             Name = "Boost Control Fragment",
-            Description = "A fragment of NIMDOK's Boost Control System. Highly dangerous.",
+            Description = "A fragment of Lazarus's Boost Control System. Highly dangerous.",
             Category = MicrochipCategory.Driver,
             Rarity = ItemRarity.Legendary,
             IsUnique = true,
@@ -1839,7 +1839,7 @@ public static class Microchips
         {
             Id = "archive_key",
             Name = "Archive Key",
-            Description = "Grants access to NIMDOK's deep archives. What secrets lie within?",
+            Description = "Grants access to Lazarus's deep archives. What secrets lie within?",
             Category = MicrochipCategory.Protocol,
             Rarity = ItemRarity.Legendary,
             IsUnique = true,

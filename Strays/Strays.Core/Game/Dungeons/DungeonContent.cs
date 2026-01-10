@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 
 namespace Strays.Core.Game.Dungeons;
@@ -739,11 +740,11 @@ public static class DungeonContent
         {
             Id = "green_lab_reception",
             Name = "Reception Hall",
-            Description = "NIMDOK's logo still adorns the wall. 'Preserving Tomorrow, Today.'",
+            Description = "Lazarus's logo still adorns the wall. 'Preserving Tomorrow, Today.'",
             DungeonId = "green_laboratory",
             Layout = RoomLayout.OpenSquare,
             Features = new List<RoomFeature> { RoomFeature.DataTerminal },
-            LoreText = "Welcome to NIMDOK Bio-Research. Your appointment has been confirmed."
+            LoreText = "Welcome to Lazarus Bio-Research. Your appointment has been confirmed."
         });
 
         Register(new AuthoredRoom
@@ -761,7 +762,7 @@ public static class DungeonContent
         {
             Id = "green_lab_perfect",
             Name = "Chamber Zero",
-            Description = "The final experiment. NIMDOK's 'perfect' creation awaits.",
+            Description = "The final experiment. Lazarus's 'perfect' creation awaits.",
             DungeonId = "green_laboratory",
             Layout = RoomLayout.BossArena,
             EntryDialogId = "boss_perfect_organism_intro"
@@ -1113,7 +1114,7 @@ public static class DungeonContent
         {
             Id = "glow_gate_perimeter",
             Name = "Security Perimeter",
-            Description = "NIMDOK's outer defenses. Drones patrol endlessly.",
+            Description = "Lazarus's outer defenses. Drones patrol endlessly.",
             DungeonId = "glow_nimdok_gate",
             Layout = RoomLayout.OpenSquare,
             FixedEncounterId = "glow_nimdok_forces"
@@ -1134,7 +1135,7 @@ public static class DungeonContent
         {
             Id = "glow_gate_avatar",
             Name = "Avatar Chamber",
-            Description = "NIMDOK manifests here. This is as close to the real thing as you can get.",
+            Description = "Lazarus manifests here. This is as close to the real thing as you can get.",
             DungeonId = "glow_nimdok_gate",
             Layout = RoomLayout.BossArena,
             EntryDialogId = "boss_nimdok_avatar_intro"
@@ -1218,7 +1219,7 @@ public static class DungeonContent
         {
             Id = "archive_memory_vault",
             Name = "Memory Vault",
-            Description = "Protected memories. Things NIMDOK deemed too precious to lose.",
+            Description = "Protected memories. Things Lazarus deemed too precious to lose.",
             DungeonId = "archive_memory_banks",
             Layout = RoomLayout.CentralPillar,
             Features = new List<RoomFeature> { RoomFeature.DataTerminal, RoomFeature.SecretArea },
@@ -1259,8 +1260,8 @@ public static class DungeonContent
         Register(new AuthoredRoom
         {
             Id = "archive_core_final",
-            Name = "NIMDOK's Heart",
-            Description = "The true form of NIMDOK. Everything leads here.",
+            Name = "Lazarus's Heart",
+            Description = "The true form of Lazarus. Everything leads here.",
             DungeonId = "archive_core",
             Layout = RoomLayout.BossArena,
             EntryDialogId = "boss_nimdok_true_form_intro"
@@ -1434,7 +1435,7 @@ public static class DungeonContent
             }
         });
 
-        // NIMDOK Avatar - 5 phases
+        // Lazarus Avatar - 5 phases
         RegisterBossPhases("nimdok_avatar", new List<BossPhase>
         {
             new()
@@ -1479,7 +1480,7 @@ public static class DungeonContent
             }
         });
 
-        // NIMDOK True Form - 5 phases (final boss)
+        // Lazarus True Form - 5 phases (final boss)
         RegisterBossPhases("nimdok_true_form", new List<BossPhase>
         {
             new()

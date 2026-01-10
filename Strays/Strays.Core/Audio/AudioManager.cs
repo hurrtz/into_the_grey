@@ -137,7 +137,7 @@ public enum SoundEffect
     // Special
     Gravitation,
     Corruption,
-    NIMDOK,
+    Lazarus,
     Warning,
     Error
 }

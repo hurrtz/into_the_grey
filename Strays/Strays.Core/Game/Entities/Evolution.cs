@@ -505,7 +505,7 @@ public static class Evolutions
 
     private static void RegisterCorruptedEvolutions()
     {
-        // Corrupted evolution - happens when Stray has NIMDOK cortex and high stress
+        // Corrupted evolution - happens when Stray has Lazarus cortex and high stress
         Register(new EvolutionDefinition
         {
             Id = "corrupted_generic",
@@ -519,7 +519,7 @@ public static class Evolutions
             NewElement = Element.Corruption,
             NewColor = Color.DarkMagenta,
             IsCorruptedEvolution = true,
-            Description = "NIMDOK's corruption consumes the Stray..."
+            Description = "Lazarus's corruption consumes the Stray..."
         });
 
         // Special: Bandit's final corrupted form (Act 3)

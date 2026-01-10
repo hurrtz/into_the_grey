@@ -100,7 +100,7 @@ public enum RoomTile
 /// <summary>
 /// Generated room layout with tile data.
 /// </summary>
-public class RoomLayout
+public class GeneratedRoomLayout
 {
     /// <summary>
     /// Layout type.
@@ -467,7 +467,7 @@ public static class RoomGenerator
     /// <summary>
     /// Generates a room layout for the specified room type.
     /// </summary>
-    public static RoomLayout GenerateRoom(RoomType roomType, int enemyCount = 3)
+    public static GeneratedRoomLayout GenerateRoom(RoomType roomType, int enemyCount = 3)
     {
         var layoutType = GetLayoutTypeForRoom(roomType);
         return GenerateFromTemplate(layoutType, enemyCount);
@@ -510,7 +510,7 @@ public static class RoomGenerator
     /// <summary>
     /// Generates a room from a template.
     /// </summary>
-    public static RoomLayout GenerateFromTemplate(RoomLayoutType layoutType, int enemyCount = 3)
+    public static GeneratedRoomLayout GenerateFromTemplate(RoomLayoutType layoutType, int enemyCount = 3)
     {
         if (!_templates.TryGetValue(layoutType, out var templates) || templates.Count == 0)
         {
@@ -525,7 +525,7 @@ public static class RoomGenerator
     /// <summary>
     /// Parses a template into a room layout.
     /// </summary>
-    private static RoomLayout ParseTemplate(RoomTemplate template, int enemyCount)
+    private static GeneratedRoomLayout ParseTemplate(RoomTemplate template, int enemyCount)
     {
         var pattern = template.Pattern;
         var legend = template.Legend.Count > 0 ? template.Legend : RoomTemplate.DefaultLegend;
@@ -534,7 +534,7 @@ public static class RoomGenerator
         int width = pattern.Max(row => row.Length);
 
         var tiles = new RoomTile[height, width];
-        var layout = new RoomLayout
+        var layout = new GeneratedRoomLayout
         {
             Type = template.Type,
             Width = width,
@@ -600,7 +600,7 @@ public static class RoomGenerator
     /// <summary>
     /// Selects enemy spawn points from potential locations.
     /// </summary>
-    private static void SelectEnemySpawns(RoomLayout layout, List<Point> potentialSpawns, int enemyCount)
+    private static void SelectEnemySpawns(GeneratedRoomLayout layout, List<Point> potentialSpawns, int enemyCount)
     {
         // Shuffle potential spawns
         var shuffled = potentialSpawns.OrderBy(_ => _random.Next()).ToList();
@@ -624,7 +624,7 @@ public static class RoomGenerator
     /// <summary>
     /// Generates random spawn points in walkable areas.
     /// </summary>
-    private static List<Point> GenerateRandomSpawnPoints(RoomLayout layout, int count)
+    private static List<Point> GenerateRandomSpawnPoints(GeneratedRoomLayout layout, int count)
     {
         var spawns = new List<Point>();
         var attempts = 0;
@@ -654,7 +654,7 @@ public static class RoomGenerator
     /// <summary>
     /// Generates a procedural room without using templates.
     /// </summary>
-    public static RoomLayout GenerateProcedural(int width, int height, int enemyCount = 3)
+    public static GeneratedRoomLayout GenerateProcedural(int width, int height, int enemyCount = 3)
     {
         var tiles = new RoomTile[height, width];
 
@@ -675,7 +675,7 @@ public static class RoomGenerator
             }
         }
 
-        var layout = new RoomLayout
+        var layout = new GeneratedRoomLayout
         {
             Type = RoomLayoutType.Open,
             Width = width,
@@ -709,7 +709,7 @@ public static class RoomGenerator
     /// <summary>
     /// Gets a healing room layout.
     /// </summary>
-    public static RoomLayout GenerateHealingRoom()
+    public static GeneratedRoomLayout GenerateHealingRoom()
     {
         var pattern = new[]
         {
@@ -734,7 +734,7 @@ public static class RoomGenerator
     /// <summary>
     /// Gets a treasure room layout.
     /// </summary>
-    public static RoomLayout GenerateTreasureRoom()
+    public static GeneratedRoomLayout GenerateTreasureRoom()
     {
         var pattern = new[]
         {

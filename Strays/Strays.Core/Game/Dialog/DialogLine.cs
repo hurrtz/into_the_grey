@@ -58,7 +58,7 @@ public enum SpeakerType
     System,
 
     /// <summary>
-    /// NIMDOK or other AI system.
+    /// Lazarus or other AI system.
     /// </summary>
     AI
 }

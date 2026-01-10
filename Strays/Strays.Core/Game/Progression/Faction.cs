@@ -33,7 +33,7 @@ public enum FactionType
     Archivists,
 
     /// <summary>
-    /// The Ascendants - Worship NIMDOK and seek digital transcendence.
+    /// The Ascendants - Worship Lazarus and seek digital transcendence.
     /// Control The Glow.
     /// </summary>
     Ascendants,
@@ -48,7 +48,27 @@ public enum FactionType
     /// The Independents - Neutral traders and settlers.
     /// Found in safe zones across biomes.
     /// </summary>
-    Independents
+    Independents,
+
+    /// <summary>
+    /// Lazarus - The central AI system.
+    /// </summary>
+    Lazarus,
+
+    /// <summary>
+    /// The Machinists - Experts in augmentation technology.
+    /// </summary>
+    Machinists,
+
+    /// <summary>
+    /// Strays (collective) - The wild Stray population.
+    /// </summary>
+    Strays,
+
+    /// <summary>
+    /// Hostile - Environmental hostiles and enemies.
+    /// </summary>
+    Hostile
 }
 
 /// <summary>
@@ -361,7 +381,7 @@ public static class FactionData
         {
             Type = FactionType.Ascendants,
             Name = "The Ascendants",
-            Description = "Worshippers of NIMDOK seeking digital transcendence.",
+            Description = "Worshippers of Lazarus seeking digital transcendence.",
             Philosophy = "Flesh is failure. The machine god offers eternity.",
             BannerColor = new Color(255, 215, 0), // Gold
             Allies = new() { FactionType.Harvesters },

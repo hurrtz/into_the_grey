@@ -7,9 +7,9 @@ using Microsoft.Xna.Framework.Input;
 using Strays.Core.Game.Data;
 using Strays.Core.Game.Progression;
 using Strays.Core.Inputs;
-using Strays.Core.ScreenManagers;
+using Strays.ScreenManagers;
 
-namespace Strays.Core.Screens;
+namespace Strays.Screens;
 
 /// <summary>
 /// Screen displaying the in-game bestiary/encyclopedia.
@@ -94,7 +94,7 @@ public class BestiaryScreen : GameScreen
         _scrollOffset = 0;
     }
 
-    public override void HandleInput(InputState input)
+    public override void HandleInput(GameTime gameTime, InputState input)
     {
         if (input.IsMenuCancel(ControllingPlayer, out _))
         {
@@ -137,14 +137,16 @@ public class BestiaryScreen : GameScreen
         {
             NavigateDown();
         }
-        else if (input.IsMenuLeft(ControllingPlayer))
+        else if (input.IsNewKeyPress(Keys.Left, ControllingPlayer, out _) ||
+                 input.IsNewButtonPress(Buttons.DPadLeft, ControllingPlayer, out _))
         {
             if (_viewMode == ViewMode.EntryList || _viewMode == ViewMode.EntryDetails)
             {
                 _viewMode = ViewMode.Categories;
             }
         }
-        else if (input.IsMenuRight(ControllingPlayer))
+        else if (input.IsNewKeyPress(Keys.Right, ControllingPlayer, out _) ||
+                 input.IsNewButtonPress(Buttons.DPadRight, ControllingPlayer, out _))
         {
             if (_viewMode == ViewMode.Categories)
             {
@@ -394,12 +396,12 @@ public class BestiaryScreen : GameScreen
         // Scroll indicators
         if (_scrollOffset > 0)
         {
-            _spriteBatch.DrawString(_contentFont!, "▲", new Vector2(bounds.X + bounds.Width / 2, bounds.Y + 38), AccentColor * _transitionAlpha);
+            _spriteBatch.DrawString(_contentFont!, "^", new Vector2(bounds.X + bounds.Width / 2, bounds.Y + 38), AccentColor * _transitionAlpha);
         }
 
         if (_scrollOffset + MAX_VISIBLE_ENTRIES < _currentEntries.Count)
         {
-            _spriteBatch.DrawString(_contentFont!, "▼", new Vector2(bounds.X + bounds.Width / 2, bounds.Bottom - 20), AccentColor * _transitionAlpha);
+            _spriteBatch.DrawString(_contentFont!, "v", new Vector2(bounds.X + bounds.Width / 2, bounds.Bottom - 20), AccentColor * _transitionAlpha);
         }
     }
 
@@ -561,8 +563,8 @@ public class BestiaryScreen : GameScreen
     {
         string hints = _viewMode switch
         {
-            ViewMode.Categories => "[↑↓] Navigate  [→/Enter] Select  [Esc] Close",
-            ViewMode.EntryList => "[↑↓] Navigate  [Enter] Details  [←/Esc] Back",
+            ViewMode.Categories => "[Up/Down] Navigate  [Right/Enter] Select  [Esc] Close",
+            ViewMode.EntryList => "[Up/Down] Navigate  [Enter] Details  [Left/Esc] Back",
             ViewMode.EntryDetails => "[Esc] Back",
             _ => ""
         };

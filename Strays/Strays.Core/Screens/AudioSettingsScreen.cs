@@ -5,9 +5,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Strays.Core.Audio;
 using Strays.Core.Inputs;
-using Strays.Core.ScreenManagers;
+using Strays.ScreenManagers;
 
-namespace Strays.Core.Screens;
+namespace Strays.Screens;
 
 /// <summary>
 /// Screen for configuring audio settings.
@@ -190,7 +190,7 @@ public class AudioSettingsScreen : GameScreen
         base.UnloadContent();
     }
 
-    public override void HandleInput(InputState input)
+    public override void HandleInput(GameTime gameTime, InputState input)
     {
         if (input.IsMenuCancel(ControllingPlayer, out _))
         {
@@ -218,11 +218,13 @@ public class AudioSettingsScreen : GameScreen
             {
                 float delta = 0f;
 
-                if (input.IsMenuLeft(ControllingPlayer))
+                if (input.IsNewKeyPress(Keys.Left, ControllingPlayer, out _) ||
+                    input.IsNewButtonPress(Buttons.DPadLeft, ControllingPlayer, out _))
                 {
                     delta = -0.05f;
                 }
-                else if (input.IsMenuRight(ControllingPlayer))
+                else if (input.IsNewKeyPress(Keys.Right, ControllingPlayer, out _) ||
+                         input.IsNewButtonPress(Buttons.DPadRight, ControllingPlayer, out _))
                 {
                     delta = 0.05f;
                 }
@@ -246,8 +248,8 @@ public class AudioSettingsScreen : GameScreen
             else if (currentItem.Type == SettingType.Toggle)
             {
                 if (input.IsMenuSelect(ControllingPlayer, out _) ||
-                    input.IsMenuLeft(ControllingPlayer) ||
-                    input.IsMenuRight(ControllingPlayer))
+                    input.IsNewKeyPress(Keys.Left, ControllingPlayer, out _) ||
+                    input.IsNewKeyPress(Keys.Right, ControllingPlayer, out _))
                 {
                     if (currentItem.Category.HasValue)
                     {
@@ -547,7 +549,7 @@ public class AudioSettingsScreen : GameScreen
 
     private void DrawFooter(Viewport viewport)
     {
-        string hints = "[↑↓] Navigate  [←→] Adjust Volume  [Enter] Select  [Esc] Back";
+        string hints = "[Up/Down] Navigate  [Left/Right] Adjust Volume  [Enter] Select  [Esc] Back";
         var hintSize = _contentFont!.MeasureString(hints);
 
         _spriteBatch!.DrawString(_contentFont, hints,

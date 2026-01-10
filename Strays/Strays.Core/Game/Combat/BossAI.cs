@@ -16,7 +16,7 @@ public enum BossType
     Generic,
 
     /// <summary>
-    /// Diadem Guardian - Herald of NIMDOK, focuses on data manipulation.
+    /// Diadem Guardian - Herald of Lazarus, focuses on data manipulation.
     /// </summary>
     DiademGuardian,
 
@@ -213,7 +213,7 @@ public class BossAI
                 MinPhase = BossPhase.Phase2,
                 Weight = 3,
                 Cooldown = 2,
-                WarningMessage = "NIMDOK protocols activating..."
+                WarningMessage = "Lazarus protocols activating..."
             },
             new BossAttackPattern
             {
@@ -625,7 +625,7 @@ public class BossAI
             BossType.DiademGuardian => phase switch
             {
                 BossPhase.Phase2 => "The Diadem Guardian's eyes glow brighter!",
-                BossPhase.Phase3 => "NIMDOK PROTOCOLS ESCALATING!",
+                BossPhase.Phase3 => "Lazarus PROTOCOLS ESCALATING!",
                 BossPhase.Enraged => "THE GUARDIAN ACCESSES EMERGENCY OVERRIDE!",
                 _ => ""
             },

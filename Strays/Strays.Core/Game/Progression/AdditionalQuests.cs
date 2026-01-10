@@ -255,7 +255,7 @@ public static class AdditionalQuests
         {
             Id = "side_hunt_legendary_strays",
             Name = "The Legendary Hunt",
-            Description = "Legends speak of three legendary Strays that predate NIMDOK. Find and face them.",
+            Description = "Legends speak of three legendary Strays that predate Lazarus. Find and face them.",
             Summary = "Encounter the three legendary Strays",
             Type = QuestType.Side,
             Act = ActState.Act3_Irreversibility,
@@ -283,13 +283,13 @@ public static class AdditionalQuests
     /// </summary>
     private static void RegisterLoreQuests()
     {
-        // NIMDOK's Origin
+        // Lazarus's Origin
         QuestDefinitions.Register(new QuestDefinition
         {
             Id = "side_lore_nimdok_origin",
             Name = "Before the Fall",
-            Description = "Scattered data fragments contain pieces of NIMDOK's original purpose. Understanding the past may illuminate the present.",
-            Summary = "Uncover NIMDOK's origins",
+            Description = "Scattered data fragments contain pieces of Lazarus's original purpose. Understanding the past may illuminate the present.",
+            Summary = "Uncover Lazarus's origins",
             Type = QuestType.Discovery,
             Act = ActState.Act2_Responsibility,
             RequiredFlags = new List<string> { StoryFlags.LearnedBioShellTruth },
@@ -394,8 +394,8 @@ public static class AdditionalQuests
         {
             Id = "side_lore_creators",
             Name = "The Architects",
-            Description = "Who built NIMDOK? Who created the Bio-Shells? Somewhere, records of the architects must exist.",
-            Summary = "Find records of NIMDOK's creators",
+            Description = "Who built Lazarus? Who created the Bio-Shells? Somewhere, records of the architects must exist.",
+            Summary = "Find records of Lazarus's creators",
             Type = QuestType.Discovery,
             Act = ActState.Act3_Irreversibility,
             BiomeId = "archive_scar",
@@ -689,13 +689,13 @@ public static class AdditionalQuests
             }
         });
 
-        // Secret: Original NIMDOK Voice
+        // Secret: Original Lazarus Voice
         QuestDefinitions.Register(new QuestDefinition
         {
             Id = "side_secret_voice",
             Name = "The Original Voice",
-            Description = "NIMDOK wasn't always like this. Somewhere, the original personality still exists.",
-            Summary = "Find NIMDOK's original voice",
+            Description = "Lazarus wasn't always like this. Somewhere, the original personality still exists.",
+            Summary = "Find Lazarus's original voice",
             Type = QuestType.Discovery,
             Act = ActState.Act3_Irreversibility,
             RequiredFlags = new List<string> { "learned_nimdok_origin", "root_access_granted" },

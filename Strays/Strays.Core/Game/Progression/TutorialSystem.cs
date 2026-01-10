@@ -253,7 +253,7 @@ public class TutorialSystem
             Priority = 100,
             Controls = new Dictionary<string, string>
             {
-                { "↑↓", "Navigate menu" },
+                { "Up/Down", "Navigate menu" },
                 { "Enter/Space", "Confirm selection" },
                 { "Esc", "Cancel/Back" }
             },
@@ -495,7 +495,7 @@ public class TutorialSystem
             Content = "Your reputation with different factions affects gameplay.",
             Tips = new List<string>
             {
-                "NIMDOK: The central AI system",
+                "Lazarus: The central AI system",
                 "Independents: Survivor communities",
                 "Machinists: Tech specialists",
                 "Strays: Wild creature collective",
@@ -517,7 +517,7 @@ public class TutorialSystem
             "Microchips level up through use. Practice makes perfect.",
             "Higher rarity augmentations can trigger special evolutions.",
             "The Diadem has three empty slots. What fills them?",
-            "NIMDOK is always watching. Or is it?",
+            "Lazarus is always watching. Or is it?",
             "Some endings can only be achieved through specific choices."
         };
 

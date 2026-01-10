@@ -6,9 +6,9 @@ using Microsoft.Xna.Framework.Input;
 using Strays.Core.Inputs;
 using Strays.Core.Localization;
 using Strays.Core.Services;
-using Strays.Core.ScreenManagers;
+using Strays.ScreenManagers;
 
-namespace Strays.Core.Screens;
+namespace Strays.Screens;
 
 /// <summary>
 /// Polished main menu screen for Into The Grey (Strays).
@@ -108,7 +108,7 @@ public class StraysMainMenuScreen : GameScreen
         {
             Text = L.Get(GameStrings.Menu_NewGame),
             Action = OnNewGame,
-            Icon = "▶"
+            Icon = ">"
         });
 
         if (_hasContinueData)
@@ -117,14 +117,14 @@ public class StraysMainMenuScreen : GameScreen
             {
                 Text = L.Get(GameStrings.Menu_Continue),
                 Action = OnContinue,
-                Icon = "↻"
+                Icon = ">"
             });
 
             _menuItems.Add(new MainMenuItem
             {
                 Text = L.Get(GameStrings.Menu_LoadGame),
                 Action = OnLoadGame,
-                Icon = "📁"
+                Icon = ">"
             });
         }
 
@@ -132,14 +132,14 @@ public class StraysMainMenuScreen : GameScreen
         {
             Text = L.Get(GameStrings.Menu_Settings),
             Action = OnSettings,
-            Icon = "⚙"
+            Icon = "*"
         });
 
         _menuItems.Add(new MainMenuItem
         {
             Text = L.Get(GameStrings.Menu_Quit),
             Action = OnQuit,
-            Icon = "✕"
+            Icon = "x"
         });
     }
 
@@ -185,7 +185,7 @@ public class StraysMainMenuScreen : GameScreen
         _pixelTexture?.Dispose();
     }
 
-    public override void HandleInput(InputState input)
+    public override void HandleInput(GameTime gameTime, InputState input)
     {
         if (input.IsMenuUp(ControllingPlayer))
         {
@@ -561,7 +561,7 @@ public class StraysMainMenuScreen : GameScreen
             new Color(80, 85, 100) * footerAlpha);
 
         // Controls hint
-        string controls = "[↑↓] Select   [Enter] Confirm   [Esc] Quit";
+        string controls = "[Up/Down] Select   [Enter] Confirm   [Esc] Quit";
         var controlsSize = _smallFont!.MeasureString(controls);
         _spriteBatch.DrawString(_smallFont, controls,
             new Vector2(viewport.Width - controlsSize.X - 15, viewport.Height - 30),
@@ -634,7 +634,7 @@ public class StraysMainMenuScreen : GameScreen
     {
         if (_gameState != null)
         {
-            var loadScreen = new SaveLoadScreen(_gameState, isSaving: false);
+            var loadScreen = new SaveLoadScreen(SaveLoadMode.Load);
             ScreenManager?.AddScreen(loadScreen, playerIndex);
         }
     }

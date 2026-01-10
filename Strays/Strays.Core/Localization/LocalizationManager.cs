@@ -348,10 +348,14 @@ public class LocalizationManager
             _currentCulture = new CultureInfo(cultureCode);
             Thread.CurrentThread.CurrentCulture = _currentCulture;
             Thread.CurrentThread.CurrentUICulture = _currentCulture;
+
+            // Also update the static Resources culture for direct Resources.XXX access
+            Resources.Culture = _currentCulture;
         }
         catch (CultureNotFoundException)
         {
             _currentCulture = CultureInfo.InvariantCulture;
+            Resources.Culture = CultureInfo.InvariantCulture;
         }
     }
 

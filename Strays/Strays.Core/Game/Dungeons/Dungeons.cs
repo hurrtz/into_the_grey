@@ -196,7 +196,7 @@ public static class Dungeons
         {
             Id = "green_laboratory",
             Name = "Bio-Research Lab",
-            Description = "NIMDOK's genetic experiments continue here, spawning ever-more dangerous creatures.",
+            Description = "Lazarus's genetic experiments continue here, spawning ever-more dangerous creatures.",
             Biome = BiomeType.Green,
             MinLevel = 15,
             MaxLevel = 25,
@@ -208,7 +208,7 @@ public static class Dungeons
             MidBossName = "Failed Experiment #7",
             FinalBossId = "perfect_organism",
             FinalBossName = "The Perfect Organism",
-            ObjectiveText = "Terminate NIMDOK's 'perfect' creation",
+            ObjectiveText = "Terminate Lazarus's 'perfect' creation",
             BaseExpReward = 500,
             BaseCurrencyReward = 250,
             AmbientColor = "#2a4a2a",
@@ -351,8 +351,8 @@ public static class Dungeons
         Register(new DungeonDefinition
         {
             Id = "glow_nimdok_gate",
-            Name = "NIMDOK's Gate",
-            Description = "The entrance to NIMDOK's core systems. Only the strongest can hope to survive.",
+            Name = "Lazarus's Gate",
+            Description = "The entrance to Lazarus's core systems. Only the strongest can hope to survive.",
             Biome = BiomeType.Glow,
             MinLevel = 28,
             MaxLevel = 40,
@@ -363,8 +363,8 @@ public static class Dungeons
             MidBossId = "firewall_construct",
             MidBossName = "Firewall Construct",
             FinalBossId = "nimdok_avatar",
-            FinalBossName = "NIMDOK Avatar",
-            ObjectiveText = "Breach NIMDOK's defenses and face its Avatar",
+            FinalBossName = "Lazarus Avatar",
+            ObjectiveText = "Breach Lazarus's defenses and face its Avatar",
             BaseExpReward = 800,
             BaseCurrencyReward = 400,
             AmbientColor = "#3a5a5a",
@@ -373,7 +373,7 @@ public static class Dungeons
     }
 
     /// <summary>
-    /// Archive Scar dungeons - NIMDOK's data core.
+    /// Archive Scar dungeons - Lazarus's data core.
     /// </summary>
     private static void RegisterArchiveDungeons()
     {
@@ -381,7 +381,7 @@ public static class Dungeons
         {
             Id = "archive_memory_banks",
             Name = "Memory Banks",
-            Description = "NIMDOK stores its memories here. Fragments of the old world, corrupted and dangerous.",
+            Description = "Lazarus stores its memories here. Fragments of the old world, corrupted and dangerous.",
             Biome = BiomeType.ArchiveScar,
             MinLevel = 25,
             MaxLevel = 35,
@@ -403,8 +403,8 @@ public static class Dungeons
         Register(new DungeonDefinition
         {
             Id = "archive_core",
-            Name = "NIMDOK Core",
-            Description = "The heart of NIMDOK itself. Here lies the truth... and the ultimate challenge.",
+            Name = "Lazarus Core",
+            Description = "The heart of Lazarus itself. Here lies the truth... and the ultimate challenge.",
             Biome = BiomeType.ArchiveScar,
             MinLevel = 35,
             MaxLevel = 50,
@@ -415,8 +415,8 @@ public static class Dungeons
             MidBossId = "truth_guardian",
             MidBossName = "Truth Guardian",
             FinalBossId = "nimdok_true_form",
-            FinalBossName = "NIMDOK - True Form",
-            ObjectiveText = "Face NIMDOK's True Form and decide the fate of the wasteland",
+            FinalBossName = "Lazarus - True Form",
+            ObjectiveText = "Face Lazarus's True Form and decide the fate of the wasteland",
             BaseExpReward = 1000,
             BaseCurrencyReward = 500,
             AmbientColor = "#3a3a5a",

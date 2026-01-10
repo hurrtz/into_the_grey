@@ -173,7 +173,7 @@ class SettingsScreen : MenuScreen
         currentLanguage = (currentLanguage + 1) % languages.Count;
 
         var selectedLanguage = languages[currentLanguage].Name;
-        LocalizationManager.SetCulture(selectedLanguage);
+        LocalizationManager.Instance.SetCulture(selectedLanguage);
 
         settingsManager.Settings.Language = currentLanguage;
     }

@@ -46,7 +46,7 @@ public enum Element
     Psionic,
 
     /// <summary>
-    /// Corruption - NIMDOK's dark influence.
+    /// Corruption - Lazarus's dark influence.
     /// </summary>
     Corruption
 }
@@ -147,7 +147,7 @@ public enum StatusEffect
     Shield = 1 << 9,      // Damage absorption
     Haste = 1 << 10,      // Increased speed
     Berserk = 1 << 11,    // Increased attack, can't use abilities
-    Corrupted = 1 << 12   // Special - NIMDOK influence
+    Corrupted = 1 << 12   // Special - Lazarus influence
 }
 
 /// <summary>
@@ -726,7 +726,7 @@ public static class Abilities
         {
             Id = "corrupted_strike",
             Name = "Corrupted Strike",
-            Description = "An attack infused with NIMDOK's corruption.",
+            Description = "An attack infused with Lazarus's corruption.",
             Element = Element.Corruption,
             Category = AbilityCategory.Damage,
             Target = AbilityTarget.SingleEnemy,

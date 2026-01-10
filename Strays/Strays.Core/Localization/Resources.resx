@@ -257,7 +257,7 @@
   <data name="Biome_ArchiveDesc" xml:space="preserve"><value>The wound where reality breaks down.</value></data>
 
   <!-- Factions -->
-  <data name="Faction_NIMDOK" xml:space="preserve"><value>NIMDOK</value></data>
+  <data name="Faction_Lazarus" xml:space="preserve"><value>Lazarus</value></data>
   <data name="Faction_Independents" xml:space="preserve"><value>Independents</value></data>
   <data name="Faction_Scavengers" xml:space="preserve"><value>Scavengers</value></data>
   <data name="Faction_Archive" xml:space="preserve"><value>Archive Keepers</value></data>
@@ -384,4 +384,9 @@
   <data name="Quit" xml:space="preserve"><value>Quit</value></data>
   <data name="About" xml:space="preserve"><value>About</value></data>
   <data name="Language" xml:space="preserve"><value>Language: </value></data>
+  <data name="YesButtonHelp" xml:space="preserve"><value>Yes = A Button, Space, Enter</value></data>
+  <data name="NoButtonHelp" xml:space="preserve"><value>No = B Button, Esc</value></data>
+  <data name="YesButtonText" xml:space="preserve"><value>Yes</value></data>
+  <data name="NoButtonText" xml:space="preserve"><value>No</value></data>
+  <data name="QuitQuestion" xml:space="preserve"><value>Are you sure you want to quit?</value></data>
 </root>

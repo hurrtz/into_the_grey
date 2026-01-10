@@ -70,9 +70,9 @@ public enum Faction
     Machinists,
 
     /// <summary>
-    /// NIMDOK's systems and followers.
+    /// Lazarus's systems and followers.
     /// </summary>
-    NIMDOK,
+    Lazarus,
 
     /// <summary>
     /// Hostile faction.
@@ -184,14 +184,14 @@ public static class NPCDefinitions
     {
         // Act 1 NPCs
 
-        // NIMDOK Terminal - an AI interface
+        // Lazarus Terminal - an AI interface
         Register(new NPCDefinition
         {
             Id = "nimdok_terminal",
-            Name = "NIMDOK Terminal",
+            Name = "Lazarus Terminal",
             Type = NPCType.QuestGiver,
-            Faction = Faction.NIMDOK,
-            Description = "A flickering holographic interface connected to NIMDOK.",
+            Faction = Faction.Lazarus,
+            Description = "A flickering holographic interface connected to Lazarus.",
             DefaultDialogId = "nimdok_explain",
             ConditionalDialogs = new Dictionary<string, string>
             {
@@ -416,7 +416,7 @@ public static class NPCDefinitions
             Id = "quiet_lawnbot",
             Name = "Unit-47",
             Type = NPCType.QuestGiver,
-            Faction = Faction.NIMDOK,
+            Faction = Faction.Lazarus,
             Description = "A lawn maintenance drone that has achieved a kind of sentience. Still mows. Always mows.",
             DefaultDialogId = "lawnbot_greeting",
             QuestIds = new List<string> { "side_quiet_perfect_lawn" },
@@ -534,8 +534,8 @@ public static class NPCDefinitions
             Id = "glow_admin",
             Name = "Root",
             Type = NPCType.Merchant,
-            Faction = Faction.NIMDOK,
-            Description = "Has admin access to NIMDOK's outer systems. Uses it to help travelers... for a price.",
+            Faction = Faction.Lazarus,
+            Description = "Has admin access to Lazarus's outer systems. Uses it to help travelers... for a price.",
             DefaultDialogId = "root_greeting",
             ConditionalDialogs = new Dictionary<string, string>
             {
@@ -547,14 +547,14 @@ public static class NPCDefinitions
             RequiresFlag = "reached_glow"
         });
 
-        // NIMDOK Interface (Story Critical)
+        // Lazarus Interface (Story Critical)
         Register(new NPCDefinition
         {
             Id = "glow_nimdok_interface",
-            Name = "NIMDOK Interface",
+            Name = "Lazarus Interface",
             Type = NPCType.QuestGiver,
-            Faction = Faction.NIMDOK,
-            Description = "A direct connection to NIMDOK. It watches you. It always watches.",
+            Faction = Faction.Lazarus,
+            Description = "A direct connection to Lazarus. It watches you. It always watches.",
             DefaultDialogId = "nimdok_glow_greeting",
             ConditionalDialogs = new Dictionary<string, string>
             {

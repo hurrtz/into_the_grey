@@ -115,16 +115,16 @@ namespace Strays.Core
         {
             base.Initialize();
 
-            // Load supported languages and set the default language.
-            List<CultureInfo> cultures = LocalizationManager.GetSupportedCultures();
-            var languages = new List<CultureInfo>();
-            for (int i = 0; i < cultures.Count; i++)
+            // Set language from settings (Language int maps directly to GameLanguage enum)
+            var languageIndex = settingsManager.Settings.Language;
+            if (languageIndex >= 0 && languageIndex < Enum.GetValues<GameLanguage>().Length)
             {
-                languages.Add(cultures[i]);
+                LocalizationManager.Instance.SetLanguage((GameLanguage)languageIndex);
             }
-
-            var selectedLanguage = languages[settingsManager.Settings.Language].Name;
-            LocalizationManager.SetCulture(selectedLanguage);
+            else
+            {
+                LocalizationManager.Instance.SetLanguage(GameLanguage.English);
+            }
 
             // Initialize game state service
             gameStateService = new GameStateService();

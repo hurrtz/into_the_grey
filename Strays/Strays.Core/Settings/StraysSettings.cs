@@ -12,7 +12,7 @@ namespace Strays.Core.Settings;
 public class StraysSettings : INotifyPropertyChanged
 {
     private bool fullScreen;
-    private int language = 2; // Default to English for now
+    private int language = 0; // Default to English (index 0 in GameLanguage enum)
     private ParticleEffectType particleEffect;
 
     /// <summary>

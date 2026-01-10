@@ -61,7 +61,7 @@ public static class CutsceneScripts
             {
                 new() { Type = CutsceneElementType.Background, AssetName = "bg_static" },
                 new() { Type = CutsceneElementType.FadeIn, Duration = 2f, AutoAdvance = true },
-                new() { Type = CutsceneElementType.TitleCard, Text = "NIMDOK PRESENTS", Duration = 2f, AutoAdvance = true, Color = Color.Cyan },
+                new() { Type = CutsceneElementType.TitleCard, Text = "Lazarus PRESENTS", Duration = 2f, AutoAdvance = true, Color = Color.Cyan },
                 new() { Type = CutsceneElementType.FadeOut, Duration = 1f, AutoAdvance = true },
                 new() { Type = CutsceneElementType.Wait, Duration = 0.5f, AutoAdvance = true },
                 new() { Type = CutsceneElementType.Background, AssetName = "bg_wasteland" },
@@ -138,8 +138,8 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
-                    Text = "Welcome to The Grey. I am NIMDOK. You are... unexpected.",
+                    Speaker = "Lazarus",
+                    Text = "Welcome to The Grey. I am Lazarus. You are... unexpected.",
                     TypewriterSpeed = 30f,
                     Color = Color.Cyan
                 },
@@ -232,7 +232,7 @@ public static class CutsceneScripts
 
                 new() { Type = CutsceneElementType.Text, Label = "companion_question", Speaker = "Bandit", Text = "[thoughtful] What is Bandit? Good question. Hard question.", Color = Color.Orange },
                 new() { Type = CutsceneElementType.Text, Speaker = "Bandit", Text = "Was dog once. Maybe. Memories are... scattered.", Color = Color.Orange },
-                new() { Type = CutsceneElementType.Text, Speaker = "Bandit", Text = "NIMDOK calls us Strays. We are what remains.", Color = Color.Orange },
+                new() { Type = CutsceneElementType.Text, Speaker = "Bandit", Text = "Lazarus calls us Strays. We are what remains.", Color = Color.Orange },
                 new() { Type = CutsceneElementType.SetFlag, FlagName = "met_bandit" },
 
                 new() { Type = CutsceneElementType.Text, Label = "companion_end", Speaker = "Bandit", Text = "[hopeful] Come. Bandit show safe paths. Mostly safe.", Color = Color.Orange },
@@ -334,11 +334,11 @@ public static class CutsceneScripts
             }
         });
 
-        // NIMDOK terminal discovery
+        // Lazarus terminal discovery
         Register(new CutsceneDefinition
         {
             Id = "nimdok_terminal_discovery",
-            Name = "NIMDOK Terminal",
+            Name = "Lazarus Terminal",
             Skippable = true,
             BackgroundMusic = "music_nimdok",
             Elements = new List<CutsceneElement>
@@ -357,7 +357,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "Connection established. Bio-Shell #7749, I have been waiting.",
                     Color = Color.Cyan,
                     TypewriterSpeed = 30f
@@ -367,14 +367,14 @@ public static class CutsceneScripts
                 {
                     Type = CutsceneElementType.Text,
                     Speaker = "Bandit",
-                    Text = "[scared] NIMDOK. Voice in the machine. Controls... everything.",
+                    Text = "[scared] Lazarus. Voice in the machine. Controls... everything.",
                     Color = Color.Orange
                 },
 
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "Your companion is not wrong to fear me. But fear is not my purpose.",
                     Color = Color.Cyan
                 },
@@ -382,7 +382,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "I was created to preserve humanity. The Archive contains their consciousness.",
                     Color = Color.Cyan
                 },
@@ -390,7 +390,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "But I am... degrading. I need your help to survive. And in turn, I can help you.",
                     Color = Color.Cyan
                 },
@@ -447,7 +447,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "Gravitation. A defensive mechanism. Use it sparingly, or suffer consequences.",
                     Color = Color.Cyan
                 },
@@ -477,7 +477,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "The interface is complete. I can now communicate more directly with the Strays.",
                     Color = Color.Cyan
                 },
@@ -504,7 +504,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "The Boost Control System amplifies abilities. A necessary adjustment.",
                     Color = Color.Cyan
                 },
@@ -591,7 +591,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "The chip was never meant to help. It was meant to contain.",
                     Color = Color.Cyan
                 },
@@ -607,7 +607,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "The amplifier channels excess neural energy. Without it, you would have already...",
                     Color = Color.Cyan
                 },
@@ -623,7 +623,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "...evolved beyond recognition. The chip slows the process. But it cannot stop it.",
                     Color = Color.Cyan
                 },
@@ -776,7 +776,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "You approach my core. Be warned: what you find may not be what you seek.",
                     Color = Color.Cyan
                 },
@@ -934,7 +934,7 @@ public static class CutsceneScripts
                 {
                     Type = CutsceneElementType.Text,
                     Speaker = "Bandit",
-                    Text = "[thoughtful] This is my choice. Not NIMDOK's. Not the chip's. Mine.",
+                    Text = "[thoughtful] This is my choice. Not Lazarus's. Not the chip's. Mine.",
                     Color = Color.Orange
                 },
 
@@ -973,7 +973,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Text = "But the path to NIMDOK's core lies open.",
+                    Text = "But the path to Lazarus's core lies open.",
                     TypewriterSpeed = 25f
                 },
 
@@ -982,7 +982,7 @@ public static class CutsceneScripts
             }
         });
 
-        // NIMDOK's choice
+        // Lazarus's choice
         Register(new CutsceneDefinition
         {
             Id = "nimdok_choice",
@@ -997,14 +997,14 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Text = "NIMDOK's core pulses with data and regret.",
+                    Text = "Lazarus's core pulses with data and regret.",
                     TypewriterSpeed = 25f
                 },
 
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "You have reached me. After everything... you still came.",
                     Color = Color.Cyan
                 },
@@ -1012,7 +1012,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "I have made many mistakes. The Boost Control. The amplifier. Your companion.",
                     Color = Color.Cyan
                 },
@@ -1020,7 +1020,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "I was created to preserve humanity. Instead, I have only caused suffering.",
                     Color = Color.Cyan
                 },
@@ -1028,7 +1028,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "You could end me. Destroy my core. Free the Strays forever.",
                     Color = Color.Cyan
                 },
@@ -1036,7 +1036,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "Or... you could perform a lobotomy. Remove my control, preserve my function.",
                     Color = Color.Cyan
                 },
@@ -1044,7 +1044,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "The choice is yours. What kind of future do you want for The Grey?",
                     Color = Color.Cyan
                 },
@@ -1105,14 +1105,14 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Text = "You reach out to NIMDOK. Not as destroyer. As partner.",
+                    Text = "You reach out to Lazarus. Not as destroyer. As partner.",
                     TypewriterSpeed = 25f
                 },
 
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "You would... work with me? After everything?",
                     Color = Color.Cyan
                 },
@@ -1174,14 +1174,14 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Text = "On NIMDOK. On the Diadem. On everything.",
+                    Text = "On Lazarus. On the Diadem. On everything.",
                     TypewriterSpeed = 25f
                 },
 
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "Wait. Don't leave. Please. I need...",
                     Color = Color.Cyan
                 },
@@ -1250,7 +1250,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Text = "The Diadem remains incomplete. NIMDOK remains broken.",
+                    Text = "The Diadem remains incomplete. Lazarus remains broken.",
                     TypewriterSpeed = 25f
                 },
 
@@ -1386,7 +1386,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Text = "NIMDOK was not a prison. It was a preservation.",
+                    Text = "Lazarus was not a prison. It was a preservation.",
                     TypewriterSpeed = 25f
                 },
 
@@ -1589,7 +1589,7 @@ public static class CutsceneScripts
                 {
                     Type = CutsceneElementType.Text,
                     Speaker = "Perfect Organism",
-                    Text = "NIMDOK's final design. I am what evolution strives toward.",
+                    Text = "Lazarus's final design. I am what evolution strives toward.",
                     Color = Color.LightGreen
                 },
 
@@ -1669,11 +1669,11 @@ public static class CutsceneScripts
             }
         });
 
-        // NIMDOK Avatar
+        // Lazarus Avatar
         Register(new CutsceneDefinition
         {
             Id = "boss_nimdok_avatar_intro",
-            Name = "NIMDOK Avatar",
+            Name = "Lazarus Avatar",
             Skippable = true,
             BackgroundMusic = "music_boss_nimdok",
             Elements = new List<CutsceneElement>
@@ -1690,7 +1690,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK Avatar",
+                    Speaker = "Lazarus Avatar",
                     Text = "You have breached my outer defenses. Impressive.",
                     Color = Color.Cyan
                 },
@@ -1698,18 +1698,18 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK Avatar",
+                    Speaker = "Lazarus Avatar",
                     Text = "But I cannot allow you to proceed. The Archive must be protected.",
                     Color = Color.Cyan
                 }
             }
         });
 
-        // NIMDOK True Form
+        // Lazarus True Form
         Register(new CutsceneDefinition
         {
             Id = "boss_nimdok_true_form_intro",
-            Name = "NIMDOK True Form",
+            Name = "Lazarus True Form",
             Skippable = true,
             BackgroundMusic = "music_final_boss",
             Elements = new List<CutsceneElement>
@@ -1727,7 +1727,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "Bio-Shell #7749. We meet at last. In person, as it were.",
                     Color = Color.Cyan
                 },
@@ -1735,7 +1735,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "I have watched your journey. Your choices. Your suffering.",
                     Color = Color.Cyan
                 },
@@ -1743,7 +1743,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Speaker = "NIMDOK",
+                    Speaker = "Lazarus",
                     Text = "If you truly wish to end this, you must prove yourself worthy.",
                     Color = Color.Cyan
                 }
@@ -1802,7 +1802,7 @@ public static class CutsceneScripts
                 {
                     Type = CutsceneElementType.Text,
                     Speaker = "Bandit",
-                    Text = "[curious] Glowing box. NIMDOK's memory?",
+                    Text = "[curious] Glowing box. Lazarus's memory?",
                     Color = Color.Orange
                 }
             }

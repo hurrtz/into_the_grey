@@ -265,7 +265,7 @@ public static class GameStrings
 
     #region Factions
 
-    public const string Faction_NIMDOK = "Faction_NIMDOK";
+    public const string Faction_Lazarus = "Faction_Lazarus";
     public const string Faction_Independents = "Faction_Independents";
     public const string Faction_Scavengers = "Faction_Scavengers";
     public const string Faction_Archive = "Faction_Archive";

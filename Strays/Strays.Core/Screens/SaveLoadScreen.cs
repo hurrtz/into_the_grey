@@ -5,10 +5,13 @@ using System.Linq;
 using System.Text.Json;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Strays.Core.Input;
-using Strays.Core.Screens;
+using Microsoft.Xna.Framework.Input;
+using Strays.Core.Inputs;
+using Strays.ScreenManagers;
 
-namespace Strays.Core.Screens;
+namespace Strays.Screens;
+
+// Local pixel texture for drawing primitives
 
 /// <summary>
 /// Mode for the save/load screen.
@@ -107,6 +110,8 @@ public class SaveLoadScreen : GameScreen
     private float _selectionPulse;
     private float _fadeIn;
 
+    private Texture2D? _pixelTexture;
+
     private readonly Color _backgroundColor = new(15, 20, 30);
     private readonly Color _panelColor = new(25, 35, 50);
     private readonly Color _selectedColor = new(45, 65, 95);
@@ -131,6 +136,23 @@ public class SaveLoadScreen : GameScreen
         _slots = new List<SaveSlotPreview>();
 
         LoadSlotPreviews();
+    }
+
+    public override void LoadContent()
+    {
+        base.LoadContent();
+
+        // Create a 1x1 white pixel texture for drawing primitives
+        _pixelTexture = new Texture2D(ScreenManager.GraphicsDevice, 1, 1);
+        _pixelTexture.SetData(new[] { Color.White });
+    }
+
+    public override void UnloadContent()
+    {
+        base.UnloadContent();
+
+        _pixelTexture?.Dispose();
+        _pixelTexture = null;
     }
 
     /// <summary>
@@ -236,29 +258,29 @@ public class SaveLoadScreen : GameScreen
         }
 
         // Navigation
-        if (input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.Up) ||
-            input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.W))
+        if (input.IsNewKeyPress(Keys.Up, ControllingPlayer, out _) ||
+            input.IsNewKeyPress(Keys.W, ControllingPlayer, out _))
         {
             _selectedSlot = Math.Max(0, _selectedSlot - 1);
             UpdateScroll();
         }
-        else if (input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.Down) ||
-                 input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.S))
+        else if (input.IsNewKeyPress(Keys.Down, ControllingPlayer, out _) ||
+                 input.IsNewKeyPress(Keys.S, ControllingPlayer, out _))
         {
             _selectedSlot = Math.Min(_slots.Count - 1, _selectedSlot + 1);
             UpdateScroll();
         }
 
         // Selection
-        if (input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.Enter) ||
-            input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.Space))
+        if (input.IsNewKeyPress(Keys.Enter, ControllingPlayer, out _) ||
+            input.IsNewKeyPress(Keys.Space, ControllingPlayer, out _))
         {
             AttemptAction();
         }
 
         // Cancel
-        if (input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape) ||
-            input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.Back))
+        if (input.IsNewKeyPress(Keys.Escape, ControllingPlayer, out _) ||
+            input.IsNewKeyPress(Keys.Back, ControllingPlayer, out _))
         {
             Cancelled?.Invoke(this, EventArgs.Empty);
             ExitScreen();
@@ -267,7 +289,7 @@ public class SaveLoadScreen : GameScreen
         // Quick slot selection (1-6)
         for (int i = 0; i < SLOT_COUNT; i++)
         {
-            if (input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.D1 + i))
+            if (input.IsNewKeyPress(Keys.D1 + i, ControllingPlayer, out _))
             {
                 _selectedSlot = i;
                 UpdateScroll();
@@ -277,14 +299,14 @@ public class SaveLoadScreen : GameScreen
 
     private void HandleConfirmInput(InputState input)
     {
-        if (input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.Y) ||
-            input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.Enter))
+        if (input.IsNewKeyPress(Keys.Y, ControllingPlayer, out _) ||
+            input.IsNewKeyPress(Keys.Enter, ControllingPlayer, out _))
         {
             PerformAction();
             _confirmingAction = false;
         }
-        else if (input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.N) ||
-                 input.WasKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape))
+        else if (input.IsNewKeyPress(Keys.N, ControllingPlayer, out _) ||
+                 input.IsNewKeyPress(Keys.Escape, ControllingPlayer, out _))
         {
             _confirmingAction = false;
         }
@@ -376,13 +398,13 @@ public class SaveLoadScreen : GameScreen
         // Scroll indicators
         if (_scrollOffset > 0)
         {
-            spriteBatch.DrawString(font, "▲ More", new Vector2(startX + panelWidth / 2 - 30, startY - 25), _textColor * alpha * 0.6f);
+            spriteBatch.DrawString(font, "^ More", new Vector2(startX + panelWidth / 2 - 30, startY - 25), _textColor * alpha * 0.6f);
         }
 
         if (_scrollOffset + VISIBLE_SLOTS < _slots.Count)
         {
             float bottomY = startY + VISIBLE_SLOTS * (panelHeight + spacing);
-            spriteBatch.DrawString(font, "▼ More", new Vector2(startX + panelWidth / 2 - 30, bottomY), _textColor * alpha * 0.6f);
+            spriteBatch.DrawString(font, "v More", new Vector2(startX + panelWidth / 2 - 30, bottomY), _textColor * alpha * 0.6f);
         }
 
         // Instructions
@@ -532,13 +554,14 @@ public class SaveLoadScreen : GameScreen
 
     private void DrawFilledRectangle(SpriteBatch spriteBatch, Rectangle bounds, Color color)
     {
-        var pixel = ScreenManager.PixelTexture;
-        spriteBatch.Draw(pixel, bounds, color);
+        if (_pixelTexture == null) return;
+        spriteBatch.Draw(_pixelTexture, bounds, color);
     }
 
     private void DrawRectangleBorder(SpriteBatch spriteBatch, Rectangle bounds, Color color, int thickness)
     {
-        var pixel = ScreenManager.PixelTexture;
+        if (_pixelTexture == null) return;
+        var pixel = _pixelTexture;
 
         // Top
         spriteBatch.Draw(pixel, new Rectangle(bounds.X, bounds.Y, bounds.Width, thickness), color);

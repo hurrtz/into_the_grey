@@ -4,11 +4,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Strays.Core.Accessibility;
-using Strays.Core.Input;
 using Strays.Core.Inputs;
-using Strays.Core.Screens;
+using Strays.ScreenManagers;
 
-namespace Strays.Core.Screens;
+namespace Strays.Screens;
 
 /// <summary>
 /// Accessibility options screen.
@@ -25,6 +24,7 @@ public class AccessibilityScreen : GameScreen
     private readonly string[] _categories = { "Visual", "Audio", "Input", "Gameplay" };
 
     private float _fadeIn;
+    private Texture2D? _pixelTexture;
 
     private readonly Color _backgroundColor = new(18, 22, 28);
     private readonly Color _panelColor = new(28, 35, 45);
@@ -38,6 +38,19 @@ public class AccessibilityScreen : GameScreen
     {
         _settings = settings;
         BuildOptionsForCategory(0);
+    }
+
+    public override void LoadContent()
+    {
+        base.LoadContent();
+        _pixelTexture = new Texture2D(ScreenManager.GraphicsDevice, 1, 1);
+        _pixelTexture.SetData(new[] { Color.White });
+    }
+
+    public override void UnloadContent()
+    {
+        _pixelTexture?.Dispose();
+        base.UnloadContent();
     }
 
     private void BuildOptionsForCategory(int categoryIndex)
@@ -125,38 +138,38 @@ public class AccessibilityScreen : GameScreen
     public override void HandleInput(GameTime gameTime, InputState input)
     {
         // Category switching
-        if (input.WasKeyPressed(Keys.Tab) || input.WasKeyPressed(Keys.Q))
+        if (input.IsNewKeyPress(Keys.Tab, ControllingPlayer, out _) || input.IsNewKeyPress(Keys.Q, ControllingPlayer, out _))
         {
             _selectedCategory = (_selectedCategory - 1 + _categories.Length) % _categories.Length;
             BuildOptionsForCategory(_selectedCategory);
         }
-        else if (input.WasKeyPressed(Keys.E))
+        else if (input.IsNewKeyPress(Keys.E, ControllingPlayer, out _))
         {
             _selectedCategory = (_selectedCategory + 1) % _categories.Length;
             BuildOptionsForCategory(_selectedCategory);
         }
 
         // Navigation
-        if (input.WasKeyPressed(Keys.Up) || input.WasKeyPressed(Keys.W))
+        if (input.IsNewKeyPress(Keys.Up, ControllingPlayer, out _) || input.IsNewKeyPress(Keys.W, ControllingPlayer, out _))
         {
             _selectedIndex = Math.Max(0, _selectedIndex - 1);
             UpdateScroll();
         }
-        else if (input.WasKeyPressed(Keys.Down) || input.WasKeyPressed(Keys.S))
+        else if (input.IsNewKeyPress(Keys.Down, ControllingPlayer, out _) || input.IsNewKeyPress(Keys.S, ControllingPlayer, out _))
         {
             _selectedIndex = Math.Min(_options.Count - 1, _selectedIndex + 1);
             UpdateScroll();
         }
 
         // Value adjustment
-        if (input.WasKeyPressed(Keys.Left) || input.WasKeyPressed(Keys.A))
+        if (input.IsNewKeyPress(Keys.Left, ControllingPlayer, out _) || input.IsNewKeyPress(Keys.A, ControllingPlayer, out _))
         {
             if (_selectedIndex >= 0 && _selectedIndex < _options.Count)
             {
                 _options[_selectedIndex].Decrease();
             }
         }
-        else if (input.WasKeyPressed(Keys.Right) || input.WasKeyPressed(Keys.D))
+        else if (input.IsNewKeyPress(Keys.Right, ControllingPlayer, out _) || input.IsNewKeyPress(Keys.D, ControllingPlayer, out _))
         {
             if (_selectedIndex >= 0 && _selectedIndex < _options.Count)
             {
@@ -165,7 +178,7 @@ public class AccessibilityScreen : GameScreen
         }
 
         // Toggle/Select
-        if (input.WasKeyPressed(Keys.Enter) || input.WasKeyPressed(Keys.Space))
+        if (input.IsNewKeyPress(Keys.Enter, ControllingPlayer, out _) || input.IsNewKeyPress(Keys.Space, ControllingPlayer, out _))
         {
             if (_selectedIndex >= 0 && _selectedIndex < _options.Count)
             {
@@ -174,13 +187,13 @@ public class AccessibilityScreen : GameScreen
         }
 
         // Back
-        if (input.WasKeyPressed(Keys.Escape) || input.WasKeyPressed(Keys.Back))
+        if (input.IsNewKeyPress(Keys.Escape, ControllingPlayer, out _) || input.IsNewKeyPress(Keys.Back, ControllingPlayer, out _))
         {
             ExitScreen();
         }
 
         // Reset option
-        if (input.WasKeyPressed(Keys.R))
+        if (input.IsNewKeyPress(Keys.R, ControllingPlayer, out _))
         {
             if (_selectedIndex >= 0 && _selectedIndex < _options.Count)
             {
@@ -281,24 +294,24 @@ public class AccessibilityScreen : GameScreen
             // Arrows for adjustable options
             if (isSelected && option.IsAdjustable)
             {
-                spriteBatch.DrawString(font, "◄", new Vector2(panelX + panelWidth - valueSize.X - 55, y + 5), _accentColor * alpha);
-                spriteBatch.DrawString(font, "►", new Vector2(panelX + panelWidth - 15, y + 5), _accentColor * alpha);
+                spriteBatch.DrawString(font, "<", new Vector2(panelX + panelWidth - valueSize.X - 55, y + 5), _accentColor * alpha);
+                spriteBatch.DrawString(font, ">", new Vector2(panelX + panelWidth - 15, y + 5), _accentColor * alpha);
             }
         }
 
         // Scroll indicators
         if (_scrollOffset > 0)
         {
-            spriteBatch.DrawString(font, "▲", new Vector2(panelX + panelWidth / 2, panelY + 5), _textColor * alpha * 0.5f);
+            spriteBatch.DrawString(font, "^", new Vector2(panelX + panelWidth / 2, panelY + 5), _textColor * alpha * 0.5f);
         }
 
         if (_scrollOffset + VISIBLE_OPTIONS < _options.Count)
         {
-            spriteBatch.DrawString(font, "▼", new Vector2(panelX + panelWidth / 2, panelY + panelHeight - 20), _textColor * alpha * 0.5f);
+            spriteBatch.DrawString(font, "v", new Vector2(panelX + panelWidth / 2, panelY + panelHeight - 20), _textColor * alpha * 0.5f);
         }
 
         // Instructions
-        string instructions = "[Q/E] Category  [↑↓] Navigate  [←→] Adjust  [Enter] Toggle  [R] Reset  [Esc] Back";
+        string instructions = "[Q/E] Category  [Up/Down] Navigate  [Left/Right] Adjust  [Enter] Toggle  [R] Reset  [Esc] Back";
         var instSize = font.MeasureString(instructions);
         spriteBatch.DrawString(font, instructions, new Vector2((viewport.Width - instSize.X) / 2, viewport.Height - 40), _textColor * alpha * 0.6f);
 
@@ -307,8 +320,8 @@ public class AccessibilityScreen : GameScreen
 
     private void DrawFilledRectangle(SpriteBatch spriteBatch, Rectangle bounds, Color color)
     {
-        var pixel = ScreenManager.PixelTexture;
-        spriteBatch.Draw(pixel, bounds, color);
+        if (_pixelTexture == null) return;
+        spriteBatch.Draw(_pixelTexture, bounds, color);
     }
 }
 

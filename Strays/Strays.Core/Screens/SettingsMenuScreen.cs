@@ -7,9 +7,9 @@ using Strays.Core.Audio;
 using Strays.Core.Inputs;
 using Strays.Core.Localization;
 using Strays.Core.Settings;
-using Strays.Core.ScreenManagers;
+using Strays.ScreenManagers;
 
-namespace Strays.Core.Screens;
+namespace Strays.Screens;
 
 /// <summary>
 /// Modern tabbed settings screen with visual polish.
@@ -258,7 +258,7 @@ public class SettingsMenuScreen : GameScreen
         base.UnloadContent();
     }
 
-    public override void HandleInput(InputState input)
+    public override void HandleInput(GameTime gameTime, InputState input)
     {
         // Tab switching
         if (input.IsNewKeyPress(Keys.Q, ControllingPlayer, out _) ||
@@ -289,33 +289,36 @@ public class SettingsMenuScreen : GameScreen
         {
             var item = currentItems[_selectedIndex];
 
+            bool menuLeft = input.IsNewKeyPress(Keys.Left, ControllingPlayer, out _) ||
+                           input.IsNewButtonPress(Buttons.DPadLeft, ControllingPlayer, out _);
+            bool menuRight = input.IsNewKeyPress(Keys.Right, ControllingPlayer, out _) ||
+                            input.IsNewButtonPress(Buttons.DPadRight, ControllingPlayer, out _);
+
             if (item.Type == ItemType.Slider)
             {
-                if (input.IsMenuLeft(ControllingPlayer))
+                if (menuLeft)
                 {
                     AdjustSlider(item, -0.05f);
                 }
-                else if (input.IsMenuRight(ControllingPlayer))
+                else if (menuRight)
                 {
                     AdjustSlider(item, 0.05f);
                 }
             }
             else if (item.Type == ItemType.Toggle)
             {
-                if (input.IsMenuSelect(ControllingPlayer, out _) ||
-                    input.IsMenuLeft(ControllingPlayer) ||
-                    input.IsMenuRight(ControllingPlayer))
+                if (input.IsMenuSelect(ControllingPlayer, out _) || menuLeft || menuRight)
                 {
                     ToggleItem(item);
                 }
             }
             else if (item.Type == ItemType.Choice)
             {
-                if (input.IsMenuLeft(ControllingPlayer))
+                if (menuLeft)
                 {
                     CycleChoice(item, -1);
                 }
-                else if (input.IsMenuRight(ControllingPlayer) || input.IsMenuSelect(ControllingPlayer, out _))
+                else if (menuRight || input.IsMenuSelect(ControllingPlayer, out _))
                 {
                     CycleChoice(item, 1);
                 }
@@ -569,7 +572,7 @@ public class SettingsMenuScreen : GameScreen
         }
 
         // Tab switch hint
-        string hint = "[Q/LB] ← Tab → [E/RB]";
+        string hint = "[Q/LB] < Tab > [E/RB]";
         var hintSize = _smallFont!.MeasureString(hint);
         _spriteBatch!.DrawString(_smallFont, hint,
             new Vector2((viewport.Width - hintSize.X) / 2, y + tabHeight + 8),
@@ -644,7 +647,7 @@ public class SettingsMenuScreen : GameScreen
                 case ItemType.Choice:
                     if (item.Choices != null && item.ChoiceIndex < item.Choices.Length)
                     {
-                        string arrows = "◀ " + item.Choices[item.ChoiceIndex] + " ▶";
+                        string arrows = "< " + item.Choices[item.ChoiceIndex] + " >";
                         _spriteBatch.DrawString(_contentFont!, arrows,
                             new Vector2(valueX, y + 12), ValueColor * contentAlpha);
                     }
@@ -689,7 +692,7 @@ public class SettingsMenuScreen : GameScreen
 
     private void DrawFooter(Viewport viewport)
     {
-        string hints = "[↑↓] Navigate  [←→] Adjust  [Enter] Select  [Esc] Back";
+        string hints = "[Up/Down] Navigate  [Left/Right] Adjust  [Enter] Select  [Esc] Back";
         var hintSize = _contentFont!.MeasureString(hints);
 
         _spriteBatch!.DrawString(_contentFont, hints,

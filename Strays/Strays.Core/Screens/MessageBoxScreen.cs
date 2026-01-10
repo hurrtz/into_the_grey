@@ -3,7 +3,6 @@ using Strays.Core;
 using Strays.Core.Inputs;
 using Strays.Core.Localization;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Strays.Screens;
@@ -13,31 +12,39 @@ namespace Strays.Screens;
 /// </summary>
 class MessageBoxScreen : GameScreen
 {
-    private string message;
-    private Texture2D gradientTexture;
-    private readonly bool toastMessage;
-    private readonly TimeSpan toastDuration;
-    private TimeSpan toastTimer;
-    private Vector2 yesButtonPosition;
-    private Vector2 noButtonPosition;
-    private Vector2 messageTextPosition;
-    private Vector2 yesTextSize;
-    private Vector2 noTextSize;
-    private Rectangle backgroundRectangle;
+    private string _message;
+    private Texture2D? _pixelTexture;
+    private readonly bool _toastMessage;
+    private readonly TimeSpan _toastDuration;
+    private TimeSpan _toastTimer;
+    private readonly bool _showButtons;
+
+    // Layout calculations
+    private Rectangle _panelRect;
+    private Vector2 _messagePosition;
+    private Vector2 _yesButtonPosition;
+    private Vector2 _noButtonPosition;
+    private Vector2 _yesTextSize;
+    private Vector2 _noTextSize;
+
+    // Modern UI colors matching the game's style
+    private static readonly Color BackgroundColor = new(25, 30, 40, 245);
+    private static readonly Color PanelColor = new(35, 42, 55);
+    private static readonly Color BorderColor = new(80, 160, 255);
+    private static readonly Color TextColor = new(220, 225, 235);
+    private static readonly Color DimTextColor = new(140, 150, 170);
+    private static readonly Color YesColor = new(80, 200, 120);
+    private static readonly Color NoColor = new(255, 100, 100);
 
     /// <summary>
     /// Event raised when the user accepts the message box.
     /// </summary>
-    public event EventHandler<PlayerIndexEventArgs> Accepted;
+    public event EventHandler<PlayerIndexEventArgs>? Accepted;
 
     /// <summary>
     /// Event raised when the user cancels the message box.
     /// </summary>
-    public event EventHandler<PlayerIndexEventArgs> Cancelled;
-
-    // The background includes a border somewhat larger than the text itself.
-    private const int hPad = 32;
-    private const int vPad = 16;
+    public event EventHandler<PlayerIndexEventArgs>? Cancelled;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MessageBoxScreen"/> class, automatically including usage text.
@@ -52,22 +59,16 @@ class MessageBoxScreen : GameScreen
     /// Initializes a new instance of the <see cref="MessageBoxScreen"/> class, allowing customization.
     /// </summary>
     /// <param name="message">The message to display.</param>
-    /// <param name="includeUsageText">Indicates whether to include usage text.</param>
+    /// <param name="includeUsageText">Indicates whether to include usage text (shows buttons).</param>
     /// <param name="toastDuration">The duration for toast messages.</param>
     /// <param name="toastMessage">Indicates whether this is a toast message.</param>
     public MessageBoxScreen(string message, bool includeUsageText, TimeSpan toastDuration, bool toastMessage = false)
     {
-        string usageText =
-            $"{Environment.NewLine}{Environment.NewLine}{Resources.YesButtonHelp}{Environment.NewLine}{Resources.NoButtonHelp}";
-
-        if (includeUsageText && !toastMessage)
-            this.message = message + usageText;
-        else
-            this.message = message;
-
-        this.toastMessage = toastMessage;
-        this.toastDuration = toastDuration;
-        this.toastTimer = TimeSpan.Zero;
+        _message = message;
+        _toastMessage = toastMessage;
+        _toastDuration = toastDuration;
+        _toastTimer = TimeSpan.Zero;
+        _showButtons = includeUsageText && !toastMessage;
 
         IsPopup = true;
 
@@ -80,142 +81,174 @@ class MessageBoxScreen : GameScreen
     /// </summary>
     public override void LoadContent()
     {
-        ContentManager content = ScreenManager.Game.Content;
+        base.LoadContent();
 
-        gradientTexture = content.Load<Texture2D>("Sprites/gradient");
+        // Create a 1x1 white pixel texture for drawing rectangles
+        _pixelTexture = new Texture2D(ScreenManager.GraphicsDevice, 1, 1);
+        _pixelTexture.SetData(new[] { Color.White });
+    }
+
+    /// <summary>
+    /// Unloads graphics content for this screen.
+    /// </summary>
+    public override void UnloadContent()
+    {
+        base.UnloadContent();
+        _pixelTexture?.Dispose();
+        _pixelTexture = null;
     }
 
     /// <summary>
     /// Responds to user input, accepting or cancelling the message box.
     /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    /// <param name="inputState">The current input state.</param>
     public override void HandleInput(GameTime gameTime, InputState inputState)
     {
         base.HandleInput(gameTime, inputState);
 
-        // Ignore input if this is a ToastMessage
-        if (toastMessage)
+        if (_toastMessage)
         {
             return;
         }
 
         PlayerIndex playerIndex;
 
-        // We pass in our ControllingPlayer, which may either be null (to
-        // accept input from any player) or a specific index. If we pass a null
-        // controlling player, the InputState helper returns to us which player
-        // actually provided the input. We pass that through to our Accepted and
-        // Cancelled events, so they can tell which player triggered them.
         if (inputState.IsMenuSelect(ControllingPlayer, out playerIndex)
             || (StraysGame.IsMobile
-                && inputState.IsUIClicked(new Rectangle((int)yesButtonPosition.X, (int)yesButtonPosition.Y,
-                    (int)yesTextSize.X, (int)yesTextSize.Y))))
+                && inputState.IsUIClicked(new Rectangle((int)_yesButtonPosition.X, (int)_yesButtonPosition.Y,
+                    (int)_yesTextSize.X, (int)_yesTextSize.Y))))
         {
-            // Raise the accepted event, then exit the message box.
             Accepted?.Invoke(this, new PlayerIndexEventArgs(playerIndex));
-
             ExitScreen();
         }
         else if (inputState.IsMenuCancel(ControllingPlayer, out playerIndex)
                  || (StraysGame.IsMobile
-                     && inputState.IsUIClicked(new Rectangle((int)noButtonPosition.X, (int)noButtonPosition.Y,
-                         (int)noTextSize.X, (int)noTextSize.Y))))
+                     && inputState.IsUIClicked(new Rectangle((int)_noButtonPosition.X, (int)_noButtonPosition.Y,
+                         (int)_noTextSize.X, (int)_noTextSize.Y))))
         {
-            // Raise the cancelled event, then exit the message box.
             Cancelled?.Invoke(this, new PlayerIndexEventArgs(playerIndex));
-
             ExitScreen();
         }
     }
 
     /// <summary>
-    /// Updates the screen, particularly for toast messages and positioning.
+    /// Updates the screen layout.
     /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    /// <param name="otherScreenHasFocus">Indicates whether another screen has focus.</param>
-    /// <param name="coveredByOtherScreen">Indicates whether the screen is covered by another screen.</param>
     public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
     {
         base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
-        // Handle toast duration countdown.
-        if (toastMessage)
+        if (_toastMessage)
         {
-            toastTimer += gameTime.ElapsedGameTime;
-            if (toastTimer >= toastDuration)
+            _toastTimer += gameTime.ElapsedGameTime;
+            if (_toastTimer >= _toastDuration)
             {
-                // Raise the accepted event, then exit the message box.
                 Accepted?.Invoke(this, new PlayerIndexEventArgs(PlayerIndex.One));
-
-                // Exit the screen when the toast time has elapsed.
                 ExitScreen();
             }
         }
 
-        // Center the message text in the BaseScreenSize.
-        // The GlobalTransformation will scale everything for us.
-        Vector2 textSize = ScreenManager.Font.MeasureString(message);
-        messageTextPosition = (ScreenManager.BaseScreenSize - textSize) / 2;
-
-        // Done here because language setting could change dynamically. Possibly overkill?
-        yesTextSize = ScreenManager.Font.MeasureString(Resources.YesButtonText);
-        noTextSize = ScreenManager.Font.MeasureString(Resources.NoButtonText);
-        if (StraysGame.IsMobile
-            && !toastMessage)
+        if (ScreenManager?.Font == null)
         {
-            textSize += yesTextSize;
-            textSize.Y += vPad * 2;
+            return;
         }
 
-        backgroundRectangle = new Rectangle((int)messageTextPosition.X - hPad,
-            (int)messageTextPosition.Y - vPad,
-            (int)textSize.X + hPad * 2,
-            (int)textSize.Y + vPad * 2);
+        CalculateLayout();
+    }
 
-        if (StraysGame.IsMobile
-            && !toastMessage)
+    private void CalculateLayout()
+    {
+        var font = ScreenManager!.Font;
+        var screenSize = ScreenManager.BaseScreenSize;
+
+        Vector2 messageSize = font.MeasureString(_message);
+
+        // Calculate panel size
+        int panelWidth = Math.Max(320, (int)messageSize.X + 60);
+        int panelHeight = _showButtons ? 120 : 80;
+
+        // Center panel on screen
+        int panelX = (int)(screenSize.X - panelWidth) / 2;
+        int panelY = (int)(screenSize.Y - panelHeight) / 2;
+        _panelRect = new Rectangle(panelX, panelY, panelWidth, panelHeight);
+
+        // Center message in upper portion of panel
+        _messagePosition = new Vector2(
+            panelX + (panelWidth - messageSize.X) / 2,
+            panelY + 20);
+
+        // Button positions for mobile
+        if (StraysGame.IsMobile && _showButtons)
         {
-            yesButtonPosition =
-                new Vector2(
-                    backgroundRectangle.X + backgroundRectangle.Width - (yesTextSize.X + hPad + noTextSize.X + hPad),
-                    backgroundRectangle.Y + backgroundRectangle.Height - yesTextSize.Y - vPad);
-            noButtonPosition = new Vector2(backgroundRectangle.X + backgroundRectangle.Width - (noTextSize.X + hPad),
-                backgroundRectangle.Y + backgroundRectangle.Height - noTextSize.Y - vPad);
+            _yesTextSize = font.MeasureString(L.Get(GameStrings.Yes));
+            _noTextSize = font.MeasureString(L.Get(GameStrings.No));
+
+            int buttonY = panelY + panelHeight - 35;
+            int buttonSpacing = 100;
+            int centerX = panelX + panelWidth / 2;
+
+            _yesButtonPosition = new Vector2(centerX - buttonSpacing - _yesTextSize.X / 2, buttonY);
+            _noButtonPosition = new Vector2(centerX + buttonSpacing - _noTextSize.X / 2, buttonY);
         }
     }
 
     /// <summary>
-    /// Draws the message box.
+    /// Draws the message box with modern styling.
     /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
     public override void Draw(GameTime gameTime)
     {
+        if (_pixelTexture == null || ScreenManager == null || string.IsNullOrEmpty(_message)) return;
+
         SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
         SpriteFont font = ScreenManager.Font;
 
-        // Darken down any other screens that were drawn beneath the popup.
-        ScreenManager.FadeBackBufferToBlack(TransitionAlpha * 2 / 3);
+        // Darken background
+        ScreenManager.FadeBackBufferToBlack(TransitionAlpha * 0.6f);
 
-        // Fade the popup alpha during transitions.
-        Color color = Color.White * TransitionAlpha;
+        float alpha = TransitionAlpha;
 
         spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, ScreenManager.GlobalTransformation);
 
-        // Draw the background rectangle.
-        spriteBatch.Draw(gradientTexture, backgroundRectangle, color);
+        // Panel border (accent color)
+        var borderRect = new Rectangle(
+            _panelRect.X - 2,
+            _panelRect.Y - 2,
+            _panelRect.Width + 4,
+            _panelRect.Height + 4);
+        spriteBatch.Draw(_pixelTexture, borderRect, BorderColor * 0.8f * alpha);
 
-        // Draw the message box text.
-        spriteBatch.DrawString(font, message, messageTextPosition, color);
+        // Panel background
+        spriteBatch.Draw(_pixelTexture, _panelRect, PanelColor * alpha);
 
-        if (StraysGame.IsMobile
-            && !toastMessage)
+        // Inner panel highlight (top edge)
+        spriteBatch.Draw(_pixelTexture,
+            new Rectangle(_panelRect.X, _panelRect.Y, _panelRect.Width, 2),
+            BorderColor * 0.3f * alpha);
+
+        // Message text
+        spriteBatch.DrawString(font, _message, _messagePosition, TextColor * alpha);
+
+        // Draw button hints at bottom
+        if (_showButtons)
         {
-            color = Color.LimeGreen;
-            spriteBatch.DrawString(font, Resources.YesButtonText, yesButtonPosition, color);
-
-            color = Color.OrangeRed;
-            spriteBatch.DrawString(font, Resources.NoButtonText, noButtonPosition, color);
+            string hint;
+            if (StraysGame.IsMobile)
+            {
+                // Draw actual buttons for mobile
+                string yesText = L.Get(GameStrings.Yes);
+                string noText = L.Get(GameStrings.No);
+                spriteBatch.DrawString(font, yesText, _yesButtonPosition, YesColor * alpha);
+                spriteBatch.DrawString(font, noText, _noButtonPosition, NoColor * alpha);
+            }
+            else
+            {
+                // Draw hint text for desktop
+                hint = "[Enter] Yes    [Esc] No";
+                Vector2 hintSize = font.MeasureString(hint);
+                Vector2 hintPos = new Vector2(
+                    _panelRect.X + (_panelRect.Width - hintSize.X) / 2,
+                    _panelRect.Y + _panelRect.Height - 30);
+                spriteBatch.DrawString(font, hint, hintPos, DimTextColor * 0.8f * alpha);
+            }
         }
 
         spriteBatch.End();

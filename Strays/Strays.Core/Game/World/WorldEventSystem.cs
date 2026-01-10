@@ -41,9 +41,9 @@ public enum WorldEventType
     Distress,
 
     /// <summary>
-    /// NIMDOK system event.
+    /// Lazarus system event.
     /// </summary>
-    NIMDOK,
+    Lazarus,
 
     /// <summary>
     /// Companion-related event.
@@ -479,13 +479,13 @@ public class WorldEventSystem
             Reward = new EventReward { ItemIds = new List<string> { "random_rare_chip" } }
         });
 
-        // NIMDOK events
+        // Lazarus events
         Register(new WorldEventDefinition
         {
             Id = "evt_nimdok_drone",
-            Name = "NIMDOK Drone Patrol",
-            Description = "NIMDOK surveillance drones are scanning the area.",
-            Type = WorldEventType.NIMDOK,
+            Name = "Lazarus Drone Patrol",
+            Description = "Lazarus surveillance drones are scanning the area.",
+            Type = WorldEventType.Lazarus,
             Urgency = EventUrgency.Notable,
             ValidBiomes = new List<BiomeType> { BiomeType.Quiet, BiomeType.Glow },
             SpawnChance = 0.07f,
@@ -497,9 +497,9 @@ public class WorldEventSystem
         Register(new WorldEventDefinition
         {
             Id = "evt_nimdok_message",
-            Name = "NIMDOK Broadcast",
-            Description = "A NIMDOK terminal is transmitting a message...",
-            Type = WorldEventType.NIMDOK,
+            Name = "Lazarus Broadcast",
+            Description = "A Lazarus terminal is transmitting a message...",
+            Type = WorldEventType.Lazarus,
             Urgency = EventUrgency.Optional,
             ValidBiomes = new List<BiomeType> { BiomeType.Glow, BiomeType.ArchiveScar },
             MinLevel = 15,
@@ -508,7 +508,7 @@ public class WorldEventSystem
             Cooldown = 600f,
             IconColor = Color.Cyan,
             DialogId = "nimdok_broadcast",
-            Reward = new EventReward { FactionReputation = 5, FactionType = "NIMDOK" }
+            Reward = new EventReward { FactionReputation = 5, FactionType = "Lazarus" }
         });
 
         // Companion events

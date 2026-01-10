@@ -6,7 +6,7 @@ namespace Strays.Core.Game.Data;
 public enum ActState
 {
     /// <summary>
-    /// Act 1: Denial & Causality - Journey to NIMDOK's core.
+    /// Act 1: Denial & Causality - Journey to Lazarus's core.
     /// The protagonist believes the wasteland is temporary and seeks to return to the simulation.
     /// </summary>
     Act1_Denial,

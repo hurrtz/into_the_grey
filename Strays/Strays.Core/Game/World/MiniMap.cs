@@ -739,7 +739,7 @@ public class MiniMap
         return biome switch
         {
             BiomeType.Fringe => Color.DarkGreen,
-            BiomeType.Suburb => Color.Gray,
+            BiomeType.Rust => Color.Gray,
             BiomeType.Green => Color.ForestGreen,
             BiomeType.Quiet => Color.LightGray,
             BiomeType.Teeth => Color.DarkRed,
@@ -757,7 +757,7 @@ public class MiniMap
         return biome switch
         {
             BiomeType.Fringe => "The Fringe",
-            BiomeType.Suburb => "The Suburb",
+            BiomeType.Rust => "The Rust",
             BiomeType.Green => "The Green",
             BiomeType.Quiet => "The Quiet",
             BiomeType.Teeth => "The Teeth",
