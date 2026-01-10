@@ -1,26 +1,30 @@
-# Strays Architecture Documentation
+# Lazarus Architecture Documentation
 
 ## System Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         StraysGame                                   │
-│  (Main game class - initialization, services, game loop)            │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │
-│  │ScreenManager│  │SettingsMgr  │  │ParticleMgr  │  │LocalizeMgr  │ │
-│  │             │  │             │  │             │  │             │ │
-│  │ Manages UI  │  │ Persists    │  │ Visual FX   │  │ i18n        │ │
-│  │ screen stack│  │ settings    │  │ system      │  │ support     │ │
-│  └──────┬──────┘  └─────────────┘  └─────────────┘  └─────────────┘ │
-│         │                                                            │
-│  ┌──────▼──────────────────────────────────────────────────────────┐│
-│  │                      GameScreen (base)                          ││
-│  │  LoadContent() → Update() → HandleInput() → Draw() → Unload()   ││
-│  └─────────────────────────────────────────────────────────────────┘│
-│                                                                      │
-└─────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           LazarusGame                                    │
+│  (Main game class - initialization, services, game loop)                │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐       │
+│  │ScreenManager│ │GameState    │ │SettingsMgr  │ │ParticleMgr  │       │
+│  │             │ │Service      │ │             │ │             │       │
+│  │ Manages UI  │ │ Save/Load   │ │ Persists    │ │ Visual FX   │       │
+│  │ screen stack│ │ Progression │ │ settings    │ │ system      │       │
+│  └──────┬──────┘ └─────────────┘ └─────────────┘ └─────────────┘       │
+│         │                                                                │
+│  ┌──────▼───────────────────────────────────────────────────────────┐   │
+│  │                      GameScreen (base)                            │   │
+│  │  LoadContent() → Update() → HandleInput() → Draw() → Unload()    │   │
+│  └───────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐                        │
+│  │LocalizeMgr  │ │AudioManager │ │Accessibility│                        │
+│  │ i18n (5 lang)│ │ Music/SFX   │ │ Settings    │                        │
+│  └─────────────┘ └─────────────┘ └─────────────┘                        │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Initialization Flow
@@ -29,20 +33,21 @@
 Program.Main()
     │
     ▼
-StraysGame()
+LazarusGame()
     ├── Platform detection (Mobile/Desktop)
     ├── GraphicsDeviceManager creation
-    ├── SettingsManager creation
-    ├── LeaderboardManager creation
+    ├── SettingsManager<LazarusSettings> creation
+    ├── SettingsManager<LazarusLeaderboard> creation
     └── ScreenManager creation
     │
     ▼
-StraysGame.Initialize()
-    ├── LocalizationManager setup
-    └── Add initial screen (TopDownGameplayScreen)
+LazarusGame.Initialize()
+    ├── LocalizationManager setup (from saved language)
+    ├── GameStateService creation
+    └── Add MainMenuScreen
     │
     ▼
-StraysGame.LoadContent()
+LazarusGame.LoadContent()
     ├── Load particle texture
     └── Create ParticleManager
     │
@@ -100,7 +105,7 @@ Game.Run() → MonoGame Game Loop
                    └──────────────┘
 ```
 
-### Screen Stack
+### Screen Stack Example
 
 ```
 ┌─────────────────────────────────────┐
@@ -110,10 +115,11 @@ Game.Run() → MonoGame Game Loop
 │  ┌─────────────────────────────┐    │
 │  │ BackgroundScreen            │ ←── Background layer
 │  ├─────────────────────────────┤    │
-│  │ GameplayScreen              │ ←── Main gameplay
-│  │ OR TopDownGameplayScreen    │    │
+│  │ WorldScreen                 │ ←── Main gameplay
 │  ├─────────────────────────────┤    │
-│  │ PauseScreen (popup)         │ ←── Overlay (optional)
+│  │ GameMenuScreen (popup)      │ ←── Overlay (optional)
+│  ├─────────────────────────────┤    │
+│  │ PartyScreen (popup)         │ ←── Sub-overlay
 │  └─────────────────────────────┘    │
 │                                     │
 │  Only topmost non-covered screen    │
@@ -125,219 +131,368 @@ Game.Run() → MonoGame Game Loop
 
 ```
 GameScreen (abstract base)
+│
 ├── MenuScreen (abstract menu base)
 │   ├── MainMenuScreen
-│   ├── PauseScreen
-│   ├── SettingsScreen
+│   ├── GamePauseScreen
+│   ├── SettingsMenuScreen
+│   ├── LanguageScreen
 │   └── AboutScreen
-├── GameplayScreen (classic platformer)
-├── TopDownGameplayScreen (new top-down mode)
-├── BackgroundScreen
+│
+├── WorldScreen (main exploration gameplay)
+├── CombatScreen (ATB battle system)
+│
+├── DungeonScreen (dungeon selection hub)
+├── DungeonExplorationScreen (room exploration)
+│
+├── BestiaryScreen (creature catalog)
+├── PartyScreen (party management)
+├── RecruitmentScreen (recruit Strays)
+├── CompanionSelectScreen
+│
+├── EquipmentScreen (augmentations/chips)
+├── InventoryScreen (items)
+├── TradingScreen (shops)
+│
+├── FactionScreen (faction interactions)
+├── FactionReputationScreen
+├── BiomeMapScreen (world map)
+│
+├── DialogScreen (NPC conversations)
+├── EndingScreen (game endings)
+│
+├── SaveLoadScreen
 ├── LoadingScreen
+├── TransitionScreen
+├── BackgroundScreen
+│
+├── AccessibilityScreen
+├── AudioSettingsScreen
+├── InputSettingsScreen
 └── MessageBoxScreen
+```
+
+## Core Game Architecture
+
+### Entity System
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          Entity Hierarchy                                │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐            │
+│  │   Protagonist  │  │    Companion   │  │      NPC       │            │
+│  │                │  │                │  │                │            │
+│  │ - Position     │  │ - Follows      │  │ - Dialog       │            │
+│  │ - Animation    │  │   protagonist  │  │ - Shop         │            │
+│  │ - Exoskeleton  │  │ - Combat help  │  │ - Faction      │            │
+│  │ - Movement     │  │ - Bond level   │  │ - Quests       │            │
+│  └────────────────┘  └────────────────┘  └────────────────┘            │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐    │
+│  │                           Stray                                  │    │
+│  │                                                                  │    │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │    │
+│  │  │ StrayStats   │  │ Equipment    │  │ Evolution    │          │    │
+│  │  │ (61 stats)   │  │              │  │              │          │    │
+│  │  │              │  │ Augmentations│  │ - Stage      │          │    │
+│  │  │ - HP/Energy  │  │ (13-14 slots)│  │ - Stress     │          │    │
+│  │  │ - ATK types  │  │              │  │ - History    │          │    │
+│  │  │ - DEF types  │  │ Microchips   │  │              │          │    │
+│  │  │ - Elemental  │  │ (sockets)    │  │              │          │    │
+│  │  │ - Accuracy   │  │              │  │              │          │    │
+│  │  │ - Evasion    │  │              │  │              │          │    │
+│  │  └──────────────┘  └──────────────┘  └──────────────┘          │    │
+│  │                                                                  │    │
+│  │  Properties: Level, Experience, BondLevel, CombatRow, Abilities │    │
+│  └─────────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Combat System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           CombatState                                    │
+│                                                                          │
+│  Combat Phases:                                                          │
+│  ┌─────────┐   ┌─────────┐   ┌─────────────┐   ┌─────────────┐         │
+│  │Starting │──▶│ Running │──▶│Selecting    │──▶│Selecting    │         │
+│  │         │   │ (ATB)   │   │Action       │   │Target       │         │
+│  └─────────┘   └────┬────┘   └──────┬──────┘   └──────┬──────┘         │
+│                     │               │                  │                 │
+│                     │               ▼                  ▼                 │
+│                     │        ┌─────────────┐   ┌─────────────┐         │
+│                     │        │Selecting    │   │Executing    │         │
+│                     │        │Ability      │   │Action       │──┐      │
+│                     │        └─────────────┘   └─────────────┘  │      │
+│                     │                                           │      │
+│                     └───────────────────────────────────────────┘      │
+│                                          │                              │
+│                     ┌────────────────────┼────────────────────┐        │
+│                     ▼                    ▼                    ▼        │
+│              ┌─────────────┐     ┌─────────────┐     ┌─────────────┐  │
+│              │  Victory    │     │   Defeat    │     │    Fled     │  │
+│              └─────────────┘     └─────────────┘     └─────────────┘  │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                        Combatants                                │   │
+│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐                 │   │
+│  │  │ Combatant  │  │ Combatant  │  │ Combatant  │  ...            │   │
+│  │  │            │  │            │  │            │                 │   │
+│  │  │ - Stray    │  │ - ATB Gauge│  │ - Buffs    │                 │   │
+│  │  │ - IsPlayer │  │ - Position │  │ - Debuffs  │                 │   │
+│  │  └────────────┘  └────────────┘  └────────────┘                 │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  AI Systems:                                                            │
+│  ┌────────────┐  ┌────────────┐                                        │
+│  │  CombatAI  │  │   BossAI   │                                        │
+│  │ (enemies)  │  │ (bosses)   │                                        │
+│  └────────────┘  └────────────┘                                        │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### World System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                            GameWorld                                     │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                          Biomes                                  │   │
+│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐            │   │
+│  │  │The Fringe│ │The Rust │  │The Green│  │The Glow │  ...       │   │
+│  │  └────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘            │   │
+│  │       │            │            │            │                   │   │
+│  │       └────────────┴─────┬──────┴────────────┘                   │   │
+│  │                          ▼                                       │   │
+│  │                   ┌─────────────┐                                │   │
+│  │                   │BiomePortals │ (transitions)                  │   │
+│  │                   └─────────────┘                                │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐            │
+│  │     Chunks     │  │  Settlements   │  │   Encounters   │            │
+│  │                │  │                │  │                │            │
+│  │ - Tile data    │  │ - NPCs         │  │ - Wild Strays  │            │
+│  │ - Collision    │  │ - Shops        │  │ - Level range  │            │
+│  │ - Spawn points │  │ - Services     │  │ - Conditions   │            │
+│  └────────────────┘  └────────────────┘  └────────────────┘            │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐            │
+│  │ WeatherSystem  │  │WorldEventSystem│  │    MiniMap     │            │
+│  │                │  │                │  │                │            │
+│  │ - Rain/Storm   │  │ - Migrations   │  │ - Terrain view │            │
+│  │ - Fog          │  │ - Conflicts    │  │ - POI markers  │            │
+│  │ - Effects      │  │ - Special spawn│  │                │            │
+│  └────────────────┘  └────────────────┘  └────────────────┘            │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐                                │
+│  │BuildingPortals │  │   Interiors    │                                │
+│  │ (entries)      │  │ (indoor maps)  │                                │
+│  └────────────────┘  └────────────────┘                                │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Dungeon System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          Dungeon System                                  │
+│                                                                          │
+│  ┌─────────────────┐                                                    │
+│  │DungeonDefinition│ (template)                                         │
+│  │ - Room count    │                                                    │
+│  │ - Enemy types   │                                                    │
+│  │ - Loot tables   │                                                    │
+│  │ - Boss info     │                                                    │
+│  └────────┬────────┘                                                    │
+│           │ generates                                                    │
+│           ▼                                                              │
+│  ┌─────────────────┐                                                    │
+│  │ DungeonInstance │ (runtime)                                          │
+│  │                 │                                                    │
+│  │  ┌───────────────────────────────────────────────────────────┐      │
+│  │  │                    DungeonRooms                            │      │
+│  │  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │      │
+│  │  │  │  Room 1  │──│  Room 2  │──│  Room 3  │──│  Boss    │  │      │
+│  │  │  │(entrance)│  │(enemies) │  │(treasure)│  │  Room    │  │      │
+│  │  │  └──────────┘  └──────────┘  └──────────┘  └──────────┘  │      │
+│  │  └───────────────────────────────────────────────────────────┘      │
+│  └─────────────────┘                                                    │
+│                                                                          │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐         │
+│  │  RoomGenerator  │  │ ExplorableRoom  │  │  DungeonReward  │         │
+│  │                 │  │                 │  │                 │         │
+│  │ - Layout gen    │  │ - Searchable    │  │ - Loot calc     │         │
+│  │ - Enemy place   │  │ - Hidden areas  │  │ - XP rewards    │         │
+│  │ - Loot place    │  │                 │  │                 │         │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘         │
+│                                                                          │
+│  ┌─────────────────┐                                                    │
+│  │  DungeonPortal  │ (world entry point)                                │
+│  │ - Location      │                                                    │
+│  │ - Difficulty    │                                                    │
+│  │ - Preview       │                                                    │
+│  └─────────────────┘                                                    │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Progression System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        Progression Systems                               │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                         QuestLog                                 │   │
+│  │  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐    │   │
+│  │  │ Active Quests  │  │Completed Quests│  │ Failed Quests  │    │   │
+│  │  └───────┬────────┘  └────────────────┘  └────────────────┘    │   │
+│  │          │                                                       │   │
+│  │          ▼                                                       │   │
+│  │  ┌────────────────┐     ┌─────────────────────────┐             │   │
+│  │  │     Quest      │────▶│    QuestDefinition      │             │   │
+│  │  │ - State        │     │ - Objectives            │             │   │
+│  │  │ - Progress     │     │ - Rewards               │             │   │
+│  │  │ - Objectives   │     │ - Dialog                │             │   │
+│  │  └────────────────┘     │ - Branching paths       │             │   │
+│  │                         └─────────────────────────┘             │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                      Faction System                              │   │
+│  │                                                                  │   │
+│  │  FactionType:  Shepherds │ Harvesters │ Archivists │ Ascendants │   │
+│  │                Ferals    │ Independents│ Machinists│ Lazarus    │   │
+│  │                                                                  │   │
+│  │  FactionStanding: Hostile ─▶ Unfriendly ─▶ Neutral ─▶           │   │
+│  │                   (-1000)    (-499)        (-99 to 99)           │   │
+│  │                                                                  │   │
+│  │                   ─▶ Friendly ─▶ Allied                          │   │
+│  │                      (100)       (500+)                          │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐            │
+│  │    Bestiary    │  │ Achievements   │  │ TutorialSystem │            │
+│  │                │  │                │  │                │            │
+│  │ - Discovered   │  │ - Unlockables  │  │ - First-time   │            │
+│  │ - Caught       │  │ - Progress     │  │   triggers     │            │
+│  │ - Completion % │  │ - Rewards      │  │ - Gating       │            │
+│  └────────────────┘  └────────────────┘  └────────────────┘            │
+│                                                                          │
+│  ┌────────────────┐                                                     │
+│  │  NewGamePlus   │                                                     │
+│  │ - Carryover    │                                                     │
+│  │ - Scaling      │                                                     │
+│  │ - Exclusives   │                                                     │
+│  └────────────────┘                                                     │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Input System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        InputState                                │
-│                                                                  │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐           │
-│  │   Keyboard   │  │   GamePad    │  │    Mouse     │           │
-│  │   [4 slots]  │  │   [4 slots]  │  │              │           │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘           │
-│         │                 │                 │                    │
-│         └────────────┬────┴────────────┬────┘                    │
-│                      ▼                 ▼                         │
-│              ┌─────────────────────────────────┐                 │
-│              │ CurrentCursorLocation           │                 │
-│              │ (unified position)              │                 │
-│              └─────────────────────────────────┘                 │
-│                                                                  │
-│  ┌──────────────┐  ┌──────────────┐                             │
-│  │    Touch     │  │   Gestures   │                             │
-│  │              │  │   (taps)     │                             │
-│  └──────────────┘  └──────────────┘                             │
-│                                                                  │
-│  State Tracking:                                                 │
-│  - Previous frame state                                         │
-│  - Current frame state                                          │
-│  - Delta detection (IsNewKeyPress, etc.)                        │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           InputState                                     │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                  │
+│  │   Keyboard   │  │   GamePad    │  │    Mouse     │                  │
+│  │              │  │   [4 slots]  │  │              │                  │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘                  │
+│         │                 │                 │                           │
+│         └────────────┬────┴────────────┬────┘                           │
+│                      ▼                 ▼                                │
+│              ┌─────────────────────────────────┐                        │
+│              │ CurrentCursorLocation           │                        │
+│              │ (unified position)              │                        │
+│              └─────────────────────────────────┘                        │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐                                    │
+│  │    Touch     │  │   Gestures   │                                    │
+│  │              │  │   (taps)     │                                    │
+│  └──────────────┘  └──────────────┘                                    │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐  │
+│  │                     GamepadManager                                │  │
+│  │  - Button remapping                                               │  │
+│  │  - Dead zone configuration                                        │  │
+│  │  - Vibration control                                              │  │
+│  │  - Multi-controller (up to 4)                                     │  │
+│  └──────────────────────────────────────────────────────────────────┘  │
+│                                                                          │
+│  State Tracking:                                                        │
+│  - Previous frame state                                                 │
+│  - Current frame state                                                  │
+│  - Delta detection (IsNewKeyPress, IsNewButtonPress, etc.)             │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Settings System Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│                   SettingsManager<T>                              │
-│                                                                   │
-│  ┌─────────────────┐                                             │
-│  │ ISettingsStorage│ ◄──────── Interface                         │
-│  └────────┬────────┘                                             │
-│           │                                                       │
-│           ├──────────────────────────────────────────────────┐   │
-│           ▼                                                   ▼   │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐│
-│  │DesktopSettings   │  │MobileSettings    │  │ConsoleSettings   ││
-│  │Storage           │  │Storage           │  │Storage           ││
-│  │(file-based)      │  │(platform APIs)   │  │(console-specific)││
-│  └──────────────────┘  └──────────────────┘  └──────────────────┘│
-│                                                                   │
-│  Data Classes:                                                    │
-│  ┌──────────────────┐  ┌──────────────────┐                      │
-│  │ StraysSettings   │  │ StraysLeaderboard│                      │
-│  │ - MusicVolume    │  │ - HighScores[]   │                      │
-│  │ - SfxVolume      │  │ - per level      │                      │
-│  │ - Language       │  │                  │                      │
-│  └──────────────────┘  └──────────────────┘                      │
-└──────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      SettingsManager<T>                                  │
+│                                                                          │
+│  ┌─────────────────┐                                                    │
+│  │ ISettingsStorage│ ◄──────── Interface                                │
+│  └────────┬────────┘                                                    │
+│           │                                                              │
+│           ├──────────────────────────────────────────────────┐          │
+│           ▼                                                   ▼          │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐      │
+│  │DesktopSettings   │  │MobileSettings    │  │ConsoleSettings   │      │
+│  │Storage           │  │Storage           │  │Storage           │      │
+│  │(file-based)      │  │(platform APIs)   │  │(console-specific)│      │
+│  └──────────────────┘  └──────────────────┘  └──────────────────┘      │
+│                                                                          │
+│  Data Classes:                                                          │
+│  ┌──────────────────────┐  ┌──────────────────────┐                    │
+│  │   LazarusSettings    │  │  LazarusLeaderboard  │                    │
+│  │ - MusicVolume        │  │ - Achievement data   │                    │
+│  │ - SfxVolume          │  │ - Statistics         │                    │
+│  │ - Language           │  │                      │                    │
+│  │ - Accessibility opts │  │                      │                    │
+│  │ - Control bindings   │  │                      │                    │
+│  └──────────────────────┘  └──────────────────────┘                    │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Particle System Architecture
+## Game State Service Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│                      ParticleManager                              │
-│                                                                   │
-│  Properties:                                                      │
-│  - Position (emission origin)                                    │
-│  - ParticleCount                                                 │
-│  - Finished (all particles dead)                                 │
-│                                                                   │
-│  ┌─────────────────────────────────────────────────────────────┐ │
-│  │                    Particle Pool                             │ │
-│  │  ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐               │ │
-│  │  │ P1 │ │ P2 │ │ P3 │ │ P4 │ │... │ │ Pn │               │ │
-│  │  └────┘ └────┘ └────┘ └────┘ └────┘ └────┘               │ │
-│  └─────────────────────────────────────────────────────────────┘ │
-│                                                                   │
-│  Effect Types (ParticleEffectType enum):                         │
-│  ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐        │
-│  │ Confetti  │ │ Explosion │ │ Fireworks │ │ Sparkles  │        │
-│  │ (random   │ │ (radial,  │ │ (cascade  │ │ (light    │        │
-│  │  colors)  │ │  red/org) │ │  effect)  │ │  white)   │        │
-│  └───────────┘ └───────────┘ └───────────┘ └───────────┘        │
-│                                                                   │
-│  Emit() → Creates particles with:                                │
-│  - Initial velocity                                              │
-│  - Color                                                         │
-│  - Lifetime                                                      │
-│  - Tailing (particle trails)                                     │
-└──────────────────────────────────────────────────────────────────┘
-```
-
-## Game Mode Architectures
-
-### Top-Down Mode
-
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                   TopDownGameplayScreen                           │
-│                                                                   │
-│  ┌────────────────────────────────────────────────────────────┐  │
-│  │                      TopDownLevel                          │  │
-│  │                                                            │  │
-│  │  ┌────────────────┐     ┌────────────────────────────┐    │  │
-│  │  │   TiledMap     │     │      TopDownPlayer         │    │  │
-│  │  │                │     │                            │    │  │
-│  │  │ - Layers[]     │     │ - Position                 │    │  │
-│  │  │ - Tilesets[]   │     │ - FacingDirection          │    │  │
-│  │  │ - Draw()       │     │ - Velocity                 │    │  │
-│  │  │ - IsBlocked()  │     │ - WalkSpeed/RunSpeed       │    │  │
-│  │  └────────────────┘     │                            │    │  │
-│  │                         │ ┌────────────────────────┐ │    │  │
-│  │                         │ │DirectionalAnimPlayer   │ │    │  │
-│  │                         │ │ - idle animation       │ │    │  │
-│  │                         │ │ - walk animation       │ │    │  │
-│  │                         │ │ - run animation        │ │    │  │
-│  │                         │ └────────────────────────┘ │    │  │
-│  │                         └────────────────────────────┘    │  │
-│  │                                                            │  │
-│  │  Camera System:                                            │  │
-│  │  - Follows player position                                │  │
-│  │  - Viewport culling for rendering                         │  │
-│  └────────────────────────────────────────────────────────────┘  │
-└──────────────────────────────────────────────────────────────────┘
-```
-
-### Classic Platformer Mode
-
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                      GameplayScreen                               │
-│                                                                   │
-│  ┌────────────────────────────────────────────────────────────┐  │
-│  │                         Level                              │  │
-│  │                                                            │  │
-│  │  ┌─────────────────┐  ┌─────────────────┐                 │  │
-│  │  │    Tile[,]      │  │     Player      │                 │  │
-│  │  │    grid         │  │                 │                 │  │
-│  │  │                 │  │ - Position      │                 │  │
-│  │  │ Platform tiles  │  │ - Velocity      │                 │  │
-│  │  │ Empty spaces    │  │ - IsOnGround    │                 │  │
-│  │  │ Exit tile       │  │ - Physics       │                 │  │
-│  │  └─────────────────┘  └─────────────────┘                 │  │
-│  │                                                            │  │
-│  │  ┌─────────────────┐  ┌─────────────────┐                 │  │
-│  │  │   List<Gem>     │  │   List<Enemy>   │                 │  │
-│  │  │                 │  │                 │                 │  │
-│  │  │ Collectibles    │  │ AI patrol       │                 │  │
-│  │  │ Point values    │  │ Collision=death │                 │  │
-│  │  └─────────────────┘  └─────────────────┘                 │  │
-│  │                                                            │  │
-│  │  Game State:                                               │  │
-│  │  - Score, TimeTaken, GemsCollected                        │  │
-│  │  - Level index (00-06)                                    │  │
-│  └────────────────────────────────────────────────────────────┘  │
-└──────────────────────────────────────────────────────────────────┘
-```
-
-## Animation System
-
-### Classic Animation (2D Sprite Sheet)
-
-```
-Animation
-├── Texture2D texture (sprite sheet)
-├── int frameCount
-├── float frameTime
-├── bool isLooping
-└── GetSourceRectangle(frameIndex) → Rectangle
-
-AnimationPlayer
-├── Animation animation
-├── int frameIndex
-├── float time
-├── Update(gameTime)
-└── Draw(spriteBatch, position, flip)
-```
-
-### Directional Animation (8-Way)
-
-```
-DirectionalAnimation
-├── Dictionary<Direction, Texture2D[]> frames
-│   ├── South → [frame0, frame1, ...]
-│   ├── SouthEast → [frame0, frame1, ...]
-│   ├── East → [frame0, frame1, ...]
-│   ├── NorthEast → [frame0, frame1, ...]
-│   ├── North → [frame0, frame1, ...]
-│   ├── NorthWest → [frame0, frame1, ...]
-│   ├── West → [frame0, frame1, ...]
-│   └── SouthWest → [frame0, frame1, ...]
-├── float frameTime
-├── bool isLooping
-└── GetFrame(direction, frameIndex) → Texture2D
-
-DirectionalAnimationPlayer
-├── DirectionalAnimation animation
-├── int frameIndex
-├── float time
-├── Direction currentDirection
-├── Update(gameTime)
-└── Draw(spriteBatch, position)
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        GameStateService                                  │
+│                                                                          │
+│  Central manager for all persistent game state                          │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                       GameSaveData                               │   │
+│  │                                                                  │   │
+│  │  Protagonist State:          │  World State:                    │   │
+│  │  - Position                  │  - Current biome                 │   │
+│  │  - Companion type            │  - Discovered locations          │   │
+│  │  - Exoskeleton status        │  - Weather state                 │   │
+│  │                              │                                   │   │
+│  │  Collection:                 │  Progression:                    │   │
+│  │  - StrayRoster               │  - Quest states                  │   │
+│  │  - Party composition         │  - Faction standings             │   │
+│  │  - Inventory                 │  - Story flags                   │   │
+│  │                              │  - Act progress                  │   │
+│  │  Flags:                      │                                   │   │
+│  │  - Dictionary<string, bool>  │  Play Time:                      │   │
+│  │  - Story triggers            │  - Total time                    │   │
+│  │  - Tutorial completion       │  - Session time                  │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  Methods:                                                               │
+│  - NewGame(companionType)                                               │
+│  - SaveGame(slot)                                                       │
+│  - LoadGame(slot)                                                       │
+│  - SetFlag(name) / GetFlag(name)                                        │
+│  - ModifyFactionReputation(faction, amount)                             │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Service Registration
@@ -345,42 +500,85 @@ DirectionalAnimationPlayer
 ```
 Game.Services (IServiceProvider)
 │
+├── GraphicsDeviceManager
+│   └── Registered in LazarusGame constructor
+│
+├── SettingsManager<LazarusSettings>
+│   └── Registered in LazarusGame constructor
+│
+├── SettingsManager<LazarusLeaderboard>
+│   └── Registered in LazarusGame constructor
+│
 ├── ScreenManager
-│   └── Registered in StraysGame constructor
+│   └── Added as GameComponent in constructor
 │
-├── SettingsManager<StraysSettings>
-│   └── Registered in StraysGame constructor
+├── ParticleManager
+│   └── Registered in LazarusGame.LoadContent()
 │
-├── LeaderboardManager (SettingsManager<StraysLeaderboard>)
-│   └── Registered in StraysGame constructor
-│
-└── ParticleManager
-    └── Registered in StraysGame.LoadContent()
+└── GameStateService
+    └── Registered in LazarusGame.Initialize()
 
 Access pattern:
-var screenManager = game.Services.GetService<ScreenManager>();
+var gameState = game.Services.GetService<GameStateService>();
+var settings = game.Services.GetService<SettingsManager<LazarusSettings>>();
 ```
 
 ## Platform Abstraction
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        StraysGame                                │
-│                                                                  │
-│  Platform Detection:                                             │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │  IsMobile = CurrentPlatform == iOS || Android             │  │
-│  │  IsDesktop = CurrentPlatform == Windows || Mac || Linux   │  │
-│  └───────────────────────────────────────────────────────────┘  │
-│                                                                  │
-│  Platform-Specific Behavior:                                     │
-│  ┌─────────────────────┐  ┌─────────────────────┐               │
-│  │      Mobile         │  │      Desktop        │               │
-│  │                     │  │                     │               │
-│  │ - Fullscreen        │  │ - Windowed          │               │
-│  │ - Touch input       │  │ - Mouse/keyboard    │               │
-│  │ - MobileSettings    │  │ - DesktopSettings   │               │
-│  │ - Landscape orient  │  │ - Any resolution    │               │
-│  └─────────────────────┘  └─────────────────────┘               │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          LazarusGame                                     │
+│                                                                          │
+│  Platform Detection:                                                     │
+│  ┌───────────────────────────────────────────────────────────────────┐ │
+│  │  IsMobile = OperatingSystem.IsAndroid() || OperatingSystem.IsIOS()│ │
+│  │  IsDesktop = OperatingSystem.IsMacOS() || IsLinux() || IsWindows()│ │
+│  └───────────────────────────────────────────────────────────────────┘ │
+│                                                                          │
+│  Platform-Specific Behavior:                                            │
+│  ┌─────────────────────────┐  ┌─────────────────────────┐              │
+│  │        Mobile           │  │        Desktop          │              │
+│  │                         │  │                         │              │
+│  │ - Fullscreen            │  │ - Windowed (1280x800)   │              │
+│  │ - Touch input           │  │ - Mouse/keyboard        │              │
+│  │ - MobileSettingsStorage │  │ - DesktopSettingsStorage│              │
+│  │ - Landscape orientation │  │ - Resizable window      │              │
+│  │ - Virtual gamepad       │  │ - Physical gamepad      │              │
+│  └─────────────────────────┘  └─────────────────────────┘              │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+## Data Flow: Typical Gameplay Session
+
+```
+┌──────────────┐
+│ MainMenuScreen│
+│ "New Game"   │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐     ┌──────────────┐
+│CompanionSelect│────▶│ LoadingScreen│
+│(choose dog)  │     │              │
+└──────────────┘     └──────┬───────┘
+                            │
+       ┌────────────────────┘
+       ▼
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│ WorldScreen  │◀───▶│ GameMenu     │◀───▶│ PartyScreen  │
+│ (exploration)│     │ Screen       │     │ EquipScreen  │
+└──────┬───────┘     └──────────────┘     │ BestiaryScr  │
+       │                                   └──────────────┘
+       │ encounter
+       ▼
+┌──────────────┐     ┌──────────────┐
+│ CombatScreen │────▶│ Recruitment  │ (if capture)
+│ (ATB battle) │     │ Screen       │
+└──────┬───────┘     └──────────────┘
+       │
+       │ victory/defeat
+       ▼
+┌──────────────┐
+│ WorldScreen  │ (return to exploration)
+└──────────────┘
 ```
