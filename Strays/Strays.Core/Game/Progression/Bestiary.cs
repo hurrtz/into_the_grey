@@ -99,6 +99,11 @@ public class BestiaryEntry
     public DateTime? FirstEncounter { get; set; }
 
     /// <summary>
+    /// Ledger number (order caught). 0 = not yet in ledger.
+    /// </summary>
+    public int LedgerNumber { get; set; } = 0;
+
+    /// <summary>
     /// Biomes where this Stray has been encountered.
     /// </summary>
     public HashSet<string> EncounteredBiomes { get; set; } = new();
@@ -167,6 +172,7 @@ public class Bestiary
 {
     private readonly Dictionary<string, BestiaryEntry> _entries = new();
     private readonly List<BestiaryCategory> _categories = new();
+    private int _nextLedgerNumber = 1;
 
     /// <summary>
     /// All bestiary entries.
@@ -192,6 +198,11 @@ public class Bestiary
     /// Number of mastered entries.
     /// </summary>
     public int MasteredCount => _entries.Values.Count(e => e.Status >= DiscoveryStatus.Mastered);
+
+    /// <summary>
+    /// Number of entries in the ledger (caught/recruited).
+    /// </summary>
+    public int LedgerCount => _entries.Values.Count(e => e.LedgerNumber > 0);
 
     /// <summary>
     /// Overall completion percentage.
@@ -226,10 +237,28 @@ public class Bestiary
         // Create entries for all Stray definitions
         foreach (var def in StrayDefinitions.GetAll())
         {
-            _entries[def.Id] = new BestiaryEntry
+            var entry = new BestiaryEntry
             {
                 DefinitionId = def.Id
             };
+
+            // Pre-register companions with their fixed ledger numbers
+            if (def.IsCompanion && def.LedgerNumber > 0)
+            {
+                entry.LedgerNumber = def.LedgerNumber;
+                entry.Status = DiscoveryStatus.Recruited;
+                entry.RecruitCount = 1;
+                entry.EncounterCount = 1;
+                entry.FirstEncounter = DateTime.Now;
+
+                // Track highest ledger number for next assignment
+                if (def.LedgerNumber >= _nextLedgerNumber)
+                {
+                    _nextLedgerNumber = def.LedgerNumber + 1;
+                }
+            }
+
+            _entries[def.Id] = entry;
         }
 
         TotalEntries = _entries.Count;
@@ -397,7 +426,14 @@ public class Bestiary
         }
 
         var oldStatus = entry.Status;
+        bool isFirstRecruit = entry.RecruitCount == 0;
         entry.RecruitCount++;
+
+        // Assign ledger number on first recruitment
+        if (isFirstRecruit && entry.LedgerNumber == 0)
+        {
+            entry.LedgerNumber = _nextLedgerNumber++;
+        }
 
         if (entry.Status < DiscoveryStatus.Recruited)
         {
@@ -471,6 +507,17 @@ public class Bestiary
     public IEnumerable<BestiaryEntry> GetEntriesByStatus(DiscoveryStatus status)
     {
         return _entries.Values.Where(e => e.Status == status);
+    }
+
+    /// <summary>
+    /// Gets all entries that have been added to the ledger (recruited),
+    /// ordered by their ledger number.
+    /// </summary>
+    public IEnumerable<BestiaryEntry> GetLedgerEntries()
+    {
+        return _entries.Values
+            .Where(e => e.LedgerNumber > 0)
+            .OrderBy(e => e.LedgerNumber);
     }
 
     /// <summary>
@@ -604,6 +651,7 @@ public class Bestiary
     {
         return new BestiarySaveData
         {
+            NextLedgerNumber = _nextLedgerNumber,
             Entries = _entries.Values.Select(e => new BestiaryEntrySaveData
             {
                 DefinitionId = e.DefinitionId,
@@ -611,6 +659,7 @@ public class Bestiary
                 EncounterCount = e.EncounterCount,
                 DefeatCount = e.DefeatCount,
                 RecruitCount = e.RecruitCount,
+                LedgerNumber = e.LedgerNumber,
                 FirstEncounter = e.FirstEncounter,
                 EncounteredBiomes = e.EncounteredBiomes.ToList(),
                 PlayerNotes = e.PlayerNotes
@@ -623,6 +672,8 @@ public class Bestiary
     /// </summary>
     public void Import(BestiarySaveData data)
     {
+        _nextLedgerNumber = data.NextLedgerNumber > 0 ? data.NextLedgerNumber : 1;
+
         foreach (var entryData in data.Entries)
         {
             if (_entries.TryGetValue(entryData.DefinitionId, out var entry))
@@ -631,9 +682,16 @@ public class Bestiary
                 entry.EncounterCount = entryData.EncounterCount;
                 entry.DefeatCount = entryData.DefeatCount;
                 entry.RecruitCount = entryData.RecruitCount;
+                entry.LedgerNumber = entryData.LedgerNumber;
                 entry.FirstEncounter = entryData.FirstEncounter;
                 entry.EncounteredBiomes = new HashSet<string>(entryData.EncounteredBiomes);
                 entry.PlayerNotes = entryData.PlayerNotes ?? "";
+
+                // Update next ledger number if needed
+                if (entry.LedgerNumber >= _nextLedgerNumber)
+                {
+                    _nextLedgerNumber = entry.LedgerNumber + 1;
+                }
             }
         }
     }
@@ -686,6 +744,7 @@ public class BestiaryMilestone
 /// </summary>
 public class BestiarySaveData
 {
+    public int NextLedgerNumber { get; set; } = 1;
     public List<BestiaryEntrySaveData> Entries { get; set; } = new();
 }
 
@@ -699,6 +758,7 @@ public class BestiaryEntrySaveData
     public int EncounterCount { get; set; }
     public int DefeatCount { get; set; }
     public int RecruitCount { get; set; }
+    public int LedgerNumber { get; set; }
     public DateTime? FirstEncounter { get; set; }
     public List<string> EncounteredBiomes { get; set; } = new();
     public string? PlayerNotes { get; set; }

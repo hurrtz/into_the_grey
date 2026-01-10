@@ -77,7 +77,6 @@ public class GameMenuScreen : GameScreen
     private Dictionary<BiomeType, Vector2> _biomePositions = new();
 
     // Ledger tab state
-    private int _ledgerCategoryIndex = 0;
     private int _ledgerEntryIndex = 0;
     private int _ledgerScroll = 0;
     private List<BestiaryEntry> _ledgerEntries = new();
@@ -132,7 +131,7 @@ public class GameMenuScreen : GameScreen
         }
 
         // Initialize ledger
-        RefreshLedgerCategory();
+        RefreshLedger();
     }
 
     private void InitializeBiomePositions()
@@ -150,17 +149,11 @@ public class GameMenuScreen : GameScreen
         _biomePositions[BiomeType.ArchiveScar] = new Vector2(cx + spacing, cy - spacing);
     }
 
-    private void RefreshLedgerCategory()
+    private void RefreshLedger()
     {
-        if (_bestiary.Categories.Count == 0)
-        {
-            _ledgerEntries = new List<BestiaryEntry>();
-            return;
-        }
-
-        var category = _bestiary.Categories[_ledgerCategoryIndex];
-        _ledgerEntries = _bestiary.GetEntriesForCategory(category.Id).ToList();
-        _ledgerEntryIndex = 0;
+        // Get ledger entries ordered by ledger number (catch order)
+        _ledgerEntries = _bestiary.GetLedgerEntries().ToList();
+        _ledgerEntryIndex = Math.Min(_ledgerEntryIndex, Math.Max(0, _ledgerEntries.Count - 1));
         _ledgerScroll = 0;
     }
 
@@ -538,17 +531,8 @@ public class GameMenuScreen : GameScreen
 
     private void HandleLedgerInput(InputState input)
     {
-        if (input.IsNewKeyPress(Keys.Left, ControllingPlayer, out _))
-        {
-            _ledgerCategoryIndex = Math.Max(0, _ledgerCategoryIndex - 1);
-            RefreshLedgerCategory();
-        }
-        else if (input.IsNewKeyPress(Keys.Right, ControllingPlayer, out _))
-        {
-            _ledgerCategoryIndex = Math.Min(_bestiary.Categories.Count - 1, _ledgerCategoryIndex + 1);
-            RefreshLedgerCategory();
-        }
-        else if (input.IsMenuUp(ControllingPlayer))
+        // Simple up/down navigation through the numbered list
+        if (input.IsMenuUp(ControllingPlayer))
         {
             _ledgerEntryIndex = Math.Max(0, _ledgerEntryIndex - 1);
             UpdateLedgerScroll();
@@ -721,7 +705,7 @@ public class GameMenuScreen : GameScreen
             MenuTab.Inventory => "[Up/Down] Select | [Left/Right] Category | [Q/E] Tab",
             MenuTab.Factions => "[Up/Down] Select | [Q/E] Tab",
             MenuTab.Map => "[Arrows] Navigate | [Enter] Travel | [Q/E] Tab",
-            MenuTab.Ledger => "[Up/Down] Entry | [Left/Right] Category | [Q/E] Tab",
+            MenuTab.Ledger => "[Up/Down] Select | [Q/E] Tab",
             MenuTab.Game => "[Up/Down] Select | [Enter] Confirm | [Q/E] Tab",
             _ => "[Q/E] Switch Tab | [Esc] Close"
         };
@@ -1114,30 +1098,11 @@ public class GameMenuScreen : GameScreen
 
     private void DrawLedgerTab(Rectangle bounds)
     {
-        // Title with completion
-        string title = $"THE LEDGER - {_bestiary.CompletionPercent:F0}% Complete";
+        // Title with count (Pokédex style)
+        string title = $"THE LEDGER - {_bestiary.LedgerCount} / {_bestiary.TotalEntries} Caught";
         _spriteBatch!.DrawString(_titleFont!, title, new Vector2(bounds.X + 10, bounds.Y + 5), AccentColor * _transitionAlpha);
 
-        // Category tabs
-        int catTabWidth = bounds.Width / Math.Max(1, _bestiary.Categories.Count);
-        int y = bounds.Y + 35;
-
-        for (int i = 0; i < _bestiary.Categories.Count; i++)
-        {
-            var cat = _bestiary.Categories[i];
-            var rect = new Rectangle(bounds.X + i * catTabWidth, y, catTabWidth - 4, 22);
-            bool active = i == _ledgerCategoryIndex;
-
-            DrawRect(rect, (active ? TabActiveColor : TabColor) * _transitionAlpha);
-            var size = _font!.MeasureString(cat.Name);
-            float scale = Math.Min(1f, (catTabWidth - 8) / size.X);
-            _spriteBatch.DrawString(_font, cat.Name,
-                new Vector2(rect.X + (rect.Width - size.X * scale) / 2, rect.Y + 2),
-                (active ? cat.Color : DimColor) * _transitionAlpha,
-                0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-        }
-
-        y += 32;
+        int y = bounds.Y + 40;
 
         // Entry list (left) and details (right)
         int listWidth = bounds.Width / 3;
@@ -1154,7 +1119,9 @@ public class GameMenuScreen : GameScreen
 
         if (_ledgerEntries.Count == 0)
         {
-            _spriteBatch!.DrawString(_font!, "No entries", new Vector2(bounds.X + 10, bounds.Y + 10), DimColor * _transitionAlpha);
+            _spriteBatch!.DrawString(_font!, "No Strays caught yet", new Vector2(bounds.X + 10, bounds.Y + 10), DimColor * _transitionAlpha);
+            _spriteBatch.DrawString(_font!, "Recruit Strays to add", new Vector2(bounds.X + 10, bounds.Y + 30), DimColor * _transitionAlpha);
+            _spriteBatch.DrawString(_font!, "them to your Ledger.", new Vector2(bounds.X + 10, bounds.Y + 50), DimColor * _transitionAlpha);
             return;
         }
 
@@ -1168,15 +1135,26 @@ public class GameMenuScreen : GameScreen
             var rect = new Rectangle(bounds.X + 3, y, bounds.Width - 6, 32);
             if (selected) DrawRect(rect, SelectColor * _transitionAlpha);
 
-            // Status color
-            var statusColor = GetDiscoveryColor(entry.Status);
-            DrawRect(new Rectangle(rect.X + 3, rect.Y + 8, 6, 16), statusColor * _transitionAlpha);
+            // Ledger number (Pokédex style)
+            string number = $"#{entry.LedgerNumber:D3}";
+            _spriteBatch!.DrawString(_font!, number, new Vector2(rect.X + 5, rect.Y + 6),
+                DimColor * _transitionAlpha);
 
+            // Name
             string name = _bestiary.GetDisplayName(entry.DefinitionId);
-            _spriteBatch!.DrawString(_font!, name, new Vector2(rect.X + 15, rect.Y + 6),
+            _spriteBatch.DrawString(_font!, name, new Vector2(rect.X + 50, rect.Y + 6),
                 (selected ? Color.White : TextColor) * _transitionAlpha);
 
             y += 35;
+        }
+
+        // Scroll indicator
+        if (_ledgerEntries.Count > MaxVisibleItems)
+        {
+            string scrollInfo = $"{_ledgerScroll + 1}-{Math.Min(_ledgerScroll + MaxVisibleItems, _ledgerEntries.Count)} of {_ledgerEntries.Count}";
+            _spriteBatch!.DrawString(_font!, scrollInfo,
+                new Vector2(bounds.X + 5, bounds.Y + bounds.Height - 20),
+                DimColor * 0.7f * _transitionAlpha);
         }
     }
 
@@ -1186,7 +1164,8 @@ public class GameMenuScreen : GameScreen
 
         if (_ledgerEntries.Count == 0 || _ledgerEntryIndex >= _ledgerEntries.Count)
         {
-            _spriteBatch!.DrawString(_font!, "Select an entry", new Vector2(bounds.X + 10, bounds.Y + 10), DimColor * _transitionAlpha);
+            _spriteBatch!.DrawString(_font!, "Catch Strays to view", new Vector2(bounds.X + 10, bounds.Y + 10), DimColor * _transitionAlpha);
+            _spriteBatch.DrawString(_font!, "their details here.", new Vector2(bounds.X + 10, bounds.Y + 30), DimColor * _transitionAlpha);
             return;
         }
 
@@ -1194,9 +1173,9 @@ public class GameMenuScreen : GameScreen
         var def = StrayDefinitions.Get(entry.DefinitionId);
         int y = bounds.Y + 10;
 
-        // Name
-        string name = _bestiary.GetDisplayName(entry.DefinitionId);
-        _spriteBatch!.DrawString(_titleFont!, name, new Vector2(bounds.X + 10, y), AccentColor * _transitionAlpha);
+        // Ledger number and name
+        string header = $"#{entry.LedgerNumber:D3} - {_bestiary.GetDisplayName(entry.DefinitionId)}";
+        _spriteBatch!.DrawString(_titleFont!, header, new Vector2(bounds.X + 10, y), AccentColor * _transitionAlpha);
         y += 35;
 
         // Status badge

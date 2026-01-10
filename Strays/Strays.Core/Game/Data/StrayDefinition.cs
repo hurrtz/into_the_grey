@@ -208,6 +208,17 @@ public class StrayDefinition
     public bool IsBoss { get; set; } = false;
 
     /// <summary>
+    /// Whether this is a companion Stray (starts with the player).
+    /// </summary>
+    public bool IsCompanion { get; set; } = false;
+
+    /// <summary>
+    /// Fixed ledger number for this Stray (0 = assigned dynamically when caught).
+    /// Companions and special Strays have fixed numbers.
+    /// </summary>
+    public int LedgerNumber { get; set; } = 0;
+
+    /// <summary>
     /// Base recruitment chance (0.0 - 1.0).
     /// </summary>
     public float RecruitChance { get; set; } = 0.5f;
@@ -233,6 +244,9 @@ public static class StrayDefinitions
 
     static StrayDefinitions()
     {
+        // Register companions first (they have fixed ledger numbers)
+        RegisterCompanionStrays();
+
         // Initialize all Strays by biome
         RegisterFringeStrays();
         RegisterRustStrays();
@@ -263,6 +277,45 @@ public static class StrayDefinitions
     public static void Register(StrayDefinition definition)
     {
         _definitions[definition.Id] = definition;
+    }
+
+    /// <summary>
+    /// Registers companion Strays that start with the player.
+    /// These have fixed ledger numbers starting at 1.
+    /// </summary>
+    private static void RegisterCompanionStrays()
+    {
+        // Bandit - The player's loyal companion from the start
+        // A glitch-touched dog who gained sentience through corrupted data
+        Register(new StrayDefinition
+        {
+            Id = "bandit",
+            Name = "Bandit",
+            Description = "Your first companion. Found you in the pod fields and never left. " +
+                          "Something in its corrupted code makes it fiercely loyal. " +
+                          "The Gravitation chip embedded in its skull grants strange powers.",
+            CreatureType = CreatureType.GrayWolf,
+            Role = StrayRole.Support,
+            BaseStats = new StrayBaseStats
+            {
+                MaxHp = 120,
+                Attack = 14,
+                Defense = 12,
+                Speed = 15,
+                Special = 18,
+                MaxEnergy = 120,
+                EnergyRegen = 6
+            },
+            Biomes = new List<string> { "fringe" },
+            EvolutionLevel = 0, // Special evolution through story
+            MicrochipSlots = 4,
+            InnateAbilities = new List<string> { "gravitation", "loyalty_bond", "glitch_sense" },
+            PlaceholderColor = new Color(255, 140, 60), // Orange
+            PlaceholderSize = 24,
+            CanRecruit = false, // Already with player
+            IsCompanion = true,
+            LedgerNumber = 1 // First entry in the ledger
+        });
     }
 
     /// <summary>
