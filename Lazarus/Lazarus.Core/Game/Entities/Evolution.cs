@@ -8,7 +8,7 @@ using Lazarus.Core.Game.Data;
 namespace Lazarus.Core.Game.Entities;
 
 /// <summary>
-/// Triggers that can cause a Stray to evolve.
+/// Triggers that can cause a Kyn to evolve.
 /// </summary>
 public enum EvolutionTrigger
 {
@@ -59,14 +59,14 @@ public class EvolutionDefinition
     public string Id { get; init; } = "";
 
     /// <summary>
-    /// ID of the base form Stray.
+    /// ID of the base form Kyn.
     /// </summary>
-    public string FromStrayId { get; init; } = "";
+    public string FromKynId { get; init; } = "";
 
     /// <summary>
-    /// ID of the evolved form Stray.
+    /// ID of the evolved form Kyn.
     /// </summary>
-    public string ToStrayId { get; init; } = "";
+    public string ToKynId { get; init; } = "";
 
     /// <summary>
     /// Primary trigger type.
@@ -135,7 +135,7 @@ public class EvolutionDefinition
 }
 
 /// <summary>
-/// Tracks a Stray's evolution state and stress.
+/// Tracks a Kyn's evolution state and stress.
 /// </summary>
 public class EvolutionState
 {
@@ -150,7 +150,7 @@ public class EvolutionState
     public const int MaxStress = 100;
 
     /// <summary>
-    /// Whether this Stray has evolved.
+    /// Whether this Kyn has evolved.
     /// </summary>
     public bool HasEvolved { get; private set; } = false;
 
@@ -160,7 +160,7 @@ public class EvolutionState
     public string? AppliedEvolutionId { get; private set; }
 
     /// <summary>
-    /// Number of times this Stray has evolved.
+    /// Number of times this Kyn has evolved.
     /// </summary>
     public int EvolutionCount { get; private set; } = 0;
 
@@ -185,7 +185,7 @@ public class EvolutionState
     public event EventHandler<EvolutionDefinition>? Evolved;
 
     /// <summary>
-    /// Adds stress to the Stray.
+    /// Adds stress to the Kyn.
     /// </summary>
     /// <param name="amount">Amount of stress to add.</param>
     /// <returns>True if stress cap was reached.</returns>
@@ -230,7 +230,7 @@ public class EvolutionState
     }
 
     /// <summary>
-    /// Applies an evolution to this Stray.
+    /// Applies an evolution to this Kyn.
     /// </summary>
     public void ApplyEvolution(EvolutionDefinition evolution)
     {
@@ -281,18 +281,18 @@ public class EvolutionState
 public class EvolutionManager
 {
     /// <summary>
-    /// Checks if a Stray can evolve and returns available evolutions.
+    /// Checks if a Kyn can evolve and returns available evolutions.
     /// </summary>
     public List<EvolutionDefinition> GetAvailableEvolutions(
-        Stray stray,
+        Kyn kyn,
         Func<string, bool>? hasFlag = null,
         Func<string, bool>? hasAugmentation = null)
     {
         var available = new List<EvolutionDefinition>();
 
-        foreach (var evolution in Evolutions.GetByFromStray(stray.Definition.Id))
+        foreach (var evolution in Evolutions.GetByFromKyn(kyn.Definition.Id))
         {
-            if (CanEvolve(stray, evolution, hasFlag, hasAugmentation))
+            if (CanEvolve(kyn, evolution, hasFlag, hasAugmentation))
             {
                 available.Add(evolution);
             }
@@ -305,47 +305,47 @@ public class EvolutionManager
     /// Checks if a specific evolution is possible.
     /// </summary>
     public bool CanEvolve(
-        Stray stray,
+        Kyn kyn,
         EvolutionDefinition evolution,
         Func<string, bool>? hasFlag = null,
         Func<string, bool>? hasAugmentation = null)
     {
         // Already evolved with this specific evolution
-        if (stray.EvolutionState.AppliedEvolutionId == evolution.Id)
+        if (kyn.EvolutionState.AppliedEvolutionId == evolution.Id)
             return false;
 
         return evolution.Trigger switch
         {
-            EvolutionTrigger.Level => stray.Level >= evolution.RequiredLevel,
-            EvolutionTrigger.Stress => stray.EvolutionState.Stress >= evolution.RequiredStress,
+            EvolutionTrigger.Level => kyn.Level >= evolution.RequiredLevel,
+            EvolutionTrigger.Stress => kyn.EvolutionState.Stress >= evolution.RequiredStress,
             EvolutionTrigger.Augmentation => !string.IsNullOrEmpty(evolution.RequiredAugmentation) &&
                                               (hasAugmentation?.Invoke(evolution.RequiredAugmentation) ?? false),
-            EvolutionTrigger.Bond => stray.BondLevel >= evolution.RequiredBond,
+            EvolutionTrigger.Bond => kyn.BondLevel >= evolution.RequiredBond,
             EvolutionTrigger.Story => !string.IsNullOrEmpty(evolution.RequiredFlag) &&
                                        (hasFlag?.Invoke(evolution.RequiredFlag) ?? false),
-            EvolutionTrigger.Corruption => stray.EvolutionState.Stress >= evolution.RequiredStress &&
+            EvolutionTrigger.Corruption => kyn.EvolutionState.Stress >= evolution.RequiredStress &&
                                             (hasAugmentation?.Invoke("nimdok_cortex") ?? false),
             _ => false
         };
     }
 
     /// <summary>
-    /// Triggers evolution for a Stray.
+    /// Triggers evolution for a Kyn.
     /// </summary>
     /// <returns>True if evolution occurred.</returns>
-    public bool TriggerEvolution(Stray stray, EvolutionDefinition evolution)
+    public bool TriggerEvolution(Kyn kyn, EvolutionDefinition evolution)
     {
-        if (stray.EvolutionState.AppliedEvolutionId == evolution.Id)
+        if (kyn.EvolutionState.AppliedEvolutionId == evolution.Id)
             return false;
 
-        stray.EvolutionState.ApplyEvolution(evolution);
+        kyn.EvolutionState.ApplyEvolution(evolution);
         return true;
     }
 
     /// <summary>
-    /// Adds combat stress to a Stray based on events.
+    /// Adds combat stress to a Kyn based on events.
     /// </summary>
-    public void AddCombatStress(Stray stray, int damagePercent, bool alliesDefeated, bool nearDeath)
+    public void AddCombatStress(Kyn kyn, int damagePercent, bool alliesDefeated, bool nearDeath)
     {
         int stress = 0;
 
@@ -360,7 +360,7 @@ public class EvolutionManager
         if (nearDeath)
             stress += 15;
 
-        stray.EvolutionState.AddStress(stress);
+        kyn.EvolutionState.AddStress(stress);
     }
 }
 
@@ -383,10 +383,10 @@ public static class Evolutions
         _evolutions.TryGetValue(id, out var evo) ? evo : null;
 
     /// <summary>
-    /// Gets all evolutions from a specific base Stray.
+    /// Gets all evolutions from a specific base Kyn.
     /// </summary>
-    public static IEnumerable<EvolutionDefinition> GetByFromStray(string strayId) =>
-        _evolutions.Values.Where(e => e.FromStrayId == strayId);
+    public static IEnumerable<EvolutionDefinition> GetByFromKyn(string kynId) =>
+        _evolutions.Values.Where(e => e.FromKynId == kynId);
 
     /// <summary>
     /// Registers an evolution.
@@ -409,8 +409,8 @@ public static class Evolutions
         Register(new EvolutionDefinition
         {
             Id = "echo_pup_evolve",
-            FromStrayId = "echo_pup",
-            ToStrayId = "echo_hound",
+            FromKynId = "echo_pup",
+            ToKynId = "echo_hound",
             Trigger = EvolutionTrigger.Level,
             RequiredLevel = 15,
             StatMultipliers = new() { { "MaxHp", 1.3f }, { "Attack", 1.25f }, { "Speed", 1.2f } },
@@ -421,8 +421,8 @@ public static class Evolutions
         Register(new EvolutionDefinition
         {
             Id = "echo_hound_evolve",
-            FromStrayId = "echo_hound",
-            ToStrayId = "echo_alpha",
+            FromKynId = "echo_hound",
+            ToKynId = "echo_alpha",
             Trigger = EvolutionTrigger.Level,
             RequiredLevel = 30,
             StatMultipliers = new() { { "MaxHp", 1.4f }, { "Attack", 1.35f }, { "Speed", 1.25f }, { "Special", 1.2f } },
@@ -435,8 +435,8 @@ public static class Evolutions
         Register(new EvolutionDefinition
         {
             Id = "rust_rat_evolve",
-            FromStrayId = "rust_rat",
-            ToStrayId = "rust_ravager",
+            FromKynId = "rust_rat",
+            ToKynId = "rust_ravager",
             Trigger = EvolutionTrigger.Level,
             RequiredLevel = 12,
             StatMultipliers = new() { { "Speed", 1.4f }, { "Attack", 1.2f } },
@@ -448,8 +448,8 @@ public static class Evolutions
         Register(new EvolutionDefinition
         {
             Id = "circuit_cat_evolve",
-            FromStrayId = "circuit_cat",
-            ToStrayId = "voltage_lynx",
+            FromKynId = "circuit_cat",
+            ToKynId = "voltage_lynx",
             Trigger = EvolutionTrigger.Level,
             RequiredLevel = 18,
             StatMultipliers = new() { { "Special", 1.35f }, { "Speed", 1.25f } },
@@ -465,8 +465,8 @@ public static class Evolutions
         Register(new EvolutionDefinition
         {
             Id = "bandit_stress_evolve",
-            FromStrayId = "companion_dog",
-            ToStrayId = "companion_dog_evolved",
+            FromKynId = "companion_dog",
+            ToKynId = "companion_dog_evolved",
             Trigger = EvolutionTrigger.Stress,
             RequiredStress = 80,
             StatMultipliers = new() { { "Attack", 1.5f }, { "Special", 1.5f }, { "Defense", 0.9f } },
@@ -479,8 +479,8 @@ public static class Evolutions
         Register(new EvolutionDefinition
         {
             Id = "tinker_stress_evolve",
-            FromStrayId = "companion_cat",
-            ToStrayId = "companion_cat_evolved",
+            FromKynId = "companion_cat",
+            ToKynId = "companion_cat_evolved",
             Trigger = EvolutionTrigger.Stress,
             RequiredStress = 80,
             StatMultipliers = new() { { "Special", 1.6f }, { "Speed", 1.3f } },
@@ -493,8 +493,8 @@ public static class Evolutions
         Register(new EvolutionDefinition
         {
             Id = "pirate_stress_evolve",
-            FromStrayId = "companion_rabbit",
-            ToStrayId = "companion_rabbit_evolved",
+            FromKynId = "companion_rabbit",
+            ToKynId = "companion_rabbit_evolved",
             Trigger = EvolutionTrigger.Stress,
             RequiredStress = 80,
             StatMultipliers = new() { { "Speed", 1.7f }, { "Attack", 1.3f } },
@@ -505,12 +505,12 @@ public static class Evolutions
 
     private static void RegisterCorruptedEvolutions()
     {
-        // Corrupted evolution - happens when Stray has Lazarus cortex and high stress
+        // Corrupted evolution - happens when Kyn has Lazarus cortex and high stress
         Register(new EvolutionDefinition
         {
             Id = "corrupted_generic",
-            FromStrayId = "*", // Special marker - applies to any Stray
-            ToStrayId = "corrupted_form",
+            FromKynId = "*", // Special marker - applies to any Kyn
+            ToKynId = "corrupted_form",
             Trigger = EvolutionTrigger.Corruption,
             RequiredStress = 90,
             RequiredAugmentation = "nimdok_cortex",
@@ -519,15 +519,15 @@ public static class Evolutions
             NewElement = Element.Corruption,
             NewColor = Color.DarkMagenta,
             IsCorruptedEvolution = true,
-            Description = "Lazarus's corruption consumes the Stray..."
+            Description = "Lazarus's corruption consumes the Kyn..."
         });
 
         // Special: Bandit's final corrupted form (Act 3)
         Register(new EvolutionDefinition
         {
             Id = "bandit_hyper_evolved",
-            FromStrayId = "companion_dog_evolved",
-            ToStrayId = "bandit_corrupted",
+            FromKynId = "companion_dog_evolved",
+            ToKynId = "bandit_corrupted",
             Trigger = EvolutionTrigger.Story,
             RequiredFlag = "gravitation_stage_4",
             StatMultipliers = new() { { "Attack", 2.0f }, { "Special", 2.0f }, { "Speed", 1.5f } },

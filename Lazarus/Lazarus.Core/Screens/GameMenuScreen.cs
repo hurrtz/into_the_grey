@@ -36,7 +36,7 @@ public enum MenuTab
 public class GameMenuScreen : GameScreen
 {
     // Dependencies
-    private readonly StrayRoster _roster;
+    private readonly KynRoster _roster;
     private readonly GameStateService _gameState;
     private readonly FactionReputation _factionReputation;
     private readonly GameWorld? _world;
@@ -103,7 +103,7 @@ public class GameMenuScreen : GameScreen
     private static readonly Color WarningColor = new(255, 180, 80);
 
     public GameMenuScreen(
-        StrayRoster roster,
+        KynRoster roster,
         GameStateService gameState,
         FactionReputation factionReputation,
         GameWorld? world,
@@ -302,7 +302,7 @@ public class GameMenuScreen : GameScreen
         }
         else if (input.IsNewKeyPress(Keys.P, ControllingPlayer, out _))
         {
-            ToggleStrayPosition();
+            ToggleKynPosition();
         }
     }
 
@@ -324,18 +324,18 @@ public class GameMenuScreen : GameScreen
             var stored = _roster.Storage.ToList();
             if (_partySelectedIndex < stored.Count)
             {
-                var stray = stored[_partySelectedIndex];
+                var kyn = stored[_partySelectedIndex];
                 if (_partySwapMode && _partySwapSource >= 0)
                 {
                     var partyMember = _roster.Party.ElementAtOrDefault(_partySwapSource);
                     if (partyMember != null)
-                        _roster.SwapStrays(partyMember, stray);
+                        _roster.SwapKyns(partyMember, kyn);
                     _partySwapMode = false;
                     _partySwapSource = -1;
                 }
                 else if (_roster.Party.Count < 5)
                 {
-                    _roster.MoveToParty(stray);
+                    _roster.MoveToParty(kyn);
                 }
             }
         }
@@ -363,16 +363,16 @@ public class GameMenuScreen : GameScreen
         }
     }
 
-    private void ToggleStrayPosition()
+    private void ToggleKynPosition()
     {
-        Stray? stray = GetSelectedStray();
-        if (stray != null)
+        Kyn? kyn = GetSelectedKyn();
+        if (kyn != null)
         {
-            stray.CombatRow = stray.CombatRow == CombatRow.Front ? CombatRow.Back : CombatRow.Front;
+            kyn.CombatRow = kyn.CombatRow == CombatRow.Front ? CombatRow.Back : CombatRow.Front;
         }
     }
 
-    private Stray? GetSelectedStray()
+    private Kyn? GetSelectedKyn()
     {
         if (_partyInRoster)
         {
@@ -749,8 +749,8 @@ public class GameMenuScreen : GameScreen
 
             if (i < party.Count)
             {
-                var stray = party[i];
-                DrawStraySlot(slotRect, stray, isSelected, isSwapSource);
+                var kyn = party[i];
+                DrawKynSlot(slotRect, kyn, isSelected, isSwapSource);
             }
             else
             {
@@ -771,7 +771,7 @@ public class GameMenuScreen : GameScreen
 
         if (stored.Count == 0)
         {
-            _spriteBatch.DrawString(_font!, "No Strays in storage",
+            _spriteBatch.DrawString(_font!, "No Kyns in storage",
                 new Vector2(bounds.X + 10, y + 20), DimColor * _transitionAlpha);
             return;
         }
@@ -779,11 +779,11 @@ public class GameMenuScreen : GameScreen
         for (int i = 0; i < MaxVisibleItems && i + _partyRosterScroll < stored.Count; i++)
         {
             int idx = i + _partyRosterScroll;
-            var stray = stored[idx];
+            var kyn = stored[idx];
             var slotRect = new Rectangle(bounds.X + 5, y, bounds.Width - 10, 40);
             bool isSelected = _partyInRoster && idx == _partySelectedIndex;
 
-            DrawStraySlotCompact(slotRect, stray, isSelected);
+            DrawKynSlotCompact(slotRect, kyn, isSelected);
             y += 45;
         }
 
@@ -794,42 +794,42 @@ public class GameMenuScreen : GameScreen
             _spriteBatch.DrawString(_font!, "v", new Vector2(bounds.Right - 20, bounds.Bottom - 20), AccentColor * _transitionAlpha);
     }
 
-    private void DrawStraySlot(Rectangle bounds, Stray stray, bool selected, bool swapSource)
+    private void DrawKynSlot(Rectangle bounds, Kyn kyn, bool selected, bool swapSource)
     {
         Color bg = swapSource ? WarningColor * 0.3f : (selected ? SelectColor : PanelColor);
         DrawRect(bounds, bg * _transitionAlpha);
         DrawBorder(bounds, (swapSource ? WarningColor : (selected ? AccentColor : DimColor)) * _transitionAlpha);
 
         // Color indicator
-        DrawRect(new Rectangle(bounds.X + 5, bounds.Y + 5, 25, 25), stray.Definition.PlaceholderColor * _transitionAlpha);
+        DrawRect(new Rectangle(bounds.X + 5, bounds.Y + 5, 25, 25), kyn.Definition.PlaceholderColor * _transitionAlpha);
 
         // Position indicator
-        string pos = stray.CombatRow == CombatRow.Back ? "BACK" : "FRONT";
-        Color posColor = stray.CombatRow == CombatRow.Back ? new Color(100, 150, 255) : new Color(255, 150, 100);
+        string pos = kyn.CombatRow == CombatRow.Back ? "BACK" : "FRONT";
+        Color posColor = kyn.CombatRow == CombatRow.Back ? new Color(100, 150, 255) : new Color(255, 150, 100);
         var posSize = _font!.MeasureString(pos);
         _spriteBatch!.DrawString(_font, pos, new Vector2(bounds.Right - posSize.X - 8, bounds.Y + 5), posColor * _transitionAlpha);
 
         // Name & level
-        _spriteBatch.DrawString(_font, $"{stray.DisplayName} Lv.{stray.Level}",
+        _spriteBatch.DrawString(_font, $"{kyn.DisplayName} Lv.{kyn.Level}",
             new Vector2(bounds.X + 35, bounds.Y + 5), TextColor * _transitionAlpha);
 
         // Type
-        _spriteBatch.DrawString(_font, $"{stray.Definition.Category} / {stray.Definition.Role}",
+        _spriteBatch.DrawString(_font, $"{kyn.Definition.Category} / {kyn.Definition.Role}",
             new Vector2(bounds.X + 35, bounds.Y + 20), DimColor * _transitionAlpha);
 
         // HP bar
-        DrawHpBar(new Rectangle(bounds.X + 35, bounds.Y + 38, 100, 10), stray.CurrentHp, stray.MaxHp);
+        DrawHpBar(new Rectangle(bounds.X + 35, bounds.Y + 38, 100, 10), kyn.CurrentHp, kyn.MaxHp);
     }
 
-    private void DrawStraySlotCompact(Rectangle bounds, Stray stray, bool selected)
+    private void DrawKynSlotCompact(Rectangle bounds, Kyn kyn, bool selected)
     {
         DrawRect(bounds, (selected ? SelectColor : PanelColor) * _transitionAlpha);
         DrawBorder(bounds, (selected ? AccentColor : DimColor * 0.5f) * _transitionAlpha);
 
-        DrawRect(new Rectangle(bounds.X + 5, bounds.Y + 5, 18, 18), stray.Definition.PlaceholderColor * _transitionAlpha);
-        _spriteBatch!.DrawString(_font!, $"{stray.DisplayName} Lv.{stray.Level}",
+        DrawRect(new Rectangle(bounds.X + 5, bounds.Y + 5, 18, 18), kyn.Definition.PlaceholderColor * _transitionAlpha);
+        _spriteBatch!.DrawString(_font!, $"{kyn.DisplayName} Lv.{kyn.Level}",
             new Vector2(bounds.X + 28, bounds.Y + 5), TextColor * _transitionAlpha);
-        DrawHpBar(new Rectangle(bounds.X + 28, bounds.Y + 22, 70, 8), stray.CurrentHp, stray.MaxHp);
+        DrawHpBar(new Rectangle(bounds.X + 28, bounds.Y + 22, 70, 8), kyn.CurrentHp, kyn.MaxHp);
     }
 
     private void DrawEmptySlot(Rectangle bounds, bool selected)
@@ -1119,8 +1119,8 @@ public class GameMenuScreen : GameScreen
 
         if (_ledgerEntries.Count == 0)
         {
-            _spriteBatch!.DrawString(_font!, "No Strays caught yet", new Vector2(bounds.X + 10, bounds.Y + 10), DimColor * _transitionAlpha);
-            _spriteBatch.DrawString(_font!, "Recruit Strays to add", new Vector2(bounds.X + 10, bounds.Y + 30), DimColor * _transitionAlpha);
+            _spriteBatch!.DrawString(_font!, "No Kyns caught yet", new Vector2(bounds.X + 10, bounds.Y + 10), DimColor * _transitionAlpha);
+            _spriteBatch.DrawString(_font!, "Recruit Kyns to add", new Vector2(bounds.X + 10, bounds.Y + 30), DimColor * _transitionAlpha);
             _spriteBatch.DrawString(_font!, "them to your Ledger.", new Vector2(bounds.X + 10, bounds.Y + 50), DimColor * _transitionAlpha);
             return;
         }
@@ -1164,13 +1164,13 @@ public class GameMenuScreen : GameScreen
 
         if (_ledgerEntries.Count == 0 || _ledgerEntryIndex >= _ledgerEntries.Count)
         {
-            _spriteBatch!.DrawString(_font!, "Catch Strays to view", new Vector2(bounds.X + 10, bounds.Y + 10), DimColor * _transitionAlpha);
+            _spriteBatch!.DrawString(_font!, "Catch Kyns to view", new Vector2(bounds.X + 10, bounds.Y + 10), DimColor * _transitionAlpha);
             _spriteBatch.DrawString(_font!, "their details here.", new Vector2(bounds.X + 10, bounds.Y + 30), DimColor * _transitionAlpha);
             return;
         }
 
         var entry = _ledgerEntries[_ledgerEntryIndex];
-        var def = StrayDefinitions.Get(entry.DefinitionId);
+        var def = KynDefinitions.Get(entry.DefinitionId);
         int y = bounds.Y + 10;
 
         // Ledger number and name

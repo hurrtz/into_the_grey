@@ -239,7 +239,7 @@ public class TutorialSystem
         {
             Id = "tut_combat_basics",
             Title = "Combat Basics",
-            Content = "Combat uses an Active Time Battle (ATB) system. Wait for your Stray's gauge to fill, then select an action.",
+            Content = "Combat uses an Active Time Battle (ATB) system. Wait for your Kyn's gauge to fill, then select an action.",
             Tips = new List<string>
             {
                 "Attack deals physical damage based on your Attack stat",
@@ -321,18 +321,18 @@ public class TutorialSystem
         Register(new TutorialEntry
         {
             Id = "tut_recruitment",
-            Title = "Stray Recruitment",
-            Content = "After winning a battle, you may have a chance to recruit one of the defeated Strays!",
+            Title = "Kyn Recruitment",
+            Content = "After winning a battle, you may have a chance to recruit one of the defeated Kyns!",
             Tips = new List<string>
             {
-                "Not all Strays can be recruited",
-                "Some Strays have special recruitment conditions",
-                "Your reputation with the Strays faction affects success rate",
-                "Recruited Strays join at their defeated level"
+                "Not all Kyns can be recruited",
+                "Some Kyns have special recruitment conditions",
+                "Your reputation with the Kyns faction affects success rate",
+                "Recruited Kyns join at their defeated level"
             },
             Type = TutorialType.OneTime,
             Trigger = TutorialTrigger.FirstRecruitment,
-            Category = "Strays",
+            Category = "Kyns",
             Priority = 85,
             IconColor = Color.LimeGreen
         });
@@ -340,18 +340,18 @@ public class TutorialSystem
         Register(new TutorialEntry
         {
             Id = "tut_evolution",
-            Title = "Stray Evolution",
-            Content = "Your Stray is ready to evolve! Evolution permanently transforms a Stray into a stronger form.",
+            Title = "Kyn Evolution",
+            Content = "Your Kyn is ready to evolve! Evolution permanently transforms a Kyn into a stronger form.",
             Tips = new List<string>
             {
                 "Evolution improves base stats significantly",
                 "Some evolutions unlock new ability slots",
-                "Certain Strays require special items or conditions to evolve",
+                "Certain Kyns require special items or conditions to evolve",
                 "Evolved forms cannot be reversed"
             },
             Type = TutorialType.OneTime,
             Trigger = TutorialTrigger.FirstEvolution,
-            Category = "Strays",
+            Category = "Kyns",
             Priority = 80,
             IconColor = Color.Gold
         });
@@ -380,13 +380,13 @@ public class TutorialSystem
         {
             Id = "tut_new_biome",
             Title = "New Area Discovered",
-            Content = "Each biome has unique characteristics, native Strays, and environmental conditions.",
+            Content = "Each biome has unique characteristics, native Kyns, and environmental conditions.",
             Tips = new List<string>
             {
                 "Check the recommended level range before exploring",
                 "Weather effects can help or hinder you in combat",
                 "Some biomes have environmental hazards",
-                "Native Strays have adapted to their biome's conditions"
+                "Native Kyns have adapted to their biome's conditions"
             },
             Type = TutorialType.Contextual,
             Trigger = TutorialTrigger.NewBiome,
@@ -473,7 +473,7 @@ public class TutorialSystem
         {
             Id = "help_microchips",
             Title = "Microchip Guide",
-            Content = "Microchips grant abilities and stat bonuses to your Strays.",
+            Content = "Microchips grant abilities and stat bonuses to your Kyns.",
             Tips = new List<string>
             {
                 "Protocol chips: Passive stat bonuses",
@@ -498,7 +498,7 @@ public class TutorialSystem
                 "Lazarus: The central AI system",
                 "Independents: Survivor communities",
                 "Machinists: Tech specialists",
-                "Strays: Wild creature collective",
+                "Kyns: Wild creature collective",
                 "Actions and choices affect reputation"
             },
             Type = TutorialType.HelpTopic,
@@ -510,7 +510,7 @@ public class TutorialSystem
         var loadingTips = new[]
         {
             "Defending in combat regenerates Energy Points faster.",
-            "Some Strays can only be found in specific weather conditions.",
+            "Some Kyns can only be found in specific weather conditions.",
             "The Archive Scar holds secrets for those brave enough to seek them.",
             "Bandit's Gravitation grows stronger... and more unstable.",
             "Every choice matters. The wasteland remembers.",

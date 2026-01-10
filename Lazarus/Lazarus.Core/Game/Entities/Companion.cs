@@ -7,7 +7,7 @@ using Lazarus.Core.Services;
 namespace Lazarus.Core.Game.Entities;
 
 /// <summary>
-/// The companion Stray - Bandit (dog), Tinker (cat), or Pirate (rabbit).
+/// The companion Kyn - Bandit (dog), Tinker (cat), or Pirate (rabbit).
 /// Follows the protagonist on the overworld and can intervene in combat.
 /// Named in tribute to We3 by Grant Morrison.
 /// </summary>

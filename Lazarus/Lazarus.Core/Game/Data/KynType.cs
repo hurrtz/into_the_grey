@@ -1,10 +1,10 @@
 namespace Lazarus.Core.Game.Data;
 
 /// <summary>
-/// Biological classification of Stray types.
+/// Biological classification of Kyn types.
 /// Each type has unique augmentation capabilities and equipment compatibility.
 /// </summary>
-public enum StrayType
+public enum KynType
 {
     /// <summary>
     /// Tool-users / stealth-tech generalists.
@@ -140,98 +140,98 @@ public enum StrayType
 }
 
 /// <summary>
-/// Extension methods for StrayType.
+/// Extension methods for KynType.
 /// </summary>
-public static class StrayTypeExtensions
+public static class KynTypeExtensions
 {
     /// <summary>
-    /// Gets the display name for a Stray type.
+    /// Gets the display name for a Kyn type.
     /// </summary>
-    public static string GetDisplayName(this StrayType type) => type switch
+    public static string GetDisplayName(this KynType type) => type switch
     {
-        StrayType.Primate => "Primate",
-        StrayType.Carnivore => "Carnivore",
-        StrayType.Rodent => "Rodent",
-        StrayType.Lagomorph => "Lagomorph",
-        StrayType.Ungulate => "Ungulate",
-        StrayType.Marsupial => "Marsupial",
-        StrayType.Monotreme => "Monotreme",
-        StrayType.Chiroptera => "Chiroptera",
-        StrayType.Cetacean => "Cetacean",
-        StrayType.Proboscidean => "Proboscidean",
-        StrayType.Sirenian => "Sirenian",
-        StrayType.Eulipotyphlan => "Eulipotyphlan",
-        StrayType.Xenarthran => "Xenarthran",
-        StrayType.Pangolin => "Pangolin",
-        StrayType.Insect => "Insect",
-        StrayType.Arachnid => "Arachnid",
-        StrayType.Crustacean => "Crustacean",
-        StrayType.Mollusk => "Mollusk",
-        StrayType.Worm => "Worm",
-        StrayType.Echinoderm => "Echinoderm",
-        StrayType.Cnidarian => "Cnidarian",
-        StrayType.Sponge => "Sponge",
+        KynType.Primate => "Primate",
+        KynType.Carnivore => "Carnivore",
+        KynType.Rodent => "Rodent",
+        KynType.Lagomorph => "Lagomorph",
+        KynType.Ungulate => "Ungulate",
+        KynType.Marsupial => "Marsupial",
+        KynType.Monotreme => "Monotreme",
+        KynType.Chiroptera => "Chiroptera",
+        KynType.Cetacean => "Cetacean",
+        KynType.Proboscidean => "Proboscidean",
+        KynType.Sirenian => "Sirenian",
+        KynType.Eulipotyphlan => "Eulipotyphlan",
+        KynType.Xenarthran => "Xenarthran",
+        KynType.Pangolin => "Pangolin",
+        KynType.Insect => "Insect",
+        KynType.Arachnid => "Arachnid",
+        KynType.Crustacean => "Crustacean",
+        KynType.Mollusk => "Mollusk",
+        KynType.Worm => "Worm",
+        KynType.Echinoderm => "Echinoderm",
+        KynType.Cnidarian => "Cnidarian",
+        KynType.Sponge => "Sponge",
         _ => "Unknown"
     };
 
     /// <summary>
     /// Gets whether this type is a vertebrate.
     /// </summary>
-    public static bool IsVertebrate(this StrayType type) => type switch
+    public static bool IsVertebrate(this KynType type) => type switch
     {
-        StrayType.Insect or StrayType.Arachnid or StrayType.Crustacean or
-        StrayType.Mollusk or StrayType.Worm or StrayType.Echinoderm or
-        StrayType.Cnidarian or StrayType.Sponge => false,
+        KynType.Insect or KynType.Arachnid or KynType.Crustacean or
+        KynType.Mollusk or KynType.Worm or KynType.Echinoderm or
+        KynType.Cnidarian or KynType.Sponge => false,
         _ => true
     };
 
     /// <summary>
     /// Gets whether this type is aquatic-capable.
     /// </summary>
-    public static bool IsAquatic(this StrayType type) => type switch
+    public static bool IsAquatic(this KynType type) => type switch
     {
-        StrayType.Cetacean or StrayType.Sirenian or StrayType.Mollusk or
-        StrayType.Crustacean or StrayType.Echinoderm or StrayType.Cnidarian or
-        StrayType.Sponge => true,
+        KynType.Cetacean or KynType.Sirenian or KynType.Mollusk or
+        KynType.Crustacean or KynType.Echinoderm or KynType.Cnidarian or
+        KynType.Sponge => true,
         _ => false
     };
 
     /// <summary>
     /// Gets whether this type can fly.
     /// </summary>
-    public static bool CanFly(this StrayType type) => type switch
+    public static bool CanFly(this KynType type) => type switch
     {
-        StrayType.Chiroptera or StrayType.Insect => true,
+        KynType.Chiroptera or KynType.Insect => true,
         _ => false
     };
 
     /// <summary>
     /// Gets the signature ability category for this type.
     /// </summary>
-    public static string GetSignatureAbility(this StrayType type) => type switch
+    public static string GetSignatureAbility(this KynType type) => type switch
     {
-        StrayType.Primate => "Opposable Toolkit",
-        StrayType.Carnivore => "Scent Lock",
-        StrayType.Rodent => "Gnaw Module",
-        StrayType.Lagomorph => "Decoy Shed",
-        StrayType.Ungulate => "Herd Field",
-        StrayType.Marsupial => "Pouch Deploy",
-        StrayType.Monotreme => "Bio-Electric Pulse",
-        StrayType.Chiroptera => "Sonic Scramble",
-        StrayType.Cetacean => "Wave Cannon",
-        StrayType.Proboscidean => "Trunk Manipulator",
-        StrayType.Sirenian => "Soothing Field",
-        StrayType.Eulipotyphlan => "Earthsense",
-        StrayType.Xenarthran => "Shell Roll / Tongue Harpoon",
-        StrayType.Pangolin => "Scale Flare",
-        StrayType.Insect => "Pheromone Programs",
-        StrayType.Arachnid => "Web Projector",
-        StrayType.Crustacean => "Shell Stance",
-        StrayType.Mollusk => "Ink Cloud / Tentacle Multitool",
-        StrayType.Worm => "Soil Rewrite",
-        StrayType.Echinoderm => "Spine Bloom / Arm Split",
-        StrayType.Cnidarian => "Sting Field / Polyp Deploy",
-        StrayType.Sponge => "Reef Builder / Symbiote Slots",
+        KynType.Primate => "Opposable Toolkit",
+        KynType.Carnivore => "Scent Lock",
+        KynType.Rodent => "Gnaw Module",
+        KynType.Lagomorph => "Decoy Shed",
+        KynType.Ungulate => "Herd Field",
+        KynType.Marsupial => "Pouch Deploy",
+        KynType.Monotreme => "Bio-Electric Pulse",
+        KynType.Chiroptera => "Sonic Scramble",
+        KynType.Cetacean => "Wave Cannon",
+        KynType.Proboscidean => "Trunk Manipulator",
+        KynType.Sirenian => "Soothing Field",
+        KynType.Eulipotyphlan => "Earthsense",
+        KynType.Xenarthran => "Shell Roll / Tongue Harpoon",
+        KynType.Pangolin => "Scale Flare",
+        KynType.Insect => "Pheromone Programs",
+        KynType.Arachnid => "Web Projector",
+        KynType.Crustacean => "Shell Stance",
+        KynType.Mollusk => "Ink Cloud / Tentacle Multitool",
+        KynType.Worm => "Soil Rewrite",
+        KynType.Echinoderm => "Spine Bloom / Arm Split",
+        KynType.Cnidarian => "Sting Field / Polyp Deploy",
+        KynType.Sponge => "Reef Builder / Symbiote Slots",
         _ => "Unknown"
     };
 }

@@ -15,13 +15,13 @@ public enum FactionType
     None,
 
     /// <summary>
-    /// The Shepherds - Believe in guiding and protecting Strays.
+    /// The Shepherds - Believe in guiding and protecting Kyns.
     /// Found throughout The Fringe and The Green.
     /// </summary>
     Shepherds,
 
     /// <summary>
-    /// The Harvesters - View Strays as resources to be used.
+    /// The Harvesters - View Kyns as resources to be used.
     /// Dominant in The Rust and The Teeth.
     /// </summary>
     Harvesters,
@@ -39,7 +39,7 @@ public enum FactionType
     Ascendants,
 
     /// <summary>
-    /// The Ferals - Reject civilization, live wild with Strays.
+    /// The Ferals - Reject civilization, live wild with Kyns.
     /// Scattered throughout all biomes.
     /// </summary>
     Ferals,
@@ -61,9 +61,9 @@ public enum FactionType
     Machinists,
 
     /// <summary>
-    /// Strays (collective) - The wild Stray population.
+    /// Kyns (collective) - The wild Kyn population.
     /// </summary>
-    Strays,
+    Kyns,
 
     /// <summary>
     /// Hostile - Environmental hostiles and enemies.
@@ -339,13 +339,13 @@ public static class FactionData
         {
             Type = FactionType.Shepherds,
             Name = "The Shepherds",
-            Description = "A faction dedicated to protecting and nurturing Strays.",
-            Philosophy = "Every Stray deserves care. We guide, we protect, we never abandon.",
+            Description = "A faction dedicated to protecting and nurturing Kyns.",
+            Philosophy = "Every Kyn deserves care. We guide, we protect, we never abandon.",
             BannerColor = new Color(34, 139, 34), // Forest Green
             Allies = new() { FactionType.Ferals },
             Enemies = new() { FactionType.Harvesters },
             HomeBiomes = new() { "fringe", "green" },
-            NotableMembers = new() { "elder_moss", "stray_whisperer_kai" },
+            NotableMembers = new() { "elder_moss", "kyn_whisperer_kai" },
             LeaderId = "elder_moss"
         };
 
@@ -353,8 +353,8 @@ public static class FactionData
         {
             Type = FactionType.Harvesters,
             Name = "The Harvesters",
-            Description = "Pragmatists who view Strays as resources.",
-            Philosophy = "Survival requires sacrifice. Strays are tools, not friends.",
+            Description = "Pragmatists who view Kyns as resources.",
+            Philosophy = "Survival requires sacrifice. Kyns are tools, not friends.",
             BannerColor = new Color(139, 69, 19), // Saddle Brown
             Allies = new() { FactionType.Ascendants },
             Enemies = new() { FactionType.Shepherds, FactionType.Ferals },
@@ -520,18 +520,18 @@ public static class FactionData
 public static class ReputationEvents
 {
     /// <summary>
-    /// Player helped a Stray (Shepherds +10, Ferals +5).
+    /// Player helped a Kyn (Shepherds +10, Ferals +5).
     /// </summary>
-    public static void HelpedStray(FactionReputation rep)
+    public static void HelpedKyn(FactionReputation rep)
     {
         rep.ModifyReputation(FactionType.Shepherds, 10);
         rep.ModifyReputation(FactionType.Ferals, 5, false);
     }
 
     /// <summary>
-    /// Player harvested parts from a Stray (Harvesters +10, Shepherds -15).
+    /// Player harvested parts from a Kyn (Harvesters +10, Shepherds -15).
     /// </summary>
-    public static void HarvestedStray(FactionReputation rep)
+    public static void HarvestedKyn(FactionReputation rep)
     {
         rep.ModifyReputation(FactionType.Harvesters, 10);
         rep.ModifyReputation(FactionType.Shepherds, -15, false);
@@ -580,9 +580,9 @@ public static class ReputationEvents
     }
 
     /// <summary>
-    /// Player released captured Strays (Ferals +25, Harvesters -30).
+    /// Player released captured Kyns (Ferals +25, Harvesters -30).
     /// </summary>
-    public static void ReleasedCapturedStrays(FactionReputation rep)
+    public static void ReleasedCapturedKyns(FactionReputation rep)
     {
         rep.ModifyReputation(FactionType.Ferals, 25);
         rep.ModifyReputation(FactionType.Shepherds, 15, false);

@@ -62,9 +62,9 @@ public enum ObjectiveType
     Collect,
 
     /// <summary>
-    /// Recruit a specific Stray.
+    /// Recruit a specific Kyn.
     /// </summary>
-    RecruitStray,
+    RecruitKyn,
 
     /// <summary>
     /// Trigger a story flag.
@@ -159,9 +159,9 @@ public class QuestReward
     public List<string> ItemIds { get; set; } = new();
 
     /// <summary>
-    /// Stray definition IDs that can be recruited.
+    /// Kyn definition IDs that can be recruited.
     /// </summary>
-    public List<string> UnlockedStrayIds { get; set; } = new();
+    public List<string> UnlockedKynIds { get; set; } = new();
 
     /// <summary>
     /// Story flags to set.
@@ -444,7 +444,7 @@ public static class QuestDefinitions
         {
             Id = "main_04_first_battle",
             Name = "Trial by Fire",
-            Description = "A hostile Stray approaches. Your companion's new ability may prove useful.",
+            Description = "A hostile Kyn approaches. Your companion's new ability may prove useful.",
             Summary = "Survive your first combat",
             Type = QuestType.Main,
             Act = ActState.Act1_Denial,
@@ -454,7 +454,7 @@ public static class QuestDefinitions
             SortOrder = 4,
             Objectives = new List<QuestObjective>
             {
-                new() { Id = "fight", Description = "Defeat the hostile Stray", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_tutorial_battle" },
+                new() { Id = "fight", Description = "Defeat the hostile Kyn", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_tutorial_battle" },
                 new() { Id = "complete", Description = "Complete the tutorial battle", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.CompletedTutorialBattle }
             },
             Reward = new QuestReward
@@ -471,8 +471,8 @@ public static class QuestDefinitions
         {
             Id = "main_05_echo_pup",
             Name = "A New Friend",
-            Description = "A small Stray with unusual abilities watches you from the fog. It seems... curious rather than hostile.",
-            Summary = "Recruit your first Stray",
+            Description = "A small Kyn with unusual abilities watches you from the fog. It seems... curious rather than hostile.",
+            Summary = "Recruit your first Kyn",
             Type = QuestType.Main,
             Act = ActState.Act1_Denial,
             BiomeId = "fringe",
@@ -481,14 +481,14 @@ public static class QuestDefinitions
             SortOrder = 5,
             Objectives = new List<QuestObjective>
             {
-                new() { Id = "approach", Description = "Approach the curious Stray", Type = ObjectiveType.ReachLocation, TargetId = "loc_echo_pup" },
-                new() { Id = "recruit", Description = "Recruit Echo Pup", Type = ObjectiveType.RecruitStray, TargetId = "echo_pup" }
+                new() { Id = "approach", Description = "Approach the curious Kyn", Type = ObjectiveType.ReachLocation, TargetId = "loc_echo_pup" },
+                new() { Id = "recruit", Description = "Recruit Echo Pup", Type = ObjectiveType.RecruitKyn, TargetId = "echo_pup" }
             },
             Reward = new QuestReward
             {
                 Experience = 150,
                 Flags = new List<string> { StoryFlags.RecruitedEchoPup },
-                UnlockedStrayIds = new List<string> { "echo_pup" }
+                UnlockedKynIds = new List<string> { "echo_pup" }
             },
             SetsFlags = new List<string> { StoryFlags.RecruitedEchoPup },
             NextQuestId = "main_06_power_source"
@@ -553,7 +553,7 @@ public static class QuestDefinitions
         {
             Id = "main_08_conversion_facility",
             Name = "The Conversion Facility",
-            Description = "The industrial heart of The Rust contains a terrible truth - a facility where Strays are converted into something else.",
+            Description = "The industrial heart of The Rust contains a terrible truth - a facility where Kyns are converted into something else.",
             Summary = "Investigate the Conversion Facility",
             Type = QuestType.Main,
             Act = ActState.Act1_Denial,
@@ -669,7 +669,7 @@ public static class QuestDefinitions
         {
             Id = "main_12_the_request",
             Name = "A Simple Request",
-            Description = "Lazarus has a request: fix the interface that lets it communicate with Strays. A chance to do something good... or is it?",
+            Description = "Lazarus has a request: fix the interface that lets it communicate with Kyns. A chance to do something good... or is it?",
             Summary = "Decide whether to help Lazarus",
             Type = QuestType.Main,
             Act = ActState.Act1_Denial,
@@ -677,19 +677,19 @@ public static class QuestDefinitions
             Prerequisites = new List<string> { "main_11_bioshell_revelation" },
             CanAbandon = false,
             SortOrder = 12,
-            StartDialogId = "dialog_stray_fix_request",
+            StartDialogId = "dialog_kyn_fix_request",
             CompleteDialogId = "dialog_act1_end",
             Objectives = new List<QuestObjective>
             {
                 new() { Id = "decide", Description = "Decide on Lazarus's request", Type = ObjectiveType.Choice, TargetId = "choice_help_nimdok" },
-                new() { Id = "complete", Description = "Complete Act 1", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.RequestedStrayFix }
+                new() { Id = "complete", Description = "Complete Act 1", Type = ObjectiveType.TriggerFlag, TargetId = StoryFlags.RequestedKynFix }
             },
             Reward = new QuestReward
             {
                 Experience = 600,
-                Flags = new List<string> { StoryFlags.RequestedStrayFix }
+                Flags = new List<string> { StoryFlags.RequestedKynFix }
             },
-            SetsFlags = new List<string> { StoryFlags.RequestedStrayFix },
+            SetsFlags = new List<string> { StoryFlags.RequestedKynFix },
             NextQuestId = "main_13_boost_control"
         });
     }
@@ -751,7 +751,7 @@ public static class QuestDefinitions
         {
             Id = "side_fringe_fog_watcher",
             Name = "The Fog Watcher",
-            Description = "Something large moves through the perpetual fog of The Fringe. The other Strays avoid it. Perhaps you should too... or perhaps not.",
+            Description = "Something large moves through the perpetual fog of The Fringe. The other Kyns avoid it. Perhaps you should too... or perhaps not.",
             Summary = "Find what lurks in the fog",
             Type = QuestType.Side,
             Act = ActState.Act1_Denial,
@@ -767,7 +767,7 @@ public static class QuestDefinitions
             Reward = new QuestReward
             {
                 Experience = 300,
-                UnlockedStrayIds = new List<string> { "fog_lurker" }
+                UnlockedKynIds = new List<string> { "fog_lurker" }
             }
         });
     }
@@ -782,7 +782,7 @@ public static class QuestDefinitions
         {
             Id = "main_13_boost_control",
             Name = "Boost Control",
-            Description = "The Stray fix is complete. Now Lazarus has activated a 'Boost Control System' - and your companion is at the center of it.",
+            Description = "The Kyn fix is complete. Now Lazarus has activated a 'Boost Control System' - and your companion is at the center of it.",
             Summary = "Investigate the Boost Control System",
             Type = QuestType.Main,
             Act = ActState.Act2_Responsibility,
@@ -921,7 +921,7 @@ public static class QuestDefinitions
         {
             Id = "main_18_faction_war",
             Name = "Civil War",
-            Description = "The Strays are divided. Some worship Lazarus, others despise it. You must choose a side... or try to unite them.",
+            Description = "The Kyns are divided. Some worship Lazarus, others despise it. You must choose a side... or try to unite them.",
             Summary = "Navigate the faction conflict",
             Type = QuestType.Main,
             Act = ActState.Act2_Responsibility,
@@ -979,7 +979,7 @@ public static class QuestDefinitions
         {
             Id = "side_green_caretaker",
             Name = "The Caretaker",
-            Description = "A massive Stray tends to The Green, nurturing growth in the wasteland. It may have answers about the old world.",
+            Description = "A massive Kyn tends to The Green, nurturing growth in the wasteland. It may have answers about the old world.",
             Summary = "Find the Caretaker of The Green",
             Type = QuestType.Side,
             Act = ActState.Act2_Responsibility,
@@ -990,12 +990,12 @@ public static class QuestDefinitions
             Objectives = new List<QuestObjective>
             {
                 new() { Id = "find", Description = "Locate the Caretaker", Type = ObjectiveType.ReachLocation, TargetId = "loc_green_caretaker" },
-                new() { Id = "speak", Description = "Commune with the ancient Stray", Type = ObjectiveType.TalkTo, TargetId = "npc_caretaker" }
+                new() { Id = "speak", Description = "Commune with the ancient Kyn", Type = ObjectiveType.TalkTo, TargetId = "npc_caretaker" }
             },
             Reward = new QuestReward
             {
                 Experience = 400,
-                UnlockedStrayIds = new List<string> { "ancient_oak_deer" }
+                UnlockedKynIds = new List<string> { "ancient_oak_deer" }
             }
         });
 
@@ -1041,7 +1041,7 @@ public static class QuestDefinitions
             Objectives = new List<QuestObjective>
             {
                 new() { Id = "talk", Description = "Speak with Unit-47", Type = ObjectiveType.TalkTo, TargetId = "quiet_lawnbot" },
-                new() { Id = "clear", Description = "Clear the invasive weeds (0/5)", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_weed_strays", RequiredCount = 5 },
+                new() { Id = "clear", Description = "Clear the invasive weeds (0/5)", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_weed_kyns", RequiredCount = 5 },
                 new() { Id = "return", Description = "Return to Unit-47", Type = ObjectiveType.TalkTo, TargetId = "quiet_lawnbot" }
             },
             Reward = new QuestReward
@@ -1220,7 +1220,7 @@ public static class QuestDefinitions
             {
                 Experience = 800,
                 Flags = new List<string> { "void_walker" },
-                UnlockedStrayIds = new List<string> { "original_instance" }
+                UnlockedKynIds = new List<string> { "original_instance" }
             }
         });
 
@@ -1315,7 +1315,7 @@ public static class QuestDefinitions
         {
             Id = "main_22_gauntlet",
             Name = "The Gauntlet",
-            Description = "The path to Lazarus's core is guarded by hyper-evolved Strays - creatures pushed beyond their limits by the amplifier system.",
+            Description = "The path to Lazarus's core is guarded by hyper-evolved Kyns - creatures pushed beyond their limits by the amplifier system.",
             Summary = "Fight through the gauntlet",
             Type = QuestType.Main,
             Act = ActState.Act3_Irreversibility,
@@ -1436,7 +1436,7 @@ public static class QuestDefinitions
         {
             Id = "main_27_lobotomy",
             Name = "The Lobotomy",
-            Description = "You've chosen to surgically remove Lazarus's ability to control Strays. It will survive, but changed. Like all of you.",
+            Description = "You've chosen to surgically remove Lazarus's ability to control Kyns. It will survive, but changed. Like all of you.",
             Summary = "Perform Lazarus's lobotomy",
             Type = QuestType.Main,
             Act = ActState.Act3_Irreversibility,

@@ -108,7 +108,7 @@ public class DungeonEncounter
     public string Id { get; init; } = "";
 
     /// <summary>
-    /// Enemy Stray IDs and their counts.
+    /// Enemy Kyn IDs and their counts.
     /// </summary>
     public Dictionary<string, int> Enemies { get; init; } = new();
 
@@ -455,7 +455,7 @@ public static class DungeonContent
             Layout = RoomLayout.Circular,
             FixedEncounterId = "fringe_toxic_swarm",
             Features = new List<RoomFeature> { RoomFeature.TreasureChest },
-            LoreText = "The Strays have made this place their home."
+            LoreText = "The Kyns have made this place their home."
         });
 
         Register(new AuthoredRoom

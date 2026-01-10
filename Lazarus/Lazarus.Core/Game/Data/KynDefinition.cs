@@ -7,9 +7,9 @@ using Lazarus.Core.Game.Items;
 namespace Lazarus.Core.Game.Data;
 
 /// <summary>
-/// Role a Stray naturally fills in combat.
+/// Role a Kyn naturally fills in combat.
 /// </summary>
-public enum StrayRole
+public enum KynRole
 {
     Tank,       // High HP, defense
     Damage,     // High attack
@@ -20,9 +20,9 @@ public enum StrayRole
 }
 
 /// <summary>
-/// Base stats for a Stray at level 1.
+/// Base stats for a Kyn at level 1.
 /// </summary>
-public class StrayBaseStats
+public class KynBaseStats
 {
     public int MaxHp { get; set; } = 100;
     public int Attack { get; set; } = 10;
@@ -43,11 +43,11 @@ public class StrayBaseStats
     /// <summary>
     /// Creates stats scaled to a level.
     /// </summary>
-    public StrayBaseStats ScaleToLevel(int level)
+    public KynBaseStats ScaleToLevel(int level)
     {
         // Simple linear scaling: stats increase by 10% per level
         float multiplier = 1f + (level - 1) * 0.1f;
-        return new StrayBaseStats
+        return new KynBaseStats
         {
             MaxHp = (int)(MaxHp * multiplier),
             Attack = (int)(Attack * multiplier),
@@ -62,10 +62,10 @@ public class StrayBaseStats
 }
 
 /// <summary>
-/// Definition of a Stray species/type.
-/// This is the template from which individual Strays are created.
+/// Definition of a Kyn species/type.
+/// This is the template from which individual Kyns are created.
 /// </summary>
-public class StrayDefinition
+public class KynDefinition
 {
     /// <summary>
     /// Unique identifier for this definition.
@@ -73,12 +73,12 @@ public class StrayDefinition
     public string Id { get; set; } = "";
 
     /// <summary>
-    /// Display name of this Stray type.
+    /// Display name of this Kyn type.
     /// </summary>
-    public string Name { get; set; } = "Unknown Stray";
+    public string Name { get; set; } = "Unknown Kyn";
 
     /// <summary>
-    /// Description of this Stray.
+    /// Description of this Kyn.
     /// </summary>
     public string Description { get; set; } = "";
 
@@ -88,22 +88,22 @@ public class StrayDefinition
     public CreatureType CreatureType { get; set; } = CreatureType.GrayWolf;
 
     /// <summary>
-    /// Gets the creature category (Ordo) for this Stray.
+    /// Gets the creature category (Ordo) for this Kyn.
     /// </summary>
     public CreatureCategory Category => CreatureTypes.GetCategory(CreatureType);
 
     /// <summary>
-    /// Combat role this Stray naturally fills.
+    /// Combat role this Kyn naturally fills.
     /// </summary>
-    public StrayRole Role { get; set; } = StrayRole.Damage;
+    public KynRole Role { get; set; } = KynRole.Damage;
 
     /// <summary>
     /// Base stats at level 1.
     /// </summary>
-    public StrayBaseStats BaseStats { get; set; } = new();
+    public KynBaseStats BaseStats { get; set; } = new();
 
     /// <summary>
-    /// Biomes where this Stray can be found.
+    /// Biomes where this Kyn can be found.
     /// </summary>
     public List<string> Biomes { get; set; } = new();
 
@@ -183,7 +183,7 @@ public class StrayDefinition
     }
 
     /// <summary>
-    /// Innate abilities this Stray has.
+    /// Innate abilities this Kyn has.
     /// </summary>
     public List<string> InnateAbilities { get; set; } = new();
 
@@ -198,7 +198,7 @@ public class StrayDefinition
     public int PlaceholderSize { get; set; } = 20;
 
     /// <summary>
-    /// Whether this Stray can be recruited.
+    /// Whether this Kyn can be recruited.
     /// </summary>
     public bool CanRecruit { get; set; } = true;
 
@@ -208,13 +208,13 @@ public class StrayDefinition
     public bool IsBoss { get; set; } = false;
 
     /// <summary>
-    /// Whether this is a companion Stray (starts with the player).
+    /// Whether this is a companion Kyn (starts with the player).
     /// </summary>
     public bool IsCompanion { get; set; } = false;
 
     /// <summary>
-    /// Fixed ledger number for this Stray (0 = assigned dynamically when caught).
-    /// Companions and special Strays have fixed numbers.
+    /// Fixed ledger number for this Kyn (0 = assigned dynamically when caught).
+    /// Companions and special Kyns have fixed numbers.
     /// </summary>
     public int LedgerNumber { get; set; } = 0;
 
@@ -236,32 +236,32 @@ public class StrayDefinition
 }
 
 /// <summary>
-/// Static registry of all Stray definitions.
+/// Static registry of all Kyn definitions.
 /// </summary>
-public static class StrayDefinitions
+public static class KynDefinitions
 {
-    private static readonly Dictionary<string, StrayDefinition> _definitions = new();
+    private static readonly Dictionary<string, KynDefinition> _definitions = new();
 
-    static StrayDefinitions()
+    static KynDefinitions()
     {
         // Register companions first (they have fixed ledger numbers)
-        RegisterCompanionStrays();
+        RegisterCompanionKyns();
 
-        // Initialize all Strays by biome
-        RegisterFringeStrays();
-        RegisterRustStrays();
-        RegisterGreenStrays();
-        RegisterQuietStrays();
-        RegisterTeethStrays();
-        RegisterGlowStrays();
-        RegisterArchiveScarStrays();
-        RegisterBossStrays();
+        // Initialize all Kyns by biome
+        RegisterFringeKyns();
+        RegisterRustKyns();
+        RegisterGreenKyns();
+        RegisterQuietKyns();
+        RegisterTeethKyns();
+        RegisterGlowKyns();
+        RegisterArchiveScarKyns();
+        RegisterBossKyns();
     }
 
     /// <summary>
-    /// Gets a Stray definition by ID.
+    /// Gets a Kyn definition by ID.
     /// </summary>
-    public static StrayDefinition? Get(string id)
+    public static KynDefinition? Get(string id)
     {
         return _definitions.TryGetValue(id, out var def) ? def : null;
     }
@@ -269,25 +269,25 @@ public static class StrayDefinitions
     /// <summary>
     /// Gets all registered definitions.
     /// </summary>
-    public static IEnumerable<StrayDefinition> GetAll() => _definitions.Values;
+    public static IEnumerable<KynDefinition> GetAll() => _definitions.Values;
 
     /// <summary>
-    /// Registers a Stray definition.
+    /// Registers a Kyn definition.
     /// </summary>
-    public static void Register(StrayDefinition definition)
+    public static void Register(KynDefinition definition)
     {
         _definitions[definition.Id] = definition;
     }
 
     /// <summary>
-    /// Registers companion Strays that start with the player.
+    /// Registers companion Kyns that start with the player.
     /// These have fixed ledger numbers starting at 1.
     /// </summary>
-    private static void RegisterCompanionStrays()
+    private static void RegisterCompanionKyns()
     {
         // Bandit - The player's loyal companion from the start
         // A glitch-touched dog who gained sentience through corrupted data
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "bandit",
             Name = "Bandit",
@@ -295,8 +295,8 @@ public static class StrayDefinitions
                           "Something in its corrupted code makes it fiercely loyal. " +
                           "The Gravitation chip embedded in its skull grants strange powers.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats
             {
                 MaxHp = 120,
                 Attack = 14,
@@ -319,19 +319,19 @@ public static class StrayDefinitions
     }
 
     /// <summary>
-    /// Registers the Strays found in The Fringe biome.
+    /// Registers the Kyns found in The Fringe biome.
     /// </summary>
-    private static void RegisterFringeStrays()
+    private static void RegisterFringeKyns()
     {
-        // Echo Pup - The first recruited Stray, good at detecting glitches
-        Register(new StrayDefinition
+        // Echo Pup - The first recruited Kyn, good at detecting glitches
+        Register(new KynDefinition
         {
             Id = "echo_pup",
             Name = "Echo Pup",
             Description = "Detects glitches and digests digital data. A reliable first companion.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 90, Attack = 12, Defense = 8, Speed = 14, Special = 16 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 90, Attack = 12, Defense = 8, Speed = 14, Special = 16 },
             Biomes = new List<string> { "fringe" },
             EvolutionLevel = 16,
             EvolvedFormId = "resonator_hound",
@@ -348,14 +348,14 @@ public static class StrayDefinitions
         });
 
         // Circuit Crow - Accuracy and vision
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "circuit_crow",
             Name = "Circuit Crow",
             Description = "Enhanced vision grants party accuracy. Can spot threats from afar.",
             CreatureType = CreatureType.SugarGlider,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 70, Attack = 14, Defense = 6, Speed = 16, Special = 14 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 70, Attack = 14, Defense = 6, Speed = 16, Special = 14 },
             Biomes = new List<string> { "fringe" },
             EvolutionLevel = 18,
             EvolvedFormId = "scan_raven",
@@ -373,14 +373,14 @@ public static class StrayDefinitions
         });
 
         // Relay Rodent - Energy regen
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "relay_rodent",
             Name = "Relay Rodent",
             Description = "Generates static energy. Resists shock damage and helps with energy regen.",
             CreatureType = CreatureType.BrownRat,
-            Role = StrayRole.Utility,
-            BaseStats = new StrayBaseStats { MaxHp = 65, Attack = 10, Defense = 8, Speed = 18, Special = 12 },
+            Role = KynRole.Utility,
+            BaseStats = new KynBaseStats { MaxHp = 65, Attack = 10, Defense = 8, Speed = 18, Special = 12 },
             Biomes = new List<string> { "fringe" },
             EvolutionLevel = 15,
             EvolvedFormId = "capacitor_hare",
@@ -391,14 +391,14 @@ public static class StrayDefinitions
         });
 
         // Static Feline - Stealth and dodging
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "static_feline",
             Name = "Static Feline",
             Description = "Phases through attacks with unnatural grace. A stealth specialist.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 75, Attack = 16, Defense = 6, Speed = 20, Special = 10 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 75, Attack = 16, Defense = 6, Speed = 20, Special = 10 },
             Biomes = new List<string> { "fringe" },
             EvolutionLevel = 20,
             EvolvedFormId = "phase_panther",
@@ -410,14 +410,14 @@ public static class StrayDefinitions
         });
 
         // Buffer Badger - Tank
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "buffer_badger",
             Name = "Buffer Badger",
             Description = "Stores damage in reserve systems. A reliable tank that protects the party.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Tank,
-            BaseStats = new StrayBaseStats { MaxHp = 140, Attack = 10, Defense = 16, Speed = 8, Special = 8 },
+            Role = KynRole.Tank,
+            BaseStats = new KynBaseStats { MaxHp = 140, Attack = 10, Defense = 16, Speed = 8, Special = 8 },
             Biomes = new List<string> { "fringe" },
             EvolutionLevel = 18,
             EvolvedFormId = "fortress_meles",
@@ -429,14 +429,14 @@ public static class StrayDefinitions
         });
 
         // Resonator Hound - Echo Pup evolution
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "resonator_hound",
             Name = "Resonator Hound",
             Description = "Evolved Echo Pup. Its howl resonates with data streams.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 120, Attack = 16, Defense = 12, Speed = 16, Special = 22 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 120, Attack = 16, Defense = 12, Speed = 16, Special = 22 },
             Biomes = new List<string> { "fringe", "rust" },
             MicrochipSlots = 4,
             InnateAbilities = new List<string> { "glitch_detect", "data_digest", "resonance_howl" },
@@ -445,15 +445,15 @@ public static class StrayDefinitions
             CanRecruit = false // Only obtained through evolution
         });
 
-        // Wild Stray - Generic placeholder for testing
-        Register(new StrayDefinition
+        // Wild Kyn - Generic placeholder for testing
+        Register(new KynDefinition
         {
-            Id = "wild_stray",
-            Name = "Wild Stray",
-            Description = "A generic wild Stray. Not particularly special, but dangerous in groups.",
+            Id = "wild_kyn",
+            Name = "Wild Kyn",
+            Description = "A generic wild Kyn. Not particularly special, but dangerous in groups.",
             CreatureType = CreatureType.AmericanBison,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 80, Attack = 12, Defense = 10, Speed = 12, Special = 10 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 80, Attack = 12, Defense = 10, Speed = 12, Special = 10 },
             Biomes = new List<string> { "fringe", "rust", "green", "quiet", "teeth", "glow", "archive_scar" },
             MicrochipSlots = 1,
             PlaceholderColor = Color.Brown,
@@ -462,19 +462,19 @@ public static class StrayDefinitions
     }
 
     /// <summary>
-    /// Registers the Strays found in The Rust biome.
+    /// Registers the Kyns found in The Rust biome.
     /// </summary>
-    private static void RegisterRustStrays()
+    private static void RegisterRustKyns()
     {
         // Rust Rat - Common industrial scavenger
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "rust_rat",
             Name = "Rust Rat",
             Description = "Thrives in industrial decay. Can corrode metal with its bite.",
             CreatureType = CreatureType.BrownRat,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 70, Attack = 14, Defense = 8, Speed = 16, Special = 10 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 70, Attack = 14, Defense = 8, Speed = 16, Special = 10 },
             Biomes = new List<string> { "fringe", "rust" },
             EvolutionLevel = 18,
             EvolvedFormId = "corrosion_king",
@@ -485,14 +485,14 @@ public static class StrayDefinitions
         });
 
         // Scrap Hound - Pack hunter
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "scrap_hound",
             Name = "Scrap Hound",
             Description = "Assembled from discarded parts. Loyal once befriended.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 95, Attack = 16, Defense = 12, Speed = 14, Special = 8 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 95, Attack = 16, Defense = 12, Speed = 14, Special = 8 },
             Biomes = new List<string> { "fringe", "rust" },
             EvolutionLevel = 20,
             EvolvedFormId = "junkyard_alpha",
@@ -503,14 +503,14 @@ public static class StrayDefinitions
         });
 
         // Gear Beetle - Defensive insect
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "gear_beetle",
             Name = "Gear Beetle",
             Description = "Its shell is made of interlocking gears. Incredibly durable.",
             CreatureType = CreatureType.PrayingMantis,
-            Role = StrayRole.Tank,
-            BaseStats = new StrayBaseStats { MaxHp = 130, Attack = 8, Defense = 20, Speed = 6, Special = 6 },
+            Role = KynRole.Tank,
+            BaseStats = new KynBaseStats { MaxHp = 130, Attack = 8, Defense = 20, Speed = 6, Special = 6 },
             Biomes = new List<string> { "rust" },
             EvolutionLevel = 22,
             EvolvedFormId = "clockwork_colossus",
@@ -521,14 +521,14 @@ public static class StrayDefinitions
         });
 
         // Piston Snake - Mechanical serpent
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "piston_snake",
             Name = "Piston Snake",
             Description = "Hydraulic muscles give it crushing strength.",
             CreatureType = CreatureType.GiantCentipede,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 85, Attack = 18, Defense = 10, Speed = 12, Special = 10 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 85, Attack = 18, Defense = 10, Speed = 12, Special = 10 },
             Biomes = new List<string> { "rust" },
             EvolutionLevel = 24,
             EvolvedFormId = "hydraulic_wyrm",
@@ -539,14 +539,14 @@ public static class StrayDefinitions
         });
 
         // Forge Spider - Fire-resistant arachnid
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "forge_spider",
             Name = "Forge Spider",
             Description = "Webs of molten metal. Immune to heat.",
             CreatureType = CreatureType.BlackWidowSpider,
-            Role = StrayRole.Control,
-            BaseStats = new StrayBaseStats { MaxHp = 75, Attack = 12, Defense = 8, Speed = 14, Special = 16 },
+            Role = KynRole.Control,
+            BaseStats = new KynBaseStats { MaxHp = 75, Attack = 12, Defense = 8, Speed = 14, Special = 16 },
             Biomes = new List<string> { "rust" },
             EvolutionLevel = 20,
             EvolvedFormId = "smelter_queen",
@@ -557,14 +557,14 @@ public static class StrayDefinitions
         });
 
         // Crane Raptor - Rare aerial predator
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "crane_raptor",
             Name = "Crane Raptor",
             Description = "Built from construction equipment. Drops from great heights to strike.",
             CreatureType = CreatureType.SugarGlider,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 90, Attack = 22, Defense = 8, Speed = 18, Special = 12 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 90, Attack = 22, Defense = 8, Speed = 18, Special = 12 },
             Biomes = new List<string> { "rust" },
             MicrochipSlots = 3,
             InnateAbilities = new List<string> { "dive_bomb", "aerial_superiority" },
@@ -574,14 +574,14 @@ public static class StrayDefinitions
         });
 
         // Furnace Golem - Rare tank
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "furnace_golem",
             Name = "Furnace Golem",
             Description = "A walking smelter. Radiates intense heat.",
             CreatureType = CreatureType.AmericanBison,
-            Role = StrayRole.Tank,
-            BaseStats = new StrayBaseStats { MaxHp = 180, Attack = 14, Defense = 18, Speed = 4, Special = 14 },
+            Role = KynRole.Tank,
+            BaseStats = new KynBaseStats { MaxHp = 180, Attack = 14, Defense = 18, Speed = 4, Special = 14 },
             Biomes = new List<string> { "rust" },
             MicrochipSlots = 3,
             InnateAbilities = new List<string> { "radiant_heat", "molten_core", "slag_armor" },
@@ -591,14 +591,14 @@ public static class StrayDefinitions
         });
 
         // Corrosion King - Rust Rat evolution
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "corrosion_king",
             Name = "Corrosion King",
             Description = "Evolved Rust Rat. Its presence accelerates decay.",
             CreatureType = CreatureType.BrownRat,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 100, Attack = 20, Defense = 12, Speed = 18, Special = 16 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 100, Attack = 20, Defense = 12, Speed = 18, Special = 16 },
             Biomes = new List<string> { "rust" },
             MicrochipSlots = 3,
             InnateAbilities = new List<string> { "corrode", "scavenge", "entropy_aura" },
@@ -608,14 +608,14 @@ public static class StrayDefinitions
         });
 
         // Junkyard Alpha - Scrap Hound evolution
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "junkyard_alpha",
             Name = "Junkyard Alpha",
             Description = "Evolved Scrap Hound. Commands packs of lesser machines.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 130, Attack = 22, Defense = 16, Speed = 16, Special = 12 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 130, Attack = 22, Defense = 16, Speed = 16, Special = 12 },
             Biomes = new List<string> { "rust" },
             MicrochipSlots = 4,
             InnateAbilities = new List<string> { "pack_tactics", "salvage", "alpha_howl", "summon_pack" },
@@ -626,19 +626,19 @@ public static class StrayDefinitions
     }
 
     /// <summary>
-    /// Registers the Strays found in The Green biome.
+    /// Registers the Kyns found in The Green biome.
     /// </summary>
-    private static void RegisterGreenStrays()
+    private static void RegisterGreenKyns()
     {
         // Vine Serpent - Camouflaged ambusher
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "vine_serpent",
             Name = "Vine Serpent",
             Description = "Indistinguishable from plant life until it strikes.",
             CreatureType = CreatureType.GiantCentipede,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 80, Attack = 16, Defense = 8, Speed = 14, Special = 14 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 80, Attack = 16, Defense = 8, Speed = 14, Special = 14 },
             Biomes = new List<string> { "green" },
             EvolutionLevel = 22,
             EvolvedFormId = "jungle_hydra",
@@ -649,14 +649,14 @@ public static class StrayDefinitions
         });
 
         // Bloom Moth - Healing support
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "bloom_moth",
             Name = "Bloom Moth",
             Description = "Its scales carry healing pollen. A gentle presence.",
             CreatureType = CreatureType.PrayingMantis,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 65, Attack = 6, Defense = 6, Speed = 16, Special = 22 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 65, Attack = 6, Defense = 6, Speed = 16, Special = 22 },
             Biomes = new List<string> { "green" },
             EvolutionLevel = 18,
             EvolvedFormId = "aurora_monarch",
@@ -667,14 +667,14 @@ public static class StrayDefinitions
         });
 
         // Moss Bear - Regenerating tank
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "moss_bear",
             Name = "Moss Bear",
             Description = "Covered in symbiotic moss that heals its wounds.",
             CreatureType = CreatureType.AmericanBison,
-            Role = StrayRole.Tank,
-            BaseStats = new StrayBaseStats { MaxHp = 160, Attack = 14, Defense = 14, Speed = 6, Special = 12 },
+            Role = KynRole.Tank,
+            BaseStats = new KynBaseStats { MaxHp = 160, Attack = 14, Defense = 14, Speed = 6, Special = 12 },
             Biomes = new List<string> { "green" },
             EvolutionLevel = 25,
             EvolvedFormId = "ancient_grove_ursine",
@@ -685,14 +685,14 @@ public static class StrayDefinitions
         });
 
         // Thorn Cat - Retaliating damage dealer
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "thorn_cat",
             Name = "Thorn Cat",
             Description = "Its fur is made of thorns. Striking it hurts.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 75, Attack = 18, Defense = 10, Speed = 18, Special = 8 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 75, Attack = 18, Defense = 10, Speed = 18, Special = 8 },
             Biomes = new List<string> { "green" },
             EvolutionLevel = 20,
             EvolvedFormId = "bramble_panther",
@@ -703,14 +703,14 @@ public static class StrayDefinitions
         });
 
         // Spore Toad - Status effect specialist
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "spore_toad",
             Name = "Spore Toad",
             Description = "Releases clouds of disorienting spores.",
             CreatureType = CreatureType.Hippopotamus,
-            Role = StrayRole.Control,
-            BaseStats = new StrayBaseStats { MaxHp = 90, Attack = 8, Defense = 12, Speed = 8, Special = 18 },
+            Role = KynRole.Control,
+            BaseStats = new KynBaseStats { MaxHp = 90, Attack = 8, Defense = 12, Speed = 8, Special = 18 },
             Biomes = new List<string> { "green" },
             EvolutionLevel = 19,
             EvolvedFormId = "fungal_emperor",
@@ -721,14 +721,14 @@ public static class StrayDefinitions
         });
 
         // Ancient Oak Deer - Rare majestic creature
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "ancient_oak_deer",
             Name = "Ancient Oak Deer",
             Description = "Its antlers are living trees. Said to be centuries old.",
             CreatureType = CreatureType.AmericanBison,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 120, Attack = 12, Defense = 14, Speed = 14, Special = 24 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 120, Attack = 12, Defense = 14, Speed = 14, Special = 24 },
             Biomes = new List<string> { "green" },
             MicrochipSlots = 4,
             InnateAbilities = new List<string> { "nature_blessing", "forest_communion", "antler_barrier" },
@@ -738,14 +738,14 @@ public static class StrayDefinitions
         });
 
         // Chloro Phoenix - Rare legendary bird
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "chloro_phoenix",
             Name = "Chloro Phoenix",
             Description = "Burns with green flame. Can resurrect once per battle.",
             CreatureType = CreatureType.SugarGlider,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 100, Attack = 16, Defense = 10, Speed = 20, Special = 26 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 100, Attack = 16, Defense = 10, Speed = 20, Special = 26 },
             Biomes = new List<string> { "green" },
             MicrochipSlots = 4,
             InnateAbilities = new List<string> { "green_flame", "rebirth", "photosynthesis" },
@@ -755,14 +755,14 @@ public static class StrayDefinitions
         });
 
         // Jungle Hydra - Vine Serpent evolution
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "jungle_hydra",
             Name = "Jungle Hydra",
             Description = "Evolved Vine Serpent. Multiple heads strike simultaneously.",
             CreatureType = CreatureType.GiantCentipede,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 120, Attack = 22, Defense = 12, Speed = 16, Special = 18 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 120, Attack = 22, Defense = 12, Speed = 16, Special = 18 },
             Biomes = new List<string> { "green" },
             MicrochipSlots = 3,
             InnateAbilities = new List<string> { "camouflage", "vine_whip", "poison_bite", "multi_strike" },
@@ -772,14 +772,14 @@ public static class StrayDefinitions
         });
 
         // Aurora Monarch - Bloom Moth evolution
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "aurora_monarch",
             Name = "Aurora Monarch",
             Description = "Evolved Bloom Moth. Its wings shimmer with healing light.",
             CreatureType = CreatureType.PrayingMantis,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 90, Attack = 10, Defense = 10, Speed = 18, Special = 30 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 90, Attack = 10, Defense = 10, Speed = 18, Special = 30 },
             Biomes = new List<string> { "green" },
             MicrochipSlots = 3,
             InnateAbilities = new List<string> { "pollen_heal", "sleep_dust", "aurora_wings", "mass_heal" },
@@ -790,19 +790,19 @@ public static class StrayDefinitions
     }
 
     /// <summary>
-    /// Registers the Strays found in The Quiet biome.
+    /// Registers the Kyns found in The Quiet biome.
     /// </summary>
-    private static void RegisterQuietStrays()
+    private static void RegisterQuietKyns()
     {
         // House Cat - Deceptively domestic
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "house_cat",
             Name = "House Cat",
             Description = "Appears normal. Its eyes betray something else.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Speed,
-            BaseStats = new StrayBaseStats { MaxHp = 70, Attack = 14, Defense = 8, Speed = 22, Special = 12 },
+            Role = KynRole.Speed,
+            BaseStats = new KynBaseStats { MaxHp = 70, Attack = 14, Defense = 8, Speed = 22, Special = 12 },
             Biomes = new List<string> { "quiet" },
             EvolutionLevel = 20,
             EvolvedFormId = "uncanny_feline",
@@ -813,14 +813,14 @@ public static class StrayDefinitions
         });
 
         // Lawn Drone - Maintenance machine
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "lawn_drone",
             Name = "Lawn Drone",
             Description = "Still tending lawns that no one lives in.",
             CreatureType = CreatureType.PrayingMantis,
-            Role = StrayRole.Utility,
-            BaseStats = new StrayBaseStats { MaxHp = 60, Attack = 10, Defense = 10, Speed = 14, Special = 14 },
+            Role = KynRole.Utility,
+            BaseStats = new KynBaseStats { MaxHp = 60, Attack = 10, Defense = 10, Speed = 14, Special = 14 },
             Biomes = new List<string> { "quiet" },
             EvolutionLevel = 16,
             EvolvedFormId = "garden_sentinel",
@@ -831,14 +831,14 @@ public static class StrayDefinitions
         });
 
         // Sprinkler Serpent - Water elemental
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "sprinkler_serpent",
             Name = "Sprinkler Serpent",
             Description = "Emerged from the irrigation system. Controls water pressure.",
             CreatureType = CreatureType.GiantCentipede,
-            Role = StrayRole.Control,
-            BaseStats = new StrayBaseStats { MaxHp = 85, Attack = 12, Defense = 10, Speed = 14, Special = 16 },
+            Role = KynRole.Control,
+            BaseStats = new KynBaseStats { MaxHp = 85, Attack = 12, Defense = 10, Speed = 14, Special = 16 },
             Biomes = new List<string> { "quiet" },
             EvolutionLevel = 18,
             EvolvedFormId = "hydrant_hydra",
@@ -849,14 +849,14 @@ public static class StrayDefinitions
         });
 
         // Mailbox Mimic - Ambush predator
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "mailbox_mimic",
             Name = "Mailbox Mimic",
             Description = "Waits patiently for prey. Has been waiting a long time.",
             CreatureType = CreatureType.NineBandedArmadillo,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 100, Attack = 18, Defense = 14, Speed = 8, Special = 10 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 100, Attack = 18, Defense = 14, Speed = 8, Special = 10 },
             Biomes = new List<string> { "quiet" },
             EvolutionLevel = 22,
             EvolvedFormId = "postal_horror",
@@ -867,14 +867,14 @@ public static class StrayDefinitions
         });
 
         // Garage Guardian - Protective entity
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "garage_guardian",
             Name = "Garage Guardian",
             Description = "Protects a home that no longer exists.",
             CreatureType = CreatureType.AmericanBison,
-            Role = StrayRole.Tank,
-            BaseStats = new StrayBaseStats { MaxHp = 140, Attack = 12, Defense = 18, Speed = 6, Special = 10 },
+            Role = KynRole.Tank,
+            BaseStats = new KynBaseStats { MaxHp = 140, Attack = 12, Defense = 18, Speed = 6, Special = 10 },
             Biomes = new List<string> { "quiet" },
             EvolutionLevel = 24,
             EvolvedFormId = "home_fortress",
@@ -885,14 +885,14 @@ public static class StrayDefinitions
         });
 
         // Suburb Sentinel - Rare security system
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "suburb_sentinel",
             Name = "Suburb Sentinel",
             Description = "The neighborhood watch evolved. Sees everything.",
             CreatureType = CreatureType.SugarGlider,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 100, Attack = 14, Defense = 12, Speed = 16, Special = 20 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 100, Attack = 14, Defense = 12, Speed = 16, Special = 20 },
             Biomes = new List<string> { "quiet" },
             MicrochipSlots = 3,
             InnateAbilities = new List<string> { "surveillance", "alert_system", "coordinate_defense" },
@@ -902,14 +902,14 @@ public static class StrayDefinitions
         });
 
         // Perfect Pet - Rare uncanny entity
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "perfect_pet",
             Name = "Perfect Pet",
             Description = "Too perfect. Too obedient. Something is wrong.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 90, Attack = 10, Defense = 10, Speed = 14, Special = 24 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 90, Attack = 10, Defense = 10, Speed = 14, Special = 24 },
             Biomes = new List<string> { "quiet" },
             MicrochipSlots = 3,
             InnateAbilities = new List<string> { "perfect_loyalty", "uncanny_presence", "mimic_emotion" },
@@ -919,14 +919,14 @@ public static class StrayDefinitions
         });
 
         // Uncanny Feline - House Cat evolution
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "uncanny_feline",
             Name = "Uncanny Feline",
             Description = "Evolved House Cat. Its wrongness is now visible.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Speed,
-            BaseStats = new StrayBaseStats { MaxHp = 95, Attack = 18, Defense = 12, Speed = 26, Special = 16 },
+            Role = KynRole.Speed,
+            BaseStats = new KynBaseStats { MaxHp = 95, Attack = 18, Defense = 12, Speed = 26, Special = 16 },
             Biomes = new List<string> { "quiet" },
             MicrochipSlots = 3,
             InnateAbilities = new List<string> { "nine_lives", "silent_paws", "reality_slip", "dread_aura" },
@@ -937,19 +937,19 @@ public static class StrayDefinitions
     }
 
     /// <summary>
-    /// Registers the Strays found in The Teeth biome.
+    /// Registers the Kyns found in The Teeth biome.
     /// </summary>
-    private static void RegisterTeethStrays()
+    private static void RegisterTeethKyns()
     {
         // Turret Hawk - Aerial artillery
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "turret_hawk",
             Name = "Turret Hawk",
             Description = "Integrated targeting systems make it a deadly marksman.",
             CreatureType = CreatureType.SugarGlider,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 75, Attack = 22, Defense = 6, Speed = 20, Special = 12 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 75, Attack = 22, Defense = 6, Speed = 20, Special = 12 },
             Biomes = new List<string> { "teeth" },
             EvolutionLevel = 26,
             EvolvedFormId = "artillery_eagle",
@@ -960,14 +960,14 @@ public static class StrayDefinitions
         });
 
         // Razor Hound - Weaponized canine
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "razor_hound",
             Name = "Razor Hound",
             Description = "Blades instead of fur. Built for war.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 95, Attack = 20, Defense = 12, Speed = 16, Special = 8 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 95, Attack = 20, Defense = 12, Speed = 16, Special = 8 },
             Biomes = new List<string> { "teeth" },
             EvolutionLevel = 24,
             EvolvedFormId = "war_wolf",
@@ -978,14 +978,14 @@ public static class StrayDefinitions
         });
 
         // Bunker Bear - Armored fortress
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "bunker_bear",
             Name = "Bunker Bear",
             Description = "Armor-plated survivor. Impervious to most attacks.",
             CreatureType = CreatureType.AmericanBison,
-            Role = StrayRole.Tank,
-            BaseStats = new StrayBaseStats { MaxHp = 200, Attack = 14, Defense = 24, Speed = 4, Special = 8 },
+            Role = KynRole.Tank,
+            BaseStats = new KynBaseStats { MaxHp = 200, Attack = 14, Defense = 24, Speed = 4, Special = 8 },
             Biomes = new List<string> { "teeth" },
             EvolutionLevel = 28,
             EvolvedFormId = "fortress_ursine",
@@ -996,14 +996,14 @@ public static class StrayDefinitions
         });
 
         // Wall Crawler - Stealth infiltrator
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "wall_crawler",
             Name = "Wall Crawler",
             Description = "Moves through any terrain. Silent and deadly.",
             CreatureType = CreatureType.BlackWidowSpider,
-            Role = StrayRole.Speed,
-            BaseStats = new StrayBaseStats { MaxHp = 65, Attack = 16, Defense = 8, Speed = 24, Special = 12 },
+            Role = KynRole.Speed,
+            BaseStats = new KynBaseStats { MaxHp = 65, Attack = 16, Defense = 8, Speed = 24, Special = 12 },
             Biomes = new List<string> { "teeth" },
             EvolutionLevel = 22,
             EvolvedFormId = "shadow_stalker",
@@ -1014,14 +1014,14 @@ public static class StrayDefinitions
         });
 
         // Sentry Spider - Defensive web builder
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "sentry_spider",
             Name = "Sentry Spider",
             Description = "Webs that detect and trap intruders.",
             CreatureType = CreatureType.BlackWidowSpider,
-            Role = StrayRole.Control,
-            BaseStats = new StrayBaseStats { MaxHp = 80, Attack = 12, Defense = 14, Speed = 12, Special = 18 },
+            Role = KynRole.Control,
+            BaseStats = new KynBaseStats { MaxHp = 80, Attack = 12, Defense = 14, Speed = 12, Special = 18 },
             Biomes = new List<string> { "teeth" },
             EvolutionLevel = 24,
             EvolvedFormId = "web_fortress",
@@ -1032,14 +1032,14 @@ public static class StrayDefinitions
         });
 
         // Fortress Titan - Rare boss creature
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "fortress_titan",
             Name = "Fortress Titan",
             Description = "A walking fortress. Nearly indestructible.",
             CreatureType = CreatureType.AmericanBison,
-            Role = StrayRole.Tank,
-            BaseStats = new StrayBaseStats { MaxHp = 280, Attack = 16, Defense = 28, Speed = 2, Special = 10 },
+            Role = KynRole.Tank,
+            BaseStats = new KynBaseStats { MaxHp = 280, Attack = 16, Defense = 28, Speed = 2, Special = 10 },
             Biomes = new List<string> { "teeth" },
             MicrochipSlots = 4,
             InnateAbilities = new List<string> { "fortress_mode", "artillery_barrage", "unbreakable", "rally_defense" },
@@ -1049,14 +1049,14 @@ public static class StrayDefinitions
         });
 
         // Siege Wyrm - Rare destructive force
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "siege_wyrm",
             Name = "Siege Wyrm",
             Description = "Burrows through fortifications. Unstoppable advance.",
             CreatureType = CreatureType.GiantCentipede,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 150, Attack = 26, Defense = 18, Speed = 8, Special = 14 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 150, Attack = 26, Defense = 18, Speed = 8, Special = 14 },
             Biomes = new List<string> { "teeth" },
             MicrochipSlots = 4,
             InnateAbilities = new List<string> { "burrow", "siege_breath", "wall_breaker", "earthquake" },
@@ -1066,14 +1066,14 @@ public static class StrayDefinitions
         });
 
         // War Wolf - Razor Hound evolution
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "war_wolf",
             Name = "War Wolf",
             Description = "Evolved Razor Hound. A living weapon.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 130, Attack = 28, Defense = 16, Speed = 18, Special = 12 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 130, Attack = 28, Defense = 16, Speed = 18, Special = 12 },
             Biomes = new List<string> { "teeth" },
             MicrochipSlots = 3,
             InnateAbilities = new List<string> { "blade_fur", "rend", "bloodlust", "war_cry", "execution" },
@@ -1084,19 +1084,19 @@ public static class StrayDefinitions
     }
 
     /// <summary>
-    /// Registers the Strays found in The Glow biome.
+    /// Registers the Kyns found in The Glow biome.
     /// </summary>
-    private static void RegisterGlowStrays()
+    private static void RegisterGlowKyns()
     {
         // Server Sprite - Data elemental
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "server_sprite",
             Name = "Server Sprite",
             Description = "Pure data given form. Flickers in and out of existence.",
             CreatureType = CreatureType.GiantSquid,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 55, Attack = 8, Defense = 6, Speed = 22, Special = 24 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 55, Attack = 8, Defense = 6, Speed = 22, Special = 24 },
             Biomes = new List<string> { "glow" },
             EvolutionLevel = 24,
             EvolvedFormId = "data_djinn",
@@ -1107,14 +1107,14 @@ public static class StrayDefinitions
         });
 
         // Data Worm - System infiltrator
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "data_worm",
             Name = "Data Worm",
             Description = "Burrows through code. Corrupts what it touches.",
             CreatureType = CreatureType.GiantSquid,
-            Role = StrayRole.Control,
-            BaseStats = new StrayBaseStats { MaxHp = 70, Attack = 14, Defense = 8, Speed = 16, Special = 18 },
+            Role = KynRole.Control,
+            BaseStats = new KynBaseStats { MaxHp = 70, Attack = 14, Defense = 8, Speed = 16, Special = 18 },
             Biomes = new List<string> { "glow" },
             EvolutionLevel = 26,
             EvolvedFormId = "virus_wyrm",
@@ -1125,14 +1125,14 @@ public static class StrayDefinitions
         });
 
         // Cache Cat - Memory keeper
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "cache_cat",
             Name = "Cache Cat",
             Description = "Stores memories in its fur. Never forgets.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 75, Attack = 12, Defense = 10, Speed = 18, Special = 20 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 75, Attack = 12, Defense = 10, Speed = 18, Special = 20 },
             Biomes = new List<string> { "glow" },
             EvolutionLevel = 24,
             EvolvedFormId = "archive_panther",
@@ -1143,14 +1143,14 @@ public static class StrayDefinitions
         });
 
         // Firewall Fox - Security system
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "firewall_fox",
             Name = "Firewall Fox",
             Description = "Burns with protective fire. Blocks intrusions.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Tank,
-            BaseStats = new StrayBaseStats { MaxHp = 110, Attack = 14, Defense = 16, Speed = 14, Special = 16 },
+            Role = KynRole.Tank,
+            BaseStats = new KynBaseStats { MaxHp = 110, Attack = 14, Defense = 16, Speed = 14, Special = 16 },
             Biomes = new List<string> { "glow" },
             EvolutionLevel = 26,
             EvolvedFormId = "security_kitsune",
@@ -1161,14 +1161,14 @@ public static class StrayDefinitions
         });
 
         // Bandwidth Bat - Speed specialist
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "bandwidth_bat",
             Name = "Bandwidth Bat",
             Description = "Moves at transmission speeds. Here and gone.",
             CreatureType = CreatureType.SugarGlider,
-            Role = StrayRole.Speed,
-            BaseStats = new StrayBaseStats { MaxHp = 60, Attack = 14, Defense = 6, Speed = 28, Special = 14 },
+            Role = KynRole.Speed,
+            BaseStats = new KynBaseStats { MaxHp = 60, Attack = 14, Defense = 6, Speed = 28, Special = 14 },
             Biomes = new List<string> { "glow" },
             EvolutionLevel = 22,
             EvolvedFormId = "quantum_flyer",
@@ -1179,14 +1179,14 @@ public static class StrayDefinitions
         });
 
         // Kernel Dragon - Rare core entity
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "kernel_dragon",
             Name = "Kernel Dragon",
             Description = "A manifestation of core system processes. Incredibly powerful.",
             CreatureType = CreatureType.GiantCentipede,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 160, Attack = 28, Defense = 16, Speed = 16, Special = 26 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 160, Attack = 28, Defense = 16, Speed = 16, Special = 26 },
             Biomes = new List<string> { "glow" },
             MicrochipSlots = 5,
             InnateAbilities = new List<string> { "kernel_panic", "system_override", "process_breath", "root_access" },
@@ -1196,14 +1196,14 @@ public static class StrayDefinitions
         });
 
         // Root Access Bear - Rare admin entity
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "root_access_bear",
             Name = "Root Access Bear",
             Description = "Has administrator privileges to reality itself.",
             CreatureType = CreatureType.AmericanBison,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 140, Attack = 16, Defense = 18, Speed = 10, Special = 30 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 140, Attack = 16, Defense = 18, Speed = 10, Special = 30 },
             Biomes = new List<string> { "glow" },
             MicrochipSlots = 5,
             InnateAbilities = new List<string> { "sudo", "permission_grant", "system_restore", "admin_shield" },
@@ -1213,14 +1213,14 @@ public static class StrayDefinitions
         });
 
         // Data Djinn - Server Sprite evolution
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "data_djinn",
             Name = "Data Djinn",
             Description = "Evolved Server Sprite. Grants digital wishes.",
             CreatureType = CreatureType.GiantSquid,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 85, Attack = 12, Defense = 10, Speed = 24, Special = 32 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 85, Attack = 12, Defense = 10, Speed = 24, Special = 32 },
             Biomes = new List<string> { "glow" },
             MicrochipSlots = 3,
             InnateAbilities = new List<string> { "data_transfer", "buffer", "phase_shift", "wish_grant", "reality_edit" },
@@ -1230,14 +1230,14 @@ public static class StrayDefinitions
         });
 
         // Virus Wyrm - Data Worm evolution
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "virus_wyrm",
             Name = "Virus Wyrm",
             Description = "Evolved Data Worm. A catastrophic system threat.",
             CreatureType = CreatureType.GiantSquid,
-            Role = StrayRole.Control,
-            BaseStats = new StrayBaseStats { MaxHp = 100, Attack = 20, Defense = 12, Speed = 18, Special = 26 },
+            Role = KynRole.Control,
+            BaseStats = new KynBaseStats { MaxHp = 100, Attack = 20, Defense = 12, Speed = 18, Special = 26 },
             Biomes = new List<string> { "glow" },
             MicrochipSlots = 3,
             InnateAbilities = new List<string> { "corrupt", "replicate", "system_exploit", "mass_infection", "zero_day" },
@@ -1248,19 +1248,19 @@ public static class StrayDefinitions
     }
 
     /// <summary>
-    /// Registers the Strays found in The Archive Scar biome.
+    /// Registers the Kyns found in The Archive Scar biome.
     /// </summary>
-    private static void RegisterArchiveScarStrays()
+    private static void RegisterArchiveScarKyns()
     {
         // Memory Ghost - Fragmentary entity
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "memory_ghost",
             Name = "Memory Ghost",
             Description = "An echo of something that was deleted. Half-real.",
             CreatureType = CreatureType.GiantSquid,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 50, Attack = 10, Defense = 4, Speed = 20, Special = 22 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 50, Attack = 10, Defense = 4, Speed = 20, Special = 22 },
             Biomes = new List<string> { "archive_scar" },
             EvolutionLevel = 20,
             EvolvedFormId = "phantom_archive",
@@ -1271,14 +1271,14 @@ public static class StrayDefinitions
         });
 
         // Deleted Dog - Partially erased
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "deleted_dog",
             Name = "Deleted Dog",
             Description = "Parts of it are missing. Still loyal.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 80, Attack = 16, Defense = 8, Speed = 16, Special = 14 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 80, Attack = 16, Defense = 8, Speed = 16, Special = 14 },
             Biomes = new List<string> { "archive_scar" },
             EvolutionLevel = 22,
             EvolvedFormId = "void_hound",
@@ -1289,14 +1289,14 @@ public static class StrayDefinitions
         });
 
         // Corrupted Cat - Data decay
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "corrupted_cat",
             Name = "Corrupted Cat",
             Description = "Its data is scrambled. Unpredictable behavior.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Control,
-            BaseStats = new StrayBaseStats { MaxHp = 70, Attack = 14, Defense = 8, Speed = 18, Special = 18 },
+            Role = KynRole.Control,
+            BaseStats = new KynBaseStats { MaxHp = 70, Attack = 14, Defense = 8, Speed = 18, Special = 18 },
             Biomes = new List<string> { "archive_scar" },
             EvolutionLevel = 20,
             EvolvedFormId = "entropy_panther",
@@ -1307,14 +1307,14 @@ public static class StrayDefinitions
         });
 
         // Null Serpent - Void creature
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "null_serpent",
             Name = "Null Serpent",
             Description = "Made of nothing. Its bite erases.",
             CreatureType = CreatureType.GiantCentipede,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 75, Attack = 20, Defense = 6, Speed = 16, Special = 16 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 75, Attack = 20, Defense = 6, Speed = 16, Special = 16 },
             Biomes = new List<string> { "archive_scar" },
             EvolutionLevel = 24,
             EvolvedFormId = "void_wyrm",
@@ -1325,14 +1325,14 @@ public static class StrayDefinitions
         });
 
         // Void Moth - Darkness flyer
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "void_moth",
             Name = "Void Moth",
             Description = "Drawn to the gaps in reality.",
             CreatureType = CreatureType.PrayingMantis,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 55, Attack = 8, Defense = 6, Speed = 20, Special = 22 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 55, Attack = 8, Defense = 6, Speed = 20, Special = 22 },
             Biomes = new List<string> { "archive_scar" },
             EvolutionLevel = 18,
             EvolvedFormId = "oblivion_butterfly",
@@ -1343,14 +1343,14 @@ public static class StrayDefinitions
         });
 
         // Ancient Backup - Rare preserved entity
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "ancient_backup",
             Name = "Ancient Backup",
             Description = "A complete backup from before the fall. Pristine.",
             CreatureType = CreatureType.AmericanBison,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 120, Attack = 14, Defense = 14, Speed = 14, Special = 26 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 120, Attack = 14, Defense = 14, Speed = 14, Special = 26 },
             Biomes = new List<string> { "archive_scar" },
             MicrochipSlots = 4,
             InnateAbilities = new List<string> { "restore", "archive_knowledge", "pristine_form", "time_lock" },
@@ -1360,14 +1360,14 @@ public static class StrayDefinitions
         });
 
         // Original Instance - Rare first version
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "original_instance",
             Name = "Original Instance",
             Description = "The first of its kind. All others are copies.",
             CreatureType = CreatureType.NineBandedArmadillo,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 130, Attack = 24, Defense = 16, Speed = 16, Special = 22 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 130, Attack = 24, Defense = 16, Speed = 16, Special = 22 },
             Biomes = new List<string> { "archive_scar" },
             MicrochipSlots = 4,
             InnateAbilities = new List<string> { "original_power", "spawn_copy", "prime_strike", "legacy" },
@@ -1377,14 +1377,14 @@ public static class StrayDefinitions
         });
 
         // Phantom Archive - Memory Ghost evolution
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "phantom_archive",
             Name = "Phantom Archive",
             Description = "Evolved Memory Ghost. Contains entire deleted histories.",
             CreatureType = CreatureType.GiantSquid,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 80, Attack = 14, Defense = 8, Speed = 22, Special = 30 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 80, Attack = 14, Defense = 8, Speed = 22, Special = 30 },
             Biomes = new List<string> { "archive_scar" },
             MicrochipSlots = 3,
             InnateAbilities = new List<string> { "intangible", "memory_drain", "haunt", "archive_recall", "spectral_library" },
@@ -1394,14 +1394,14 @@ public static class StrayDefinitions
         });
 
         // Void Hound - Deleted Dog evolution
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "void_hound",
             Name = "Void Hound",
             Description = "Evolved Deleted Dog. Hunts between realities.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats { MaxHp = 110, Attack = 22, Defense = 12, Speed = 20, Special = 18 },
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats { MaxHp = 110, Attack = 22, Defense = 12, Speed = 20, Special = 18 },
             Biomes = new List<string> { "archive_scar" },
             MicrochipSlots = 3,
             InnateAbilities = new List<string> { "glitch_bite", "fragment_form", "loyalty", "void_hunt", "reality_tear" },
@@ -1411,14 +1411,14 @@ public static class StrayDefinitions
         });
 
         // Oblivion Butterfly - Void Moth evolution
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "oblivion_butterfly",
             Name = "Oblivion Butterfly",
             Description = "Evolved Void Moth. Beautiful and terrifying.",
             CreatureType = CreatureType.PrayingMantis,
-            Role = StrayRole.Support,
-            BaseStats = new StrayBaseStats { MaxHp = 80, Attack = 12, Defense = 10, Speed = 22, Special = 30 },
+            Role = KynRole.Support,
+            BaseStats = new KynBaseStats { MaxHp = 80, Attack = 12, Defense = 10, Speed = 22, Special = 30 },
             Biomes = new List<string> { "archive_scar" },
             MicrochipSlots = 3,
             InnateAbilities = new List<string> { "void_dust", "darkness_shroud", "memory_siphon", "oblivion_wings", "entropy_dance" },
@@ -1429,21 +1429,21 @@ public static class StrayDefinitions
     }
 
     /// <summary>
-    /// Registers special boss Strays.
+    /// Registers special boss Kyns.
     /// </summary>
-    private static void RegisterBossStrays()
+    private static void RegisterBossKyns()
     {
         // Hyper-evolved Bandit - Final Boss
         // The companion, fully corrupted by the Boost Control System
         // Uses Absolute Gravitation to deal 99% HP damage to the party
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "hyper_bandit",
             Name = "Hyper-Evolved Bandit",
             Description = "Your former companion, consumed by the Boost Control System. The Gravitation ability has reached Absolute power - reality itself bends before it. This is not a fight you can win. You can only survive.",
             CreatureType = CreatureType.GrayWolf,
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats
             {
                 MaxHp = 9999,   // Effectively unkillable
                 Attack = 999,   // Massive attack (though Gravitation ignores this)
@@ -1462,14 +1462,14 @@ public static class StrayDefinitions
 
         // The Ancients - Optional Super Bosses
         // Ancient Hydra - Multi-headed data construct (uses ColosssalSquid as base)
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "ancient_hydra",
             Name = "The Ancient Hydra",
             Description = "A fragment of Lazarus's original consciousness, split and endlessly regenerating. Each tendril contains a different corrupted memory.",
             CreatureType = CreatureType.ColossalSquid,  // Closest to multi-tentacled horror
-            Role = StrayRole.Tank,
-            BaseStats = new StrayBaseStats
+            Role = KynRole.Tank,
+            BaseStats = new KynBaseStats
             {
                 MaxHp = 5000,
                 Attack = 150,
@@ -1487,14 +1487,14 @@ public static class StrayDefinitions
         });
 
         // Ancient Phoenix - Rebirth construct (uses SugarGlider as flying base)
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "ancient_phoenix",
             Name = "The Ancient Phoenix",
             Description = "Born from deleted save states, this creature resurrects endlessly. Only by breaking its cycle can it be defeated.",
             CreatureType = CreatureType.SugarGlider,  // Flying creature base
-            Role = StrayRole.Damage,
-            BaseStats = new StrayBaseStats
+            Role = KynRole.Damage,
+            BaseStats = new KynBaseStats
             {
                 MaxHp = 3000,
                 Attack = 200,
@@ -1512,14 +1512,14 @@ public static class StrayDefinitions
         });
 
         // Ancient Leviathan - Deep data ocean monster (uses GiantPacificOctopus)
-        Register(new StrayDefinition
+        Register(new KynDefinition
         {
             Id = "ancient_leviathan",
             Name = "The Ancient Leviathan",
             Description = "Lurking in the deepest memory pools, this behemoth predates even Lazarus. What it wants is unknown.",
             CreatureType = CreatureType.GiantPacificOctopus,  // Deep sea horror
-            Role = StrayRole.Tank,
-            BaseStats = new StrayBaseStats
+            Role = KynRole.Tank,
+            BaseStats = new KynBaseStats
             {
                 MaxHp = 8000,
                 Attack = 180,

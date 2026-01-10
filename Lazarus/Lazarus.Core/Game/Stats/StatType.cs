@@ -1,7 +1,7 @@
 namespace Lazarus.Core.Game.Stats;
 
 /// <summary>
-/// All stat types available for Strays.
+/// All stat types available for Kyns.
 /// </summary>
 public enum StatType
 {

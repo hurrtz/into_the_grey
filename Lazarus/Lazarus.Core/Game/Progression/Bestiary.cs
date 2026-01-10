@@ -39,12 +39,12 @@ public enum DiscoveryStatus
 }
 
 /// <summary>
-/// A single bestiary entry for a Stray type.
+/// A single bestiary entry for a Kyn type.
 /// </summary>
 public class BestiaryEntry
 {
     /// <summary>
-    /// The Stray definition ID.
+    /// The Kyn definition ID.
     /// </summary>
     public string DefinitionId { get; init; } = "";
 
@@ -104,7 +104,7 @@ public class BestiaryEntry
     public int LedgerNumber { get; set; } = 0;
 
     /// <summary>
-    /// Biomes where this Stray has been encountered.
+    /// Biomes where this Kyn has been encountered.
     /// </summary>
     public HashSet<string> EncounteredBiomes { get; set; } = new();
 
@@ -160,13 +160,13 @@ public class BestiaryCategory
     public Color Color { get; init; } = Color.White;
 
     /// <summary>
-    /// Stray definition IDs in this category.
+    /// Kyn definition IDs in this category.
     /// </summary>
-    public List<string> StrayIds { get; init; } = new();
+    public List<string> KynIds { get; init; } = new();
 }
 
 /// <summary>
-/// The in-game bestiary/encyclopedia for discovered Strays.
+/// The in-game bestiary/encyclopedia for discovered Kyns.
 /// </summary>
 public class Bestiary
 {
@@ -210,7 +210,7 @@ public class Bestiary
     public float CompletionPercent => TotalEntries > 0 ? (float)DiscoveredCount / TotalEntries * 100f : 0f;
 
     /// <summary>
-    /// Event fired when a new Stray is discovered.
+    /// Event fired when a new Kyn is discovered.
     /// </summary>
     public event EventHandler<BestiaryEntry>? EntryDiscovered;
 
@@ -230,12 +230,12 @@ public class Bestiary
     }
 
     /// <summary>
-    /// Initializes the bestiary with all Stray definitions.
+    /// Initializes the bestiary with all Kyn definitions.
     /// </summary>
     private void Initialize()
     {
-        // Create entries for all Stray definitions
-        foreach (var def in StrayDefinitions.GetAll())
+        // Create entries for all Kyn definitions
+        foreach (var def in KynDefinitions.GetAll())
         {
             var entry = new BestiaryEntry
             {
@@ -270,7 +270,7 @@ public class Bestiary
             Name = "The Fringe",
             Description = "Creatures found in the pod fields and foggy outskirts.",
             Color = new Color(150, 150, 170),
-            StrayIds = StrayDefinitions.GetAll().Where(s => s.Biomes.Contains("fringe")).Select(s => s.Id).ToList()
+            KynIds = KynDefinitions.GetAll().Where(s => s.Biomes.Contains("fringe")).Select(s => s.Id).ToList()
         });
 
         _categories.Add(new BestiaryCategory
@@ -279,7 +279,7 @@ public class Bestiary
             Name = "The Rust",
             Description = "Industrial creatures of metal and decay.",
             Color = new Color(180, 100, 60),
-            StrayIds = StrayDefinitions.GetAll().Where(s => s.Biomes.Contains("rust")).Select(s => s.Id).ToList()
+            KynIds = KynDefinitions.GetAll().Where(s => s.Biomes.Contains("rust")).Select(s => s.Id).ToList()
         });
 
         _categories.Add(new BestiaryCategory
@@ -288,7 +288,7 @@ public class Bestiary
             Name = "The Green",
             Description = "Overgrown creatures of nature reclaimed.",
             Color = new Color(80, 180, 80),
-            StrayIds = StrayDefinitions.GetAll().Where(s => s.Biomes.Contains("green")).Select(s => s.Id).ToList()
+            KynIds = KynDefinitions.GetAll().Where(s => s.Biomes.Contains("green")).Select(s => s.Id).ToList()
         });
 
         _categories.Add(new BestiaryCategory
@@ -297,7 +297,7 @@ public class Bestiary
             Name = "The Quiet",
             Description = "Uncanny creatures of the perfect suburbs.",
             Color = new Color(200, 200, 150),
-            StrayIds = StrayDefinitions.GetAll().Where(s => s.Biomes.Contains("quiet")).Select(s => s.Id).ToList()
+            KynIds = KynDefinitions.GetAll().Where(s => s.Biomes.Contains("quiet")).Select(s => s.Id).ToList()
         });
 
         _categories.Add(new BestiaryCategory
@@ -306,7 +306,7 @@ public class Bestiary
             Name = "The Teeth",
             Description = "Militarized creatures of war and ruin.",
             Color = new Color(150, 50, 50),
-            StrayIds = StrayDefinitions.GetAll().Where(s => s.Biomes.Contains("teeth")).Select(s => s.Id).ToList()
+            KynIds = KynDefinitions.GetAll().Where(s => s.Biomes.Contains("teeth")).Select(s => s.Id).ToList()
         });
 
         _categories.Add(new BestiaryCategory
@@ -315,7 +315,7 @@ public class Bestiary
             Name = "The Glow",
             Description = "Digital creatures of data and code.",
             Color = new Color(100, 200, 255),
-            StrayIds = StrayDefinitions.GetAll().Where(s => s.Biomes.Contains("glow")).Select(s => s.Id).ToList()
+            KynIds = KynDefinitions.GetAll().Where(s => s.Biomes.Contains("glow")).Select(s => s.Id).ToList()
         });
 
         _categories.Add(new BestiaryCategory
@@ -324,7 +324,7 @@ public class Bestiary
             Name = "The Archive Scar",
             Description = "Fragmentary creatures of deleted memories.",
             Color = new Color(150, 100, 200),
-            StrayIds = StrayDefinitions.GetAll().Where(s => s.Biomes.Contains("archive_scar")).Select(s => s.Id).ToList()
+            KynIds = KynDefinitions.GetAll().Where(s => s.Biomes.Contains("archive_scar")).Select(s => s.Id).ToList()
         });
 
         _categories.Add(new BestiaryCategory
@@ -333,21 +333,21 @@ public class Bestiary
             Name = "Legends",
             Description = "Unique and powerful entities.",
             Color = new Color(255, 200, 100),
-            StrayIds = StrayDefinitions.GetAll().Where(s => s.IsBoss).Select(s => s.Id).ToList()
+            KynIds = KynDefinitions.GetAll().Where(s => s.IsBoss).Select(s => s.Id).ToList()
         });
 
         _categories.Add(new BestiaryCategory
         {
             Id = "evolved",
             Name = "Evolved Forms",
-            Description = "Strays that have transcended their original forms.",
+            Description = "Kyns that have transcended their original forms.",
             Color = new Color(255, 150, 255),
-            StrayIds = StrayDefinitions.GetAll().Where(s => !s.CanRecruit && !s.IsBoss).Select(s => s.Id).ToList()
+            KynIds = KynDefinitions.GetAll().Where(s => !s.CanRecruit && !s.IsBoss).Select(s => s.Id).ToList()
         });
     }
 
     /// <summary>
-    /// Records an encounter with a Stray.
+    /// Records an encounter with a Kyn.
     /// </summary>
     public void RecordEncounter(string definitionId, string biome)
     {
@@ -385,7 +385,7 @@ public class Bestiary
     }
 
     /// <summary>
-    /// Records defeating a Stray.
+    /// Records defeating a Kyn.
     /// </summary>
     public void RecordDefeat(string definitionId)
     {
@@ -416,7 +416,7 @@ public class Bestiary
     }
 
     /// <summary>
-    /// Records recruiting a Stray.
+    /// Records recruiting a Kyn.
     /// </summary>
     public void RecordRecruitment(string definitionId)
     {
@@ -484,7 +484,7 @@ public class Bestiary
             yield break;
         }
 
-        foreach (var id in category.StrayIds)
+        foreach (var id in category.KynIds)
         {
             if (_entries.TryGetValue(id, out var entry))
             {
@@ -535,7 +535,7 @@ public class Bestiary
             return "???";
         }
 
-        var def = StrayDefinitions.Get(definitionId);
+        var def = KynDefinitions.Get(definitionId);
 
         return def?.Name ?? "Unknown";
     }
@@ -555,7 +555,7 @@ public class Bestiary
             return "This creature has never been encountered.";
         }
 
-        var def = StrayDefinitions.Get(definitionId);
+        var def = KynDefinitions.Get(definitionId);
 
         if (def == null)
         {
@@ -585,14 +585,14 @@ public class Bestiary
     {
         var category = _categories.FirstOrDefault(c => c.Id == categoryId);
 
-        if (category == null || category.StrayIds.Count == 0)
+        if (category == null || category.KynIds.Count == 0)
         {
             return 0f;
         }
 
-        int discovered = category.StrayIds.Count(id => _entries.TryGetValue(id, out var e) && e.Status > DiscoveryStatus.Unknown);
+        int discovered = category.KynIds.Count(id => _entries.TryGetValue(id, out var e) && e.Status > DiscoveryStatus.Unknown);
 
-        return (float)discovered / category.StrayIds.Count * 100f;
+        return (float)discovered / category.KynIds.Count * 100f;
     }
 
     private void CheckMilestones()
@@ -602,19 +602,19 @@ public class Bestiary
 
         if (discovered == 10)
         {
-            MilestoneReached?.Invoke(this, new BestiaryMilestone("first_10", "Naturalist", "Discovered 10 unique Strays"));
+            MilestoneReached?.Invoke(this, new BestiaryMilestone("first_10", "Naturalist", "Discovered 10 unique Kyns"));
         }
         else if (discovered == 25)
         {
-            MilestoneReached?.Invoke(this, new BestiaryMilestone("first_25", "Field Researcher", "Discovered 25 unique Strays"));
+            MilestoneReached?.Invoke(this, new BestiaryMilestone("first_25", "Field Researcher", "Discovered 25 unique Kyns"));
         }
         else if (discovered == 50)
         {
-            MilestoneReached?.Invoke(this, new BestiaryMilestone("first_50", "Biologist", "Discovered 50 unique Strays"));
+            MilestoneReached?.Invoke(this, new BestiaryMilestone("first_50", "Biologist", "Discovered 50 unique Kyns"));
         }
         else if (discovered == TotalEntries)
         {
-            MilestoneReached?.Invoke(this, new BestiaryMilestone("complete", "Master Zoologist", "Discovered all Strays!"));
+            MilestoneReached?.Invoke(this, new BestiaryMilestone("complete", "Master Zoologist", "Discovered all Kyns!"));
         }
 
         // Check for mastery milestones
@@ -639,7 +639,7 @@ public class Bestiary
                 MilestoneReached?.Invoke(this, new BestiaryMilestone(
                     $"category_{category.Id}",
                     $"{category.Name} Expert",
-                    $"Discovered all Strays in {category.Name}"));
+                    $"Discovered all Kyns in {category.Name}"));
             }
         }
     }

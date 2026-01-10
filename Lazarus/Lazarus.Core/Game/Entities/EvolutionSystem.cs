@@ -128,19 +128,19 @@ public class EvolutionSystem
     public float TotalTime { get; private set; } = 0f;
 
     /// <summary>
-    /// The Stray being evolved.
+    /// The Kyn being evolved.
     /// </summary>
-    public Stray? EvolvingStray { get; private set; }
+    public Kyn? EvolvingKyn { get; private set; }
 
     /// <summary>
     /// Old definition (before evolution).
     /// </summary>
-    public StrayDefinition? OldDefinition { get; private set; }
+    public KynDefinition? OldDefinition { get; private set; }
 
     /// <summary>
     /// New definition (after evolution).
     /// </summary>
-    public StrayDefinition? NewDefinition { get; private set; }
+    public KynDefinition? NewDefinition { get; private set; }
 
     /// <summary>
     /// Stat changes to display.
@@ -217,15 +217,15 @@ public class EvolutionSystem
     /// <summary>
     /// Starts an evolution sequence.
     /// </summary>
-    public void StartEvolution(Stray stray, StrayDefinition newDefinition)
+    public void StartEvolution(Kyn kyn, KynDefinition newDefinition)
     {
         if (IsActive)
         {
             return;
         }
 
-        EvolvingStray = stray;
-        OldDefinition = stray.Definition;
+        EvolvingKyn = kyn;
+        OldDefinition = kyn.Definition;
         NewDefinition = newDefinition;
 
         // Calculate stat changes
@@ -245,7 +245,7 @@ public class EvolutionSystem
 
         EvolutionStarted?.Invoke(this, new EvolutionEventArgs
         {
-            Stray = stray,
+            Kyn = kyn,
             OldDefinition = OldDefinition,
             NewDefinition = NewDefinition
         });
@@ -476,7 +476,7 @@ public class EvolutionSystem
 
             EvolutionCompleted?.Invoke(this, new EvolutionEventArgs
             {
-                Stray = EvolvingStray!,
+                Kyn = EvolvingKyn!,
                 OldDefinition = OldDefinition!,
                 NewDefinition = NewDefinition!
             });
@@ -494,27 +494,27 @@ public class EvolutionSystem
     }
 
     /// <summary>
-    /// Applies the evolution to the Stray.
+    /// Applies the evolution to the Kyn.
     /// </summary>
     private void ApplyEvolution()
     {
-        if (EvolvingStray == null || NewDefinition == null)
+        if (EvolvingKyn == null || NewDefinition == null)
         {
             return;
         }
 
         // Store old HP percentage to preserve relative health
-        float hpPercent = (float)EvolvingStray.CurrentHp / EvolvingStray.MaxHp;
+        float hpPercent = (float)EvolvingKyn.CurrentHp / EvolvingKyn.MaxHp;
 
-        // Update the Stray's definition
-        EvolvingStray.Evolve(NewDefinition);
+        // Update the Kyn's definition
+        EvolvingKyn.Evolve(NewDefinition);
 
         // Restore HP percentage
-        EvolvingStray.CurrentHp = (int)(EvolvingStray.MaxHp * hpPercent);
+        EvolvingKyn.CurrentHp = (int)(EvolvingKyn.MaxHp * hpPercent);
     }
 
     /// <summary>
-    /// Gets the evolution color based on the Stray's category.
+    /// Gets the evolution color based on the Kyn's category.
     /// </summary>
     private Color GetEvolutionColor()
     {
@@ -547,7 +547,7 @@ public class EvolutionSystem
     public void Dismiss()
     {
         CurrentPhase = EvolutionPhase.None;
-        EvolvingStray = null;
+        EvolvingKyn = null;
         OldDefinition = null;
         NewDefinition = null;
         StatChanges.Clear();
@@ -568,9 +568,9 @@ public class EvolutionSystem
         }
 
         // Make sure evolution is applied
-        if (EvolvingStray != null && NewDefinition != null && OldDefinition != null)
+        if (EvolvingKyn != null && NewDefinition != null && OldDefinition != null)
         {
-            if (EvolvingStray.Definition != NewDefinition)
+            if (EvolvingKyn.Definition != NewDefinition)
             {
                 ApplyEvolution();
             }
@@ -591,7 +591,7 @@ public class EvolutionSystem
 
         EvolutionCompleted?.Invoke(this, new EvolutionEventArgs
         {
-            Stray = EvolvingStray!,
+            Kyn = EvolvingKyn!,
             OldDefinition = OldDefinition!,
             NewDefinition = NewDefinition!
         });
@@ -755,17 +755,17 @@ public class EvolutionSystem
 public class EvolutionEventArgs : EventArgs
 {
     /// <summary>
-    /// The Stray being evolved.
+    /// The Kyn being evolved.
     /// </summary>
-    public Stray Stray { get; init; } = null!;
+    public Kyn Kyn { get; init; } = null!;
 
     /// <summary>
     /// Definition before evolution.
     /// </summary>
-    public StrayDefinition OldDefinition { get; init; } = null!;
+    public KynDefinition OldDefinition { get; init; } = null!;
 
     /// <summary>
     /// Definition after evolution.
     /// </summary>
-    public StrayDefinition NewDefinition { get; init; } = null!;
+    public KynDefinition NewDefinition { get; init; } = null!;
 }

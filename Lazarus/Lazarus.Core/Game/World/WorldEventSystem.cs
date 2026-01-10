@@ -314,9 +314,9 @@ public class WorldEventSystem
         // Random encounters
         Register(new WorldEventDefinition
         {
-            Id = "evt_wild_stray_pack",
-            Name = "Wild Stray Pack",
-            Description = "A group of wild Strays has been spotted nearby. They seem agitated.",
+            Id = "evt_wild_kyn_pack",
+            Name = "Wild Kyn Pack",
+            Description = "A group of wild Kyns has been spotted nearby. They seem agitated.",
             Type = WorldEventType.Encounter,
             Urgency = EventUrgency.Optional,
             ValidBiomes = new List<BiomeType> { BiomeType.Fringe, BiomeType.Rust, BiomeType.Green },
@@ -332,7 +332,7 @@ public class WorldEventSystem
         {
             Id = "evt_elite_encounter",
             Name = "Elite Threat",
-            Description = "An unusually powerful Stray has been detected. Approach with caution.",
+            Description = "An unusually powerful Kyn has been detected. Approach with caution.",
             Type = WorldEventType.Encounter,
             Urgency = EventUrgency.Notable,
             ValidBiomes = new List<BiomeType> { BiomeType.Teeth, BiomeType.Glow },
@@ -381,9 +381,9 @@ public class WorldEventSystem
         // Distress events
         Register(new WorldEventDefinition
         {
-            Id = "evt_stray_distress",
-            Name = "Stray in Distress",
-            Description = "A wounded Stray is calling for help. It might be grateful if rescued.",
+            Id = "evt_kyn_distress",
+            Name = "Kyn in Distress",
+            Description = "A wounded Kyn is calling for help. It might be grateful if rescued.",
             Type = WorldEventType.Distress,
             Urgency = EventUrgency.Urgent,
             ValidBiomes = new List<BiomeType> { BiomeType.Fringe, BiomeType.Green, BiomeType.Quiet },
@@ -391,15 +391,15 @@ public class WorldEventSystem
             Duration = 90f,
             Cooldown = 300f,
             IconColor = Color.Orange,
-            DialogId = "stray_rescue",
-            Reward = new EventReward { Experience = 40, FactionReputation = 10, FactionType = "Strays" }
+            DialogId = "kyn_rescue",
+            Reward = new EventReward { Experience = 40, FactionReputation = 10, FactionType = "Kyns" }
         });
 
         Register(new WorldEventDefinition
         {
             Id = "evt_npc_ambush",
             Name = "NPC Under Attack",
-            Description = "An Independent is being attacked by hostile Strays!",
+            Description = "An Independent is being attacked by hostile Kyns!",
             Type = WorldEventType.Distress,
             Urgency = EventUrgency.Urgent,
             ValidBiomes = new List<BiomeType> { BiomeType.Fringe, BiomeType.Rust, BiomeType.Green, BiomeType.Teeth },

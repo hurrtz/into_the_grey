@@ -207,7 +207,7 @@ public class DungeonInstance
             else
             {
                 // Fallback to generic enemy
-                enemies.Add("wild_stray");
+                enemies.Add("wild_kyn");
             }
         }
 

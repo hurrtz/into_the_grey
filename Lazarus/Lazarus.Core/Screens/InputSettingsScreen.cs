@@ -90,7 +90,7 @@ public class InputSettingsScreen : GameScreen
         _categories.Add(new BindingCategory("UI", new[]
         {
             GameAction.OpenInventory, GameAction.OpenMap, GameAction.OpenQuests,
-            GameAction.OpenStrays, GameAction.OpenSettings
+            GameAction.OpenKyns, GameAction.OpenSettings
         }));
 
         _categories.Add(new BindingCategory("Quick Slots", new[]

@@ -38,7 +38,7 @@ public enum GameAction
     OpenInventory,
     OpenMap,
     OpenQuests,
-    OpenStrays,
+    OpenKyns,
     OpenSettings,
 
     // Quick Actions
@@ -198,7 +198,7 @@ public class GamepadManager
         _defaultBindings[GameAction.OpenInventory] = new InputBinding { PrimaryKey = Keys.I, GamepadButton = Buttons.Y };
         _defaultBindings[GameAction.OpenMap] = new InputBinding { PrimaryKey = Keys.M, GamepadButton = Buttons.Back };
         _defaultBindings[GameAction.OpenQuests] = new InputBinding { PrimaryKey = Keys.J, GamepadButton = Buttons.LeftShoulder };
-        _defaultBindings[GameAction.OpenStrays] = new InputBinding { PrimaryKey = Keys.P, GamepadButton = Buttons.RightShoulder };
+        _defaultBindings[GameAction.OpenKyns] = new InputBinding { PrimaryKey = Keys.P, GamepadButton = Buttons.RightShoulder };
         _defaultBindings[GameAction.OpenSettings] = new InputBinding { PrimaryKey = Keys.Escape, GamepadButton = Buttons.Start };
 
         // Quick Actions

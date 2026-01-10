@@ -19,8 +19,8 @@ namespace Lazarus.Screens;
 /// </summary>
 public class CombatScreen : GameScreen
 {
-    private readonly List<Stray> _partyStrays;
-    private readonly List<Stray> _enemyStrays;
+    private readonly List<Kyn> _partyKyns;
+    private readonly List<Kyn> _enemyKyns;
     private readonly Encounter? _encounter;
     private readonly Companion? _companion;
     private readonly GameStateService? _gameState;
@@ -42,10 +42,10 @@ public class CombatScreen : GameScreen
     /// </summary>
     public event EventHandler<CombatEndedEventArgs>? CombatEnded;
 
-    public CombatScreen(List<Stray> partyStrays, List<Stray> enemyStrays, Encounter? encounter = null, Companion? companion = null, GameStateService? gameState = null)
+    public CombatScreen(List<Kyn> partyKyns, List<Kyn> enemyKyns, Encounter? encounter = null, Companion? companion = null, GameStateService? gameState = null)
     {
-        _partyStrays = partyStrays;
-        _enemyStrays = enemyStrays;
+        _partyKyns = partyKyns;
+        _enemyKyns = enemyKyns;
         _encounter = encounter;
         _companion = companion;
         _gameState = gameState;
@@ -67,7 +67,7 @@ public class CombatScreen : GameScreen
 
         // Initialize combat state
         _combatState = new CombatState();
-        _combatState.Initialize(_partyStrays, _enemyStrays, _encounter);
+        _combatState.Initialize(_partyKyns, _enemyKyns, _encounter);
         _combatState.CombatEnded += OnCombatStateEnded;
         _combatState.CompanionIntervened += OnCompanionIntervened;
 
@@ -256,7 +256,7 @@ public class CombatScreen : GameScreen
                 ExperienceEarned = _combatState.ExperienceEarned,
                 CurrencyEarned = _combatState.CurrencyEarned,
                 TelemetryUnitsEarned = _combatState.TelemetryUnitsEarned,
-                RecruitedStray = _combatState.RecruitableStray
+                RecruitedKyn = _combatState.RecruitableKyn
             };
 
             CombatEnded?.Invoke(this, args);
@@ -281,12 +281,12 @@ public class CombatScreen : GameScreen
             // Check for companion departure at Critical stage hitting ally
             if (e.HitAlly && e.Stage == GravitationStage.Critical && e.Target != null)
             {
-                var targetStray = e.Target.Stray;
-                if (_gameState.CheckCriticalGravitationDeparture(targetStray.CurrentHp, targetStray.MaxHp))
+                var targetKyn = e.Target.Kyn;
+                if (_gameState.CheckCriticalGravitationDeparture(targetKyn.CurrentHp, targetKyn.MaxHp))
                 {
                     // Companion departure triggered!
                     _combatState.CompanionPresent = false;
-                    System.Diagnostics.Debug.WriteLine($"[Combat] COMPANION DEPARTURE TRIGGERED! {targetStray.DisplayName} nearly killed!");
+                    System.Diagnostics.Debug.WriteLine($"[Combat] COMPANION DEPARTURE TRIGGERED! {targetKyn.DisplayName} nearly killed!");
                 }
             }
         }
@@ -455,9 +455,9 @@ public class CombatScreen : GameScreen
                 if (_combatState.ChipsLeveledUp.Count > 0)
                 {
                     var levelUpY = ScreenManager.BaseScreenSize.Y / 2 + 45;
-                    foreach (var (strayName, chipName, newLevel) in _combatState.ChipsLeveledUp)
+                    foreach (var (kynName, chipName, newLevel) in _combatState.ChipsLeveledUp)
                     {
-                        var levelUpText = $"{strayName}'s {chipName} -> {newLevel}!";
+                        var levelUpText = $"{kynName}'s {chipName} -> {newLevel}!";
                         var levelUpPos = new Vector2(
                             ScreenManager.BaseScreenSize.X / 2 - _font.MeasureString(levelUpText).X / 2,
                             levelUpY

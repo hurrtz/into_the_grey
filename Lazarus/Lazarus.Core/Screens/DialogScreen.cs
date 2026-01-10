@@ -397,9 +397,9 @@ public class DialogScreen : GameScreen
         {
             SpeakerType.Protagonist => Color.Cyan,
             SpeakerType.Companion => Color.Orange,
-            SpeakerType.PartyStray => Color.LimeGreen,
+            SpeakerType.PartyKyn => Color.LimeGreen,
             SpeakerType.Npc => Color.White,
-            SpeakerType.WildStray => Color.Yellow,
+            SpeakerType.WildKyn => Color.Yellow,
             SpeakerType.System => Color.Gray,
             SpeakerType.AI => Color.Magenta,
             _ => Color.White

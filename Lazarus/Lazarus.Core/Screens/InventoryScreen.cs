@@ -27,7 +27,7 @@ public enum InventoryTab
 /// </summary>
 public class InventoryScreen : GameScreen
 {
-    private readonly StrayRoster _roster;
+    private readonly KynRoster _roster;
     private readonly List<string> _ownedMicrochips;
     private readonly List<string> _ownedAugmentations;
     private readonly List<string> _ownedItems;
@@ -40,11 +40,11 @@ public class InventoryScreen : GameScreen
     private int _selectedIndex = 0;
     private int _scrollOffset = 0;
     private bool _equipMode = false;
-    private int _selectedStrayIndex = 0;
+    private int _selectedKynIndex = 0;
 
     private const int MaxVisibleItems = 10;
 
-    public InventoryScreen(StrayRoster roster, List<string> microchips, List<string> augmentations, List<string> items)
+    public InventoryScreen(KynRoster roster, List<string> microchips, List<string> augmentations, List<string> items)
     {
         _roster = roster;
         _ownedMicrochips = microchips ?? new List<string>();
@@ -123,7 +123,7 @@ public class InventoryScreen : GameScreen
             if (_currentTab == InventoryTab.Microchips || _currentTab == InventoryTab.Augmentations)
             {
                 _equipMode = true;
-                _selectedStrayIndex = 0;
+                _selectedKynIndex = 0;
             }
         }
     }
@@ -135,33 +135,33 @@ public class InventoryScreen : GameScreen
 
         if (input.IsMenuUp(ControllingPlayer))
         {
-            _selectedStrayIndex = Math.Max(0, _selectedStrayIndex - 1);
+            _selectedKynIndex = Math.Max(0, _selectedKynIndex - 1);
         }
         else if (input.IsMenuDown(ControllingPlayer))
         {
-            _selectedStrayIndex = Math.Min(partyList.Count - 1, _selectedStrayIndex + 1);
+            _selectedKynIndex = Math.Min(partyList.Count - 1, _selectedKynIndex + 1);
         }
         else if (input.IsMenuSelect(ControllingPlayer, out playerIndex) && partyList.Count > 0)
         {
-            var stray = partyList[_selectedStrayIndex];
+            var kyn = partyList[_selectedKynIndex];
             var items = GetCurrentItems();
             if (_selectedIndex >= 0 && _selectedIndex < items.Count)
             {
                 string itemId = items[_selectedIndex];
-                EquipItem(stray, itemId);
+                EquipItem(kyn, itemId);
                 _equipMode = false;
             }
         }
     }
 
-    private void EquipItem(Stray stray, string itemId)
+    private void EquipItem(Kyn kyn, string itemId)
     {
         if (_currentTab == InventoryTab.Microchips)
         {
             var chipDef = Microchips.Get(itemId);
-            if (chipDef != null && stray.EquippedMicrochips.Count < stray.Definition.MicrochipSlots)
+            if (chipDef != null && kyn.EquippedMicrochips.Count < kyn.Definition.MicrochipSlots)
             {
-                stray.EquippedMicrochips.Add(itemId);
+                kyn.EquippedMicrochips.Add(itemId);
                 _ownedMicrochips.Remove(itemId);
             }
         }
@@ -173,11 +173,11 @@ public class InventoryScreen : GameScreen
                 // Check if slot is empty and category is compatible
                 var slot = augDef.Slot;
                 var slotKey = slot.ToKey();
-                if (stray.EquippedAugmentations.TryGetValue(slotKey, out var equipped) &&
+                if (kyn.EquippedAugmentations.TryGetValue(slotKey, out var equipped) &&
                     equipped == null &&
-                    augDef.IsCompatibleWith(stray.Definition.Category))
+                    augDef.IsCompatibleWith(kyn.Definition.Category))
                 {
-                    stray.EquipAugmentation(itemId, slot);
+                    kyn.EquipAugmentation(itemId, slot);
                     _ownedAugmentations.Remove(itemId);
                 }
             }
@@ -241,7 +241,7 @@ public class InventoryScreen : GameScreen
 
         // Draw instructions
         string instructions = _equipMode
-            ? "[Arrow Keys] Select Stray | [Enter] Equip | [ESC] Cancel"
+            ? "[Arrow Keys] Select Kyn | [Enter] Equip | [ESC] Cancel"
             : "[Q/E] Switch Tab | [Arrow Keys] Navigate | [Enter] Equip | [ESC] Back";
         var instrSize = _smallFont.MeasureString(instructions);
         spriteBatch.DrawString(_smallFont, instructions, new Vector2((viewport.Width - instrSize.X) / 2, viewport.Height - 30), Color.Gray);
@@ -383,38 +383,38 @@ public class InventoryScreen : GameScreen
         DrawBorder(spriteBatch, bounds, Color.Cyan);
 
         // Title
-        spriteBatch.DrawString(_font, "Select Stray to Equip", new Vector2(bounds.X + 10, bounds.Y + 10), Color.White);
+        spriteBatch.DrawString(_font, "Select Kyn to Equip", new Vector2(bounds.X + 10, bounds.Y + 10), Color.White);
 
         var partyList = _roster.Party.ToList();
         if (partyList.Count == 0)
         {
-            spriteBatch.DrawString(_smallFont, "No Strays in party!", new Vector2(bounds.X + 20, bounds.Y + 60), Color.Red);
+            spriteBatch.DrawString(_smallFont, "No Kyns in party!", new Vector2(bounds.X + 20, bounds.Y + 60), Color.Red);
             return;
         }
 
         int yOffset = 50;
         for (int i = 0; i < partyList.Count; i++)
         {
-            var stray = partyList[i];
+            var kyn = partyList[i];
             var slotBounds = new Rectangle(bounds.X + 10, bounds.Y + yOffset + i * 60, bounds.Width - 20, 55);
-            bool isSelected = i == _selectedStrayIndex;
+            bool isSelected = i == _selectedKynIndex;
 
             // Background
             spriteBatch.Draw(_pixelTexture, slotBounds, isSelected ? Color.DarkBlue * 0.5f : Color.DimGray * 0.3f);
             DrawBorder(spriteBatch, slotBounds, isSelected ? Color.Yellow : Color.Gray);
 
-            // Stray color
+            // Kyn color
             var colorRect = new Rectangle(slotBounds.X + 5, slotBounds.Y + 5, 25, 25);
-            spriteBatch.Draw(_pixelTexture, colorRect, stray.Definition.PlaceholderColor);
+            spriteBatch.Draw(_pixelTexture, colorRect, kyn.Definition.PlaceholderColor);
 
             // Name and level
-            spriteBatch.DrawString(_smallFont, $"{stray.DisplayName} Lv.{stray.Level}",
+            spriteBatch.DrawString(_smallFont, $"{kyn.DisplayName} Lv.{kyn.Level}",
                 new Vector2(slotBounds.X + 40, slotBounds.Y + 5), Color.White);
 
             // Current equipment count
             string equipInfo = _currentTab == InventoryTab.Microchips
-                ? $"Chips: {stray.EquippedMicrochips.Count}/{stray.Definition.MicrochipSlots}"
-                : $"Augmentations: {stray.EquippedAugmentations.Count(kvp => kvp.Value != null)}";
+                ? $"Chips: {kyn.EquippedMicrochips.Count}/{kyn.Definition.MicrochipSlots}"
+                : $"Augmentations: {kyn.EquippedAugmentations.Count(kvp => kvp.Value != null)}";
             spriteBatch.DrawString(_smallFont, equipInfo,
                 new Vector2(slotBounds.X + 40, slotBounds.Y + 25), Color.Gray);
         }

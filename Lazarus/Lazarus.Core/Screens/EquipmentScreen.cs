@@ -13,11 +13,11 @@ using Lazarus.ScreenManagers;
 namespace Lazarus.Screens;
 
 /// <summary>
-/// Screen for equipping augmentations and microchips to a Stray.
+/// Screen for equipping augmentations and microchips to a Kyn.
 /// </summary>
 public class EquipmentScreen : GameScreen
 {
-    private readonly Stray _stray;
+    private readonly Kyn _kyn;
     private readonly GameStateService _gameState;
     private SpriteFont _font = null!;
     private SpriteFont _smallFont = null!;
@@ -40,9 +40,9 @@ public class EquipmentScreen : GameScreen
     private int _chipPickerIndex = 0;
     private List<string> _availableChipIds = new();
 
-    public EquipmentScreen(Stray stray, GameStateService gameState)
+    public EquipmentScreen(Kyn kyn, GameStateService gameState)
     {
-        _stray = stray;
+        _kyn = kyn;
         _gameState = gameState;
 
         TransitionOnTime = TimeSpan.FromSeconds(0.3);
@@ -64,7 +64,7 @@ public class EquipmentScreen : GameScreen
         {
             _augSlotKeys.Add(new SlotReference(slot).ToKey());
         }
-        foreach (var slot in AugmentationSlotUtility.GetCategorySlotsFor(_stray.Definition.Category))
+        foreach (var slot in AugmentationSlotUtility.GetCategorySlotsFor(_kyn.Definition.Category))
         {
             _augSlotKeys.Add(new SlotReference(slot).ToKey());
         }
@@ -129,10 +129,10 @@ public class EquipmentScreen : GameScreen
                     var slotRef = SlotReference.FromKey(slotKey);
                     if (slotRef.HasValue)
                     {
-                        var currentAugId = _stray.GetEquippedAugmentationId(slotRef.Value);
+                        var currentAugId = _kyn.GetEquippedAugmentationId(slotRef.Value);
                         if (currentAugId != null)
                         {
-                            _stray.UnequipAugmentation(slotRef.Value);
+                            _kyn.UnequipAugmentation(slotRef.Value);
                             _gameState.Data.OwnedAugmentations.Add(currentAugId);
                         }
                     }
@@ -146,7 +146,7 @@ public class EquipmentScreen : GameScreen
                     if (slotRef.HasValue)
                     {
                         // Return current augmentation to inventory
-                        var currentAugId = _stray.GetEquippedAugmentationId(slotRef.Value);
+                        var currentAugId = _kyn.GetEquippedAugmentationId(slotRef.Value);
                         if (currentAugId != null)
                         {
                             _gameState.Data.OwnedAugmentations.Add(currentAugId);
@@ -154,7 +154,7 @@ public class EquipmentScreen : GameScreen
 
                         // Remove from inventory and equip
                         _gameState.Data.OwnedAugmentations.Remove(augId);
-                        _stray.EquipAugmentation(augId, slotRef.Value);
+                        _kyn.EquipAugmentation(augId, slotRef.Value);
                     }
                 }
                 _augPickerOpen = false;
@@ -208,11 +208,11 @@ public class EquipmentScreen : GameScreen
                 if (_chipPickerIndex == 0)
                 {
                     // Remove current chip
-                    var socket = _stray.MicrochipSockets[_chipSelectedIndex];
+                    var socket = _kyn.MicrochipSockets[_chipSelectedIndex];
                     if (socket.EquippedChip != null)
                     {
                         var chipDefId = socket.EquippedChip.Definition.Id;
-                        _stray.UnequipMicrochip(_chipSelectedIndex);
+                        _kyn.UnequipMicrochip(_chipSelectedIndex);
                         _gameState.Data.OwnedMicrochips.Add(chipDefId);
                     }
                 }
@@ -224,7 +224,7 @@ public class EquipmentScreen : GameScreen
                     if (chipDef != null)
                     {
                         // Return current chip to inventory
-                        var socket = _stray.MicrochipSockets[_chipSelectedIndex];
+                        var socket = _kyn.MicrochipSockets[_chipSelectedIndex];
                         if (socket.EquippedChip != null)
                         {
                             _gameState.Data.OwnedMicrochips.Add(socket.EquippedChip.Definition.Id);
@@ -233,7 +233,7 @@ public class EquipmentScreen : GameScreen
                         // Remove from inventory and equip
                         _gameState.Data.OwnedMicrochips.Remove(chipDefId);
                         var newChip = new Microchip(chipDef);
-                        _stray.EquipMicrochip(newChip, _chipSelectedIndex);
+                        _kyn.EquipMicrochip(newChip, _chipSelectedIndex);
                     }
                 }
                 _chipPickerOpen = false;
@@ -248,11 +248,11 @@ public class EquipmentScreen : GameScreen
             }
             else if (input.IsMenuDown(ControllingPlayer))
             {
-                _chipSelectedIndex = Math.Min(_stray.MicrochipSockets.Length - 1, _chipSelectedIndex + 1);
+                _chipSelectedIndex = Math.Min(_kyn.MicrochipSockets.Length - 1, _chipSelectedIndex + 1);
             }
             else if (input.IsMenuSelect(ControllingPlayer, out _))
             {
-                if (_chipSelectedIndex < _stray.MicrochipSockets.Length)
+                if (_chipSelectedIndex < _kyn.MicrochipSockets.Length)
                 {
                     // Build list of available chips
                     _availableChipIds = _gameState.Data.OwnedMicrochips.Distinct().ToList();
@@ -268,8 +268,8 @@ public class EquipmentScreen : GameScreen
         var aug = Augmentations.Get(augId);
         if (aug == null) return false;
 
-        // Check if augmentation's slot matches and is compatible with this Stray
-        return aug.CanEquipToSlot(slot, _stray.Definition.Category);
+        // Check if augmentation's slot matches and is compatible with this Kyn
+        return aug.CanEquipToSlot(slot, _kyn.Definition.Category);
     }
 
     public override void Draw(GameTime gameTime)
@@ -283,7 +283,7 @@ public class EquipmentScreen : GameScreen
         spriteBatch.Draw(_pixelTexture, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * 0.9f);
 
         // Title
-        string title = $"Equipment - {_stray.DisplayName}";
+        string title = $"Equipment - {_kyn.DisplayName}";
         var titleSize = _font.MeasureString(title);
         spriteBatch.DrawString(_font, title, new Vector2((viewport.Width - titleSize.X) / 2, 15), Color.White);
 
@@ -394,7 +394,7 @@ public class EquipmentScreen : GameScreen
             }
 
             string slotName = slotRef?.GetDisplayName() ?? slotKey;
-            string equipped = _stray.EquippedAugmentations.TryGetValue(slotKey, out var augId) && augId != null
+            string equipped = _kyn.EquippedAugmentations.TryGetValue(slotKey, out var augId) && augId != null
                 ? GetAugmentationDisplayName(augId)
                 : "[Empty]";
 
@@ -434,7 +434,7 @@ public class EquipmentScreen : GameScreen
             spriteBatch.DrawString(_smallFont, desc, new Vector2(bounds.X + 10, bounds.Y + 40), Color.Gray);
 
             // Show equipped augmentation details
-            if (_stray.EquippedAugmentations.TryGetValue(slotKey, out var augId) && augId != null)
+            if (_kyn.EquippedAugmentations.TryGetValue(slotKey, out var augId) && augId != null)
             {
                 var aug = Augmentations.Get(augId);
                 if (aug != null)
@@ -534,15 +534,15 @@ public class EquipmentScreen : GameScreen
         spriteBatch.Draw(_pixelTexture, bounds, Color.DarkSlateGray * 0.5f);
         DrawBorder(spriteBatch, bounds, Color.Gray);
 
-        string header = $"Microchip Sockets ({_stray.MicrochipSockets.Length})";
+        string header = $"Microchip Sockets ({_kyn.MicrochipSockets.Length})";
         spriteBatch.DrawString(_smallFont, header, new Vector2(bounds.X + 5, bounds.Y + 5), Color.Yellow);
 
         int y = bounds.Y + 30;
         int socketHeight = 50;
 
-        for (int i = 0; i < _stray.MicrochipSockets.Length; i++)
+        for (int i = 0; i < _kyn.MicrochipSockets.Length; i++)
         {
-            var socket = _stray.MicrochipSockets[i];
+            var socket = _kyn.MicrochipSockets[i];
             bool isSelected = i == _chipSelectedIndex;
 
             var socketBounds = new Rectangle(bounds.X + 5, y, bounds.Width - 10, socketHeight - 2);
@@ -585,9 +585,9 @@ public class EquipmentScreen : GameScreen
         spriteBatch.Draw(_pixelTexture, bounds, Color.DarkSlateGray * 0.5f);
         DrawBorder(spriteBatch, bounds, Color.Gray);
 
-        if (_chipSelectedIndex >= 0 && _chipSelectedIndex < _stray.MicrochipSockets.Length)
+        if (_chipSelectedIndex >= 0 && _chipSelectedIndex < _kyn.MicrochipSockets.Length)
         {
-            var socket = _stray.MicrochipSockets[_chipSelectedIndex];
+            var socket = _kyn.MicrochipSockets[_chipSelectedIndex];
 
             string header = $"Socket {_chipSelectedIndex + 1}";
             if (socket.IsLinked) header += $" (Linked to {socket.LinkedSocketIndex + 1})";

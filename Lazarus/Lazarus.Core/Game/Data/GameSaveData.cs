@@ -61,20 +61,20 @@ public class GameSaveData
     public Dictionary<string, int> Counters { get; set; } = new();
 
     /// <summary>
-    /// IDs of Strays currently in the player's party (max 5).
+    /// IDs of Kyns currently in the player's party (max 5).
     /// </summary>
-    public List<string> PartyStrayIds { get; set; } = new();
+    public List<string> PartyKynIds { get; set; } = new();
 
     /// <summary>
-    /// IDs of all Strays the player has recruited (storage).
+    /// IDs of all Kyns the player has recruited (storage).
     /// </summary>
-    public List<string> RosterStrayIds { get; set; } = new();
+    public List<string> RosterKynIds { get; set; } = new();
 
     /// <summary>
-    /// Detailed data for each Stray the player owns.
-    /// Key is the Stray's unique instance ID.
+    /// Detailed data for each Kyn the player owns.
+    /// Key is the Kyn's unique instance ID.
     /// </summary>
-    public Dictionary<string, StraySaveData> OwnedStrays { get; set; } = new();
+    public Dictionary<string, KynSaveData> OwnedKyns { get; set; } = new();
 
     /// <summary>
     /// IDs of encounters that have been cleared (won't respawn).
@@ -148,9 +148,9 @@ public class GameSaveData
     public string SaveTimestamp { get; set; } = "";
 
     /// <summary>
-    /// Number of Strays recruited total.
+    /// Number of Kyns recruited total.
     /// </summary>
-    public int TotalStraysRecruited { get; set; } = 0;
+    public int TotalKynsRecruited { get; set; } = 0;
 
     /// <summary>
     /// Number of battles won.
@@ -179,17 +179,17 @@ public class GameSaveData
 }
 
 /// <summary>
-/// Save data for an individual Stray instance.
+/// Save data for an individual Kyn instance.
 /// </summary>
-public class StraySaveData
+public class KynSaveData
 {
     /// <summary>
-    /// Unique instance ID for this Stray.
+    /// Unique instance ID for this Kyn.
     /// </summary>
     public string InstanceId { get; set; } = "";
 
     /// <summary>
-    /// The definition ID (species/type) of this Stray.
+    /// The definition ID (species/type) of this Kyn.
     /// </summary>
     public string DefinitionId { get; set; } = "";
 
@@ -214,7 +214,7 @@ public class StraySaveData
     public int CurrentHp { get; set; } = 100;
 
     /// <summary>
-    /// Whether this Stray has evolved.
+    /// Whether this Kyn has evolved.
     /// </summary>
     public bool IsEvolved { get; set; } = false;
 

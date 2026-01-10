@@ -24,7 +24,7 @@ public enum NPCType
     QuestGiver,
 
     /// <summary>
-    /// A healer that can restore Strays.
+    /// A healer that can restore Kyns.
     /// </summary>
     Healer,
 
@@ -60,7 +60,7 @@ public enum Faction
     Salvagers,
 
     /// <summary>
-    /// The Shepherds - protectors of Strays.
+    /// The Shepherds - protectors of Kyns.
     /// </summary>
     Shepherds,
 
@@ -203,14 +203,14 @@ public static class NPCDefinitions
             IsEssential = true
         });
 
-        // Echo - first friendly Stray NPC
+        // Echo - first friendly Kyn NPC
         Register(new NPCDefinition
         {
             Id = "echo_guide",
             Name = "Echo",
             Type = NPCType.QuestGiver,
             Faction = Faction.Shepherds,
-            Description = "A small, friendly Stray who knows the paths through The Fringe.",
+            Description = "A small, friendly Kyn who knows the paths through The Fringe.",
             DefaultDialogId = "echo_greeting",
             ConditionalDialogs = new Dictionary<string, string>
             {
@@ -242,7 +242,7 @@ public static class NPCDefinitions
             Name = "Sara",
             Type = NPCType.Healer,
             Faction = Faction.Shepherds,
-            Description = "A gentle soul who tends to wounded Strays.",
+            Description = "A gentle soul who tends to wounded Kyns.",
             DefaultDialogId = "sara_greeting",
             SettlementId = "fringe_camp",
             PlaceholderColor = Color.Pink
@@ -270,7 +270,7 @@ public static class NPCDefinitions
             Name = "Elder Moss",
             Type = NPCType.Leader,
             Faction = Faction.Shepherds,
-            Description = "The wise leader of the Shepherds, protectors of abandoned Strays.",
+            Description = "The wise leader of the Shepherds, protectors of abandoned Kyns.",
             DefaultDialogId = "moss_introduction",
             ConditionalDialogs = new Dictionary<string, string>
             {
@@ -290,7 +290,7 @@ public static class NPCDefinitions
             Name = "Willow",
             Type = NPCType.Merchant,
             Faction = Faction.Shepherds,
-            Description = "A gentle Shepherd who provides healing supplies and Stray care items.",
+            Description = "A gentle Shepherd who provides healing supplies and Kyn care items.",
             DefaultDialogId = "willow_greeting",
             ShopId = "shepherd_sanctuary_shop",
             SettlementId = "green_sanctuary",

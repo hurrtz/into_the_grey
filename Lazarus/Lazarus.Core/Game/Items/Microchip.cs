@@ -348,14 +348,14 @@ public class Microchip
     public float HeatPercent => Definition.HeatMax > 0 ? CurrentHeat / Definition.HeatMax : 0f;
 
     /// <summary>
-    /// Whether this chip is equipped to a Stray.
+    /// Whether this chip is equipped to a Kyn.
     /// </summary>
     public bool IsEquipped { get; set; } = false;
 
     /// <summary>
-    /// ID of the Stray this is equipped to (if any).
+    /// ID of the Kyn this is equipped to (if any).
     /// </summary>
-    public string? EquippedToStrayId { get; set; }
+    public string? EquippedToKynId { get; set; }
 
     /// <summary>
     /// Socket index this chip is in (-1 if not in socket).
@@ -469,7 +469,7 @@ public class Microchip
     }
 
     /// <summary>
-    /// Checks if a Stray has enough energy to use this chip.
+    /// Checks if a Kyn has enough energy to use this chip.
     /// </summary>
     public bool HasEnoughEnergy(int currentEnergy)
     {
@@ -487,7 +487,7 @@ public class Microchip
             DefinitionId = Definition.Id,
             FirmwareLevel = (int)FirmwareLevel,
             CurrentTu = CurrentTu,
-            EquippedToStrayId = EquippedToStrayId,
+            EquippedToKynId = EquippedToKynId,
             SocketIndex = SocketIndex
         };
     }
@@ -504,9 +504,9 @@ public class Microchip
         {
             FirmwareLevel = (FirmwareLevel)data.FirmwareLevel,
             CurrentTu = data.CurrentTu,
-            EquippedToStrayId = data.EquippedToStrayId,
+            EquippedToKynId = data.EquippedToKynId,
             SocketIndex = data.SocketIndex,
-            IsEquipped = data.EquippedToStrayId != null
+            IsEquipped = data.EquippedToKynId != null
         };
 
         return chip;
@@ -522,12 +522,12 @@ public class MicrochipSaveData
     public string DefinitionId { get; set; } = "";
     public int FirmwareLevel { get; set; } = 1;
     public int CurrentTu { get; set; } = 0;
-    public string? EquippedToStrayId { get; set; }
+    public string? EquippedToKynId { get; set; }
     public int SocketIndex { get; set; } = -1;
 }
 
 /// <summary>
-/// Represents a microchip socket on a Stray.
+/// Represents a microchip socket on a Kyn.
 /// </summary>
 public class MicrochipSocket
 {

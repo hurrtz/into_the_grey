@@ -152,28 +152,28 @@
   <data name="Combat_ItemDropped" xml:space="preserve"><value>Obtained {0}!</value></data>
   <data name="Combat_LevelUp" xml:space="preserve"><value>Level Up!</value></data>
 
-  <!-- Strays -->
-  <data name="Stray_Level" xml:space="preserve"><value>Level {0}</value></data>
-  <data name="Stray_HP" xml:space="preserve"><value>HP</value></data>
-  <data name="Stray_Energy" xml:space="preserve"><value>Energy</value></data>
-  <data name="Stray_Attack" xml:space="preserve"><value>Attack</value></data>
-  <data name="Stray_Defense" xml:space="preserve"><value>Defense</value></data>
-  <data name="Stray_Speed" xml:space="preserve"><value>Speed</value></data>
-  <data name="Stray_Type" xml:space="preserve"><value>Type</value></data>
-  <data name="Stray_Recruited" xml:space="preserve"><value>{0} joined your party!</value></data>
-  <data name="Stray_Released" xml:space="preserve"><value>{0} has been released.</value></data>
-  <data name="Stray_Evolved" xml:space="preserve"><value>{0} evolved into {1}!</value></data>
-  <data name="Stray_EvolutionAvailable" xml:space="preserve"><value>Evolution available!</value></data>
-  <data name="Stray_Abilities" xml:space="preserve"><value>Abilities</value></data>
-  <data name="Stray_Stats" xml:space="preserve"><value>Stats</value></data>
-  <data name="Stray_Info" xml:space="preserve"><value>Info</value></data>
-  <data name="Stray_Recruit" xml:space="preserve"><value>Recruit</value></data>
-  <data name="Stray_Release" xml:space="preserve"><value>Release</value></data>
-  <data name="Stray_Evolve" xml:space="preserve"><value>Evolve</value></data>
-  <data name="Stray_ViewDetails" xml:space="preserve"><value>View Details</value></data>
-  <data name="Stray_Wild" xml:space="preserve"><value>Wild</value></data>
-  <data name="Stray_Companion" xml:space="preserve"><value>Companion</value></data>
-  <data name="Stray_Boss" xml:space="preserve"><value>Boss</value></data>
+  <!-- Kyns -->
+  <data name="Kyn_Level" xml:space="preserve"><value>Level {0}</value></data>
+  <data name="Kyn_HP" xml:space="preserve"><value>HP</value></data>
+  <data name="Kyn_Energy" xml:space="preserve"><value>Energy</value></data>
+  <data name="Kyn_Attack" xml:space="preserve"><value>Attack</value></data>
+  <data name="Kyn_Defense" xml:space="preserve"><value>Defense</value></data>
+  <data name="Kyn_Speed" xml:space="preserve"><value>Speed</value></data>
+  <data name="Kyn_Type" xml:space="preserve"><value>Type</value></data>
+  <data name="Kyn_Recruited" xml:space="preserve"><value>{0} joined your party!</value></data>
+  <data name="Kyn_Released" xml:space="preserve"><value>{0} has been released.</value></data>
+  <data name="Kyn_Evolved" xml:space="preserve"><value>{0} evolved into {1}!</value></data>
+  <data name="Kyn_EvolutionAvailable" xml:space="preserve"><value>Evolution available!</value></data>
+  <data name="Kyn_Abilities" xml:space="preserve"><value>Abilities</value></data>
+  <data name="Kyn_Stats" xml:space="preserve"><value>Stats</value></data>
+  <data name="Kyn_Info" xml:space="preserve"><value>Info</value></data>
+  <data name="Kyn_Recruit" xml:space="preserve"><value>Recruit</value></data>
+  <data name="Kyn_Release" xml:space="preserve"><value>Release</value></data>
+  <data name="Kyn_Evolve" xml:space="preserve"><value>Evolve</value></data>
+  <data name="Kyn_ViewDetails" xml:space="preserve"><value>View Details</value></data>
+  <data name="Kyn_Wild" xml:space="preserve"><value>Wild</value></data>
+  <data name="Kyn_Companion" xml:space="preserve"><value>Companion</value></data>
+  <data name="Kyn_Boss" xml:space="preserve"><value>Boss</value></data>
 
   <!-- Items -->
   <data name="Item_Use" xml:space="preserve"><value>Use</value></data>
@@ -304,7 +304,7 @@
   <data name="Tutorial_Combat" xml:space="preserve"><value>Select actions to fight enemies!</value></data>
   <data name="Tutorial_Inventory" xml:space="preserve"><value>Press I to open your inventory.</value></data>
   <data name="Tutorial_Quests" xml:space="preserve"><value>Press J to view your quests.</value></data>
-  <data name="Tutorial_Strays" xml:space="preserve"><value>Recruit Strays to join your party!</value></data>
+  <data name="Tutorial_Kyns" xml:space="preserve"><value>Recruit Kyns to join your party!</value></data>
   <data name="Tutorial_Map" xml:space="preserve"><value>Press M to open the map.</value></data>
   <data name="Tutorial_Skip" xml:space="preserve"><value>Skip Tutorial</value></data>
   <data name="Tutorial_SkipConfirm" xml:space="preserve"><value>Skip the tutorial?</value></data>

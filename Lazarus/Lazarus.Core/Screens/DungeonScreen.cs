@@ -33,7 +33,7 @@ public enum DungeonScreenPhase
 public class DungeonScreen : GameScreen
 {
     private readonly DungeonDefinition _definition;
-    private readonly StrayRoster _roster;
+    private readonly KynRoster _roster;
     private readonly GameStateService _gameState;
 
     private DungeonInstance? _instance;
@@ -60,7 +60,7 @@ public class DungeonScreen : GameScreen
     /// </summary>
     public event Action<DungeonReward?>? OnDungeonExit;
 
-    public DungeonScreen(DungeonDefinition definition, StrayRoster roster, GameStateService gameState)
+    public DungeonScreen(DungeonDefinition definition, KynRoster roster, GameStateService gameState)
     {
         _definition = definition;
         _roster = roster;
@@ -230,34 +230,34 @@ public class DungeonScreen : GameScreen
 
         // Create combat encounter from room data
         var enemies = CreateEnemiesFromRoom(_instance.CurrentRoom);
-        var partyStrays = new List<Stray>(_roster.Party);
+        var partyKyns = new List<Kyn>(_roster.Party);
 
-        var combatScreen = new CombatScreen(partyStrays, enemies, encounter: null, companion: null, gameState: _gameState);
+        var combatScreen = new CombatScreen(partyKyns, enemies, encounter: null, companion: null, gameState: _gameState);
         combatScreen.CombatEnded += OnCombatComplete;
         ScreenManager.AddScreen(combatScreen, ControllingPlayer);
     }
 
-    private List<Stray> CreateEnemiesFromRoom(DungeonRoom room)
+    private List<Kyn> CreateEnemiesFromRoom(DungeonRoom room)
     {
-        var enemies = new List<Stray>();
+        var enemies = new List<Kyn>();
 
         for (int i = 0; i < room.EnemyIds.Count; i++)
         {
             var enemyId = room.EnemyIds[i];
             var level = i < room.EnemyLevels.Count ? room.EnemyLevels[i] : 5;
 
-            // Try to get stray definition
-            var definition = StrayDefinitions.Get(enemyId);
+            // Try to get kyn definition
+            var definition = KynDefinitions.Get(enemyId);
             if (definition == null)
             {
                 // Create a generic enemy if not found
                 // Apply HP multiplier to base stats for dungeon scaling
                 int baseHp = (int)((50 + level * 10) * room.HpMultiplier);
-                definition = new StrayDefinition
+                definition = new KynDefinition
                 {
                     Id = enemyId,
                     Name = FormatEnemyName(enemyId),
-                    BaseStats = new StrayBaseStats
+                    BaseStats = new KynBaseStats
                     {
                         MaxHp = baseHp,
                         Attack = 10 + level * 2,
@@ -267,10 +267,10 @@ public class DungeonScreen : GameScreen
                 };
             }
 
-            var stray = new Stray(definition, level);
-            stray.CurrentHp = stray.MaxHp; // Start at full health
+            var kyn = new Kyn(definition, level);
+            kyn.CurrentHp = kyn.MaxHp; // Start at full health
 
-            enemies.Add(stray);
+            enemies.Add(kyn);
         }
 
         return enemies;

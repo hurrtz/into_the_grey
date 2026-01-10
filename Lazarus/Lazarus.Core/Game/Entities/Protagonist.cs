@@ -8,7 +8,7 @@ namespace Lazarus.Core.Game.Entities;
 
 /// <summary>
 /// The protagonist - a Bio-Shell awakened prematurely from stasis.
-/// Physically weak and dependent on Strays for survival.
+/// Physically weak and dependent on Kyns for survival.
 /// </summary>
 public class Protagonist
 {

@@ -116,7 +116,7 @@ public class FactionReputationScreen : GameScreen
         {
             Type = FactionType.Machinists,
             Name = "The Machinists",
-            Description = "Experts in Stray augmentation and microchip technology. Knowledge is their currency.",
+            Description = "Experts in Kyn augmentation and microchip technology. Knowledge is their currency.",
             IconColor = Color.Silver,
             ReputationTiers = new[]
             {
@@ -136,28 +136,28 @@ public class FactionReputationScreen : GameScreen
             }
         });
 
-        // Strays (collective)
+        // Kyns (collective)
         _factionData.Add(new FactionDisplayData
         {
-            Type = FactionType.Strays,
-            Name = "The Strays",
-            Description = "The collective trust of the wild Strays. Treating them well earns their loyalty.",
+            Type = FactionType.Kyns,
+            Name = "The Kyns",
+            Description = "The collective trust of the wild Kyns. Treating them well earns their loyalty.",
             IconColor = Color.LimeGreen,
             ReputationTiers = new[]
             {
-                (-100, "Hunter", "Wild Strays flee or attack immediately."),
-                (-50, "Threat", "Strays are aggressive and won't join you."),
+                (-100, "Hunter", "Wild Kyns flee or attack immediately."),
+                (-50, "Threat", "Kyns are aggressive and won't join you."),
                 (0, "Neutral", "Normal encounter and recruitment rates."),
-                (50, "Protector", "Strays are friendlier and easier to recruit."),
-                (100, "Alpha", "Rare Strays seek you out.")
+                (50, "Protector", "Kyns are friendlier and easier to recruit."),
+                (100, "Alpha", "Rare Kyns seek you out.")
             },
             Benefits = new Dictionary<int, string>
             {
                 { -50, "Recruitment chance -50%" },
                 { 0, "Normal recruitment rates" },
                 { 50, "Recruitment chance +25%" },
-                { 75, "Wild Strays may help in combat" },
-                { 100, "Legendary Strays recruitable" }
+                { 75, "Wild Kyns may help in combat" },
+                { 100, "Legendary Kyns recruitable" }
             }
         });
 

@@ -9,14 +9,14 @@ using Lazarus.Core.Game.Items;
 namespace Lazarus.Core.Game.Combat;
 
 /// <summary>
-/// Represents a participant in combat - either a party Stray or an enemy.
+/// Represents a participant in combat - either a party Kyn or an enemy.
 /// </summary>
 public class Combatant
 {
     /// <summary>
-    /// The underlying Stray.
+    /// The underlying Kyn.
     /// </summary>
-    public Stray Stray { get; }
+    public Kyn Kyn { get; }
 
     /// <summary>
     /// Whether this combatant is an enemy.
@@ -42,7 +42,7 @@ public class Combatant
     /// <summary>
     /// Whether this combatant is alive.
     /// </summary>
-    public bool IsAlive => Stray.IsAlive;
+    public bool IsAlive => Kyn.IsAlive;
 
     /// <summary>
     /// Whether this combatant is defending this turn.
@@ -52,7 +52,7 @@ public class Combatant
     /// <summary>
     /// Temporary defense bonus from defending.
     /// </summary>
-    public int DefenseBonus => IsDefending ? Stray.Defense : 0;
+    public int DefenseBonus => IsDefending ? Kyn.Defense : 0;
 
     /// <summary>
     /// The action this combatant has selected (null if not yet selected).
@@ -62,52 +62,52 @@ public class Combatant
     /// <summary>
     /// Display name.
     /// </summary>
-    public string Name => Stray.DisplayName;
+    public string Name => Kyn.DisplayName;
 
     /// <summary>
     /// Current HP.
     /// </summary>
-    public int CurrentHp => Stray.CurrentHp;
+    public int CurrentHp => Kyn.CurrentHp;
 
     /// <summary>
     /// Maximum HP.
     /// </summary>
-    public int MaxHp => Stray.MaxHp;
+    public int MaxHp => Kyn.MaxHp;
 
     /// <summary>
-    /// Current energy for abilities (delegated to Stray).
+    /// Current energy for abilities (delegated to Kyn).
     /// </summary>
-    public int CurrentEnergy => Stray.CurrentEnergy;
+    public int CurrentEnergy => Kyn.CurrentEnergy;
 
     /// <summary>
-    /// Maximum energy for abilities (delegated to Stray).
+    /// Maximum energy for abilities (delegated to Kyn).
     /// </summary>
-    public int MaxEnergy => Stray.MaxEnergy;
+    public int MaxEnergy => Kyn.MaxEnergy;
 
     /// <summary>
-    /// Energy regeneration per ATB tick (delegated to Stray).
+    /// Energy regeneration per ATB tick (delegated to Kyn).
     /// </summary>
-    public int EnergyRegen => Stray.EnergyRegen;
+    public int EnergyRegen => Kyn.EnergyRegen;
 
     /// <summary>
     /// Speed stat (affects ATB fill rate).
     /// </summary>
-    public int Speed => Stray.Speed;
+    public int Speed => Kyn.Speed;
 
     /// <summary>
     /// Attack stat.
     /// </summary>
-    public int Attack => Stray.Attack;
+    public int Attack => Kyn.Attack;
 
     /// <summary>
     /// Defense stat (including bonus from defending).
     /// </summary>
-    public int Defense => Stray.Defense + DefenseBonus;
+    public int Defense => Kyn.Defense + DefenseBonus;
 
     /// <summary>
     /// Special stat (affects ability power).
     /// </summary>
-    public int Special => Stray.Special;
+    public int Special => Kyn.Special;
 
     /// <summary>
     /// Combat abilities available to this combatant.
@@ -125,25 +125,25 @@ public class Combatant
     public Dictionary<StatusEffect, int> StatusEffects { get; } = new();
 
     /// <summary>
-    /// Creates a combatant from a Stray.
+    /// Creates a combatant from a Kyn.
     /// </summary>
-    /// <param name="stray">The Stray.</param>
+    /// <param name="kyn">The Kyn.</param>
     /// <param name="isEnemy">Whether this is an enemy.</param>
-    public Combatant(Stray stray, bool isEnemy)
+    public Combatant(Kyn kyn, bool isEnemy)
     {
-        Stray = stray;
+        Kyn = kyn;
         IsEnemy = isEnemy;
-        stray.IsHostile = isEnemy;
+        kyn.IsHostile = isEnemy;
 
         // Initialize energy and heat for combat
-        stray.FullEnergy();
-        stray.ResetChipHeat();
+        kyn.FullEnergy();
+        kyn.ResetChipHeat();
 
         LoadAbilities();
     }
 
     /// <summary>
-    /// Loads abilities from the Stray's microchips and innate abilities.
+    /// Loads abilities from the Kyn's microchips and innate abilities.
     /// </summary>
     private void LoadAbilities()
     {
@@ -153,28 +153,28 @@ public class Combatant
         // Add innate abilities based on level
         var innateAbilityIds = new List<string>();
 
-        // All Strays get basic strike
+        // All Kyns get basic strike
         innateAbilityIds.Add("strike");
         AbilitySourceChips["strike"] = -1; // Innate
 
         // Add abilities based on level
-        if (Stray.Level >= 5)
+        if (Kyn.Level >= 5)
         {
             innateAbilityIds.Add("power_strike");
             AbilitySourceChips["power_strike"] = -1;
         }
-        if (Stray.Level >= 10)
+        if (Kyn.Level >= 10)
         {
             innateAbilityIds.Add("fortify");
             AbilitySourceChips["fortify"] = -1;
         }
 
         // Add abilities from equipped microchips (new socket system)
-        if (Stray.MicrochipSockets != null)
+        if (Kyn.MicrochipSockets != null)
         {
-            for (int socketIndex = 0; socketIndex < Stray.MicrochipSockets.Length; socketIndex++)
+            for (int socketIndex = 0; socketIndex < Kyn.MicrochipSockets.Length; socketIndex++)
             {
-                var socket = Stray.MicrochipSockets[socketIndex];
+                var socket = Kyn.MicrochipSockets[socketIndex];
                 if (socket?.EquippedChip?.Definition?.GrantsAbility != null)
                 {
                     var abilityId = socket.EquippedChip.Definition.GrantsAbility;
@@ -189,7 +189,7 @@ public class Combatant
         }
 
         // Legacy support: Add abilities from EquippedMicrochips list
-        foreach (var chipId in Stray.EquippedMicrochips)
+        foreach (var chipId in Kyn.EquippedMicrochips)
         {
             var chipDef = Microchips.Get(chipId);
             if (chipDef?.GrantsAbility != null && !innateAbilityIds.Contains(chipDef.GrantsAbility))
@@ -200,7 +200,7 @@ public class Combatant
         }
 
         // Add abilities from evolution
-        foreach (var abilityId in Stray.EvolutionState.EvolvedAbilities)
+        foreach (var abilityId in Kyn.EvolutionState.EvolvedAbilities)
         {
             if (!innateAbilityIds.Contains(abilityId))
             {
@@ -243,10 +243,10 @@ public class Combatant
             return false;
 
         // Check if the chip in that socket is overheated
-        if (Stray.MicrochipSockets == null || socketIndex >= Stray.MicrochipSockets.Length)
+        if (Kyn.MicrochipSockets == null || socketIndex >= Kyn.MicrochipSockets.Length)
             return false;
 
-        var socket = Stray.MicrochipSockets[socketIndex];
+        var socket = Kyn.MicrochipSockets[socketIndex];
         return socket?.EquippedChip?.IsOverheated == true;
     }
 
@@ -261,10 +261,10 @@ public class Combatant
         if (socketIndex < 0)
             return (0, 0);
 
-        if (Stray.MicrochipSockets == null || socketIndex >= Stray.MicrochipSockets.Length)
+        if (Kyn.MicrochipSockets == null || socketIndex >= Kyn.MicrochipSockets.Length)
             return (0, 0);
 
-        var chip = Stray.MicrochipSockets[socketIndex]?.EquippedChip;
+        var chip = Kyn.MicrochipSockets[socketIndex]?.EquippedChip;
         if (chip == null)
             return (0, 0);
 
@@ -272,19 +272,19 @@ public class Combatant
     }
 
     /// <summary>
-    /// Uses energy for an ability (delegates to Stray).
+    /// Uses energy for an ability (delegates to Kyn).
     /// </summary>
     public bool UseEnergy(int amount)
     {
-        return Stray.ConsumeEnergy(amount);
+        return Kyn.ConsumeEnergy(amount);
     }
 
     /// <summary>
-    /// Restores energy (adds to Stray's current energy).
+    /// Restores energy (adds to Kyn's current energy).
     /// </summary>
     public void RestoreEnergy(int amount)
     {
-        Stray.CurrentEnergy = Math.Min(Stray.MaxEnergy, Stray.CurrentEnergy + amount);
+        Kyn.CurrentEnergy = Math.Min(Kyn.MaxEnergy, Kyn.CurrentEnergy + amount);
     }
 
     /// <summary>
@@ -298,10 +298,10 @@ public class Combatant
         if (socketIndex < 0)
             return;
 
-        if (Stray.MicrochipSockets == null || socketIndex >= Stray.MicrochipSockets.Length)
+        if (Kyn.MicrochipSockets == null || socketIndex >= Kyn.MicrochipSockets.Length)
             return;
 
-        var chip = Stray.MicrochipSockets[socketIndex]?.EquippedChip;
+        var chip = Kyn.MicrochipSockets[socketIndex]?.EquippedChip;
         chip?.AddHeat();
     }
 
@@ -316,10 +316,10 @@ public class Combatant
         if (socketIndex < 0)
             return;
 
-        if (Stray.MicrochipSockets == null || socketIndex >= Stray.MicrochipSockets.Length)
+        if (Kyn.MicrochipSockets == null || socketIndex >= Kyn.MicrochipSockets.Length)
             return;
 
-        var chip = Stray.MicrochipSockets[socketIndex]?.EquippedChip;
+        var chip = Kyn.MicrochipSockets[socketIndex]?.EquippedChip;
         chip?.AddTu(amount);
     }
 
@@ -448,7 +448,7 @@ public class Combatant
         while (_energyTickAccumulator >= EnergyTickInterval)
         {
             _energyTickAccumulator -= EnergyTickInterval;
-            Stray.RegenerateEnergy();
+            Kyn.RegenerateEnergy();
         }
 
         // Heat dissipation per tick interval
@@ -456,7 +456,7 @@ public class Combatant
         while (_heatTickAccumulator >= HeatTickInterval)
         {
             _heatTickAccumulator -= HeatTickInterval;
-            Stray.DissipateChipHeat();
+            Kyn.DissipateChipHeat();
         }
     }
 
@@ -486,7 +486,7 @@ public class Combatant
             actualDamage = actualDamage / 2;
         }
 
-        Stray.CurrentHp = System.Math.Max(0, Stray.CurrentHp - actualDamage);
+        Kyn.CurrentHp = System.Math.Max(0, Kyn.CurrentHp - actualDamage);
         return actualDamage;
     }
 
@@ -497,7 +497,7 @@ public class Combatant
     /// <returns>Damage taken.</returns>
     public int TakePercentDamage(float percent)
     {
-        return Stray.TakePercentDamage(percent);
+        return Kyn.TakePercentDamage(percent);
     }
 
     /// <summary>
@@ -507,7 +507,7 @@ public class Combatant
     /// <returns>Actual amount healed.</returns>
     public int Heal(int amount)
     {
-        return Stray.Heal(amount);
+        return Kyn.Heal(amount);
     }
 
     /// <summary>
@@ -527,13 +527,13 @@ public class Combatant
     /// <param name="isSelected">Whether this combatant is selected.</param>
     public void Draw(SpriteBatch spriteBatch, Texture2D pixelTexture, SpriteFont? font, bool isSelected)
     {
-        // Draw the Stray
-        Stray.Draw(spriteBatch, pixelTexture, Position, showHealth: true);
+        // Draw the Kyn
+        Kyn.Draw(spriteBatch, pixelTexture, Position, showHealth: true);
 
         // Draw ATB gauge
         var atbWidth = 40;
         var atbHeight = 4;
-        var atbY = Position.Y + Stray.Definition.PlaceholderSize / 2 + 4;
+        var atbY = Position.Y + Kyn.Definition.PlaceholderSize / 2 + 4;
 
         // Background
         var bgRect = new Rectangle(
@@ -558,7 +558,7 @@ public class Combatant
         if (isSelected)
         {
             var indicatorSize = 8;
-            var indicatorY = Position.Y - Stray.Definition.PlaceholderSize / 2 - indicatorSize - 10;
+            var indicatorY = Position.Y - Kyn.Definition.PlaceholderSize / 2 - indicatorSize - 10;
             var indicatorRect = new Rectangle(
                 (int)(Position.X - indicatorSize / 2),
                 (int)indicatorY,
@@ -573,7 +573,7 @@ public class Combatant
         {
             var shieldSize = 6;
             var shieldRect = new Rectangle(
-                (int)(Position.X + Stray.Definition.PlaceholderSize / 2 + 2),
+                (int)(Position.X + Kyn.Definition.PlaceholderSize / 2 + 2),
                 (int)(Position.Y - shieldSize / 2),
                 shieldSize,
                 shieldSize

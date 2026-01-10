@@ -232,7 +232,7 @@ public static class CutsceneScripts
 
                 new() { Type = CutsceneElementType.Text, Label = "companion_question", Speaker = "Bandit", Text = "[thoughtful] What is Bandit? Good question. Hard question.", Color = Color.Orange },
                 new() { Type = CutsceneElementType.Text, Speaker = "Bandit", Text = "Was dog once. Maybe. Memories are... scattered.", Color = Color.Orange },
-                new() { Type = CutsceneElementType.Text, Speaker = "Bandit", Text = "Lazarus calls us Strays. We are what remains.", Color = Color.Orange },
+                new() { Type = CutsceneElementType.Text, Speaker = "Bandit", Text = "Lazarus calls us Kyns. We are what remains.", Color = Color.Orange },
                 new() { Type = CutsceneElementType.SetFlag, FlagName = "met_bandit" },
 
                 new() { Type = CutsceneElementType.Text, Label = "companion_end", Speaker = "Bandit", Text = "[hopeful] Come. Bandit show safe paths. Mostly safe.", Color = Color.Orange },
@@ -286,7 +286,7 @@ public static class CutsceneScripts
                 {
                     Type = CutsceneElementType.Text,
                     Speaker = "Rust",
-                    Text = "Another wanderer, eh? And you've got a Stray. Interesting.",
+                    Text = "Another wanderer, eh? And you've got a Kyn. Interesting.",
                     Color = Color.LightGray
                 },
 
@@ -478,7 +478,7 @@ public static class CutsceneScripts
                 {
                     Type = CutsceneElementType.Text,
                     Speaker = "Lazarus",
-                    Text = "The interface is complete. I can now communicate more directly with the Strays.",
+                    Text = "The interface is complete. I can now communicate more directly with the Kyns.",
                     Color = Color.Cyan
                 },
 
@@ -863,7 +863,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Text = "Your Strays fall, one by one. The creature is too powerful.",
+                    Text = "Your Kyns fall, one by one. The creature is too powerful.",
                     TypewriterSpeed = 25f
                 },
 
@@ -1029,7 +1029,7 @@ public static class CutsceneScripts
                 {
                     Type = CutsceneElementType.Text,
                     Speaker = "Lazarus",
-                    Text = "You could end me. Destroy my core. Free the Strays forever.",
+                    Text = "You could end me. Destroy my core. Free the Kyns forever.",
                     Color = Color.Cyan
                 },
 
@@ -1257,7 +1257,7 @@ public static class CutsceneScripts
                 new()
                 {
                     Type = CutsceneElementType.Text,
-                    Text = "But the Strays... the Strays are free.",
+                    Text = "But the Kyns... the Kyns are free.",
                     TypewriterSpeed = 25f
                 },
 

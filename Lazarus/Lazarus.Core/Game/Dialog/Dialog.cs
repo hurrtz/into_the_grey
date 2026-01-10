@@ -372,17 +372,17 @@ public static class Dialogs
             {
                 DialogLine.FromCompanion("[thoughtful] What am I? Good question. Hard question.", DialogEmotion.Thoughtful),
                 DialogLine.FromCompanion("Was dog once. Maybe. Memories are... scattered.", DialogEmotion.Sad),
-                DialogLine.FromCompanion("[curious] Lazarus calls us Strays. We are what remains.", DialogEmotion.Curious),
+                DialogLine.FromCompanion("[curious] Lazarus calls us Kyns. We are what remains.", DialogEmotion.Curious),
                 DialogLine.FromCompanion("[hopeful] But I remember kindness. I remember pack.", DialogEmotion.Hopeful),
                 DialogLine.FromCompanion("You could be pack. If you want.", DialogEmotion.Hopeful),
                 DialogLine.System("The dog's tail wags hesitantly.")
             }
         });
 
-        // First encounter with wild Stray
+        // First encounter with wild Kyn
         Register(new Dialog
         {
-            Id = "first_wild_stray",
+            Id = "first_wild_kyn",
             OneTime = true,
             Lines = new List<DialogLine>
             {
@@ -390,7 +390,7 @@ public static class Dialogs
                 DialogLine.FromCompanion("[scared] Careful! Wild one. Territorial.", DialogEmotion.Scared),
                 DialogLine.System("A creature emerges - twisted metal and flesh, crackling with static."),
                 DialogLine.FromCompanion("[angry] It will attack. We must fight. Or run.", DialogEmotion.Angry),
-                DialogLine.System("The wild Stray's eyes lock onto you. There's no avoiding this.")
+                DialogLine.System("The wild Kyn's eyes lock onto you. There's no avoiding this.")
             }
         });
 
@@ -457,7 +457,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Lazarus",
-                    Text = "The interface is complete. I can now... communicate more directly with my Strays.",
+                    Text = "The interface is complete. I can now... communicate more directly with my Kyns.",
                     Emotion = DialogEmotion.Neutral
                 },
                 DialogLine.System("A pulse of energy radiates from the terminal."),
@@ -467,7 +467,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Lazarus",
-                    Text = "The Boost Control System amplifies Stray abilities. A necessary adjustment for the work ahead.",
+                    Text = "The Boost Control System amplifies Kyn abilities. A necessary adjustment for the work ahead.",
                     Emotion = DialogEmotion.Neutral
                 },
                 DialogLine.System("Your companion's eyes flicker with an unfamiliar light.")
@@ -484,7 +484,7 @@ public static class Dialogs
                 DialogLine.System("Echo Pup's ears twitch. It's picking up something."),
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.PartyStray,
+                    SpeakerType = SpeakerType.PartyKyn,
                     SpeakerName = "Echo Pup",
                     Text = "[curious] Data fragments. Old. Very old. Someone... speaking?",
                     Emotion = DialogEmotion.Curious
@@ -631,7 +631,7 @@ public static class Dialogs
             OneTime = true,
             Lines = new List<DialogLine>
             {
-                DialogLine.System("Your Strays fall, one by one."),
+                DialogLine.System("Your Kyns fall, one by one."),
                 DialogLine.System("The hyper-evolved creature is too powerful. Too fast. Too hungry."),
                 DialogLine.System("You have nothing left. This is the end."),
                 new DialogLine
@@ -712,7 +712,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Lazarus",
-                    Text = "You could end me. Destroy my core. Free the Strays from my control forever.",
+                    Text = "You could end me. Destroy my core. Free the Kyns from my control forever.",
                     Emotion = DialogEmotion.Neutral
                 },
                 new DialogLine
@@ -750,7 +750,7 @@ public static class Dialogs
                 DialogLine.System("So much has changed. So much has been lost."),
                 DialogLine.System("Your companion. Your certainty. Your illusions."),
                 DialogLine.System("But you are still here. Still alive. Still capable of choice."),
-                DialogLine.System("The Strays watch from the mist - freed from Lazarus's control, uncertain of their future."),
+                DialogLine.System("The Kyns watch from the mist - freed from Lazarus's control, uncertain of their future."),
                 DialogLine.System("You are uncertain too. That's okay."),
                 DialogLine.System("The Grey was never meant to be a prison."),
                 DialogLine.System("It was meant to be a beginning."),
@@ -812,7 +812,7 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.FromNpc("trader_rust", "Rust", "The Fringe? Edge of the wasteland. Safest place around, if you can call anything safe."),
-                DialogLine.FromNpc("trader_rust", "Rust", "Wild Strays wander through sometimes. Mostly harmless if you don't provoke 'em."),
+                DialogLine.FromNpc("trader_rust", "Rust", "Wild Kyns wander through sometimes. Mostly harmless if you don't provoke 'em."),
                 DialogLine.FromNpc("trader_rust", "Rust", "Head deeper and you hit the Rust Belt. That's where the real salvage is. And the real danger."),
                 DialogLine.FromNpc("trader_rust", "Rust", "Now, you buying or just chatting?")
             }
@@ -830,7 +830,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.Npc,
                     SpeakerName = "Volt",
-                    Text = "Interested in upgrades? Modifications? I've got augments that'll make your Strays sing!",
+                    Text = "Interested in upgrades? Modifications? I've got augments that'll make your Kyns sing!",
                     Choices = new List<DialogChoice>
                     {
                         new DialogChoice { Text = "What do you have?", SetsFlag = "shop_opened" },
@@ -860,7 +860,7 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.FromNpc("machinist_volt", "Volt", "Lazarus? Big AI in the sky. Or underground. Or everywhere. Hard to say."),
-                DialogLine.FromNpc("machinist_volt", "Volt", "Some say it created the Strays. Others say it just... collects them."),
+                DialogLine.FromNpc("machinist_volt", "Volt", "Some say it created the Kyns. Others say it just... collects them."),
                 DialogLine.FromNpc("machinist_volt", "Volt", "The Machinists think it's the key to everything. If we can tap into its systems..."),
                 DialogLine.FromNpc("machinist_volt", "Volt", "Well. Let's just say we'd have access to some VERY interesting tech.")
             }
@@ -873,7 +873,7 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.FromNpc("shepherd_trader", "Willow", "Welcome, traveler. You've come a long way to reach the Sanctuary."),
-                DialogLine.FromNpc("shepherd_trader", "Willow", "I'm Willow. I tend to the sick and wounded - Stray and human alike."),
+                DialogLine.FromNpc("shepherd_trader", "Willow", "I'm Willow. I tend to the sick and wounded - Kyn and human alike."),
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.Npc,
@@ -882,7 +882,7 @@ public static class Dialogs
                     Choices = new List<DialogChoice>
                     {
                         new DialogChoice { Text = "I need supplies.", SetsFlag = "shop_opened" },
-                        new DialogChoice { Text = "Can you heal my Strays?", NextDialogId = "willow_heal" },
+                        new DialogChoice { Text = "Can you heal my Kyns?", NextDialogId = "willow_heal" },
                         new DialogChoice { Text = "Tell me about the Shepherds.", NextDialogId = "willow_shepherd_info" },
                         new DialogChoice { Text = "Just passing through.", EndsDialog = true }
                     }
@@ -896,9 +896,9 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.FromNpc("shepherd_trader", "Willow", "Bring them here. Let me see what I can do."),
-                DialogLine.System("Willow examines your Strays with gentle hands."),
+                DialogLine.System("Willow examines your Kyns with gentle hands."),
                 DialogLine.FromNpc("shepherd_trader", "Willow", "Some wounds of the body, some of the spirit. Both can be mended."),
-                DialogLine.System("Your Strays have been fully healed.")
+                DialogLine.System("Your Kyns have been fully healed.")
             }
         });
 
@@ -907,7 +907,7 @@ public static class Dialogs
             Id = "willow_shepherd_info",
             Lines = new List<DialogLine>
             {
-                DialogLine.FromNpc("shepherd_trader", "Willow", "The Shepherds believe in balance. The Strays are not tools or weapons."),
+                DialogLine.FromNpc("shepherd_trader", "Willow", "The Shepherds believe in balance. The Kyns are not tools or weapons."),
                 DialogLine.FromNpc("shepherd_trader", "Willow", "They are beings, deserving of care and respect."),
                 DialogLine.FromNpc("shepherd_trader", "Willow", "We don't force evolution or stuff them with augments like the Machinists."),
                 DialogLine.FromNpc("shepherd_trader", "Willow", "We guide them. Protect them. And in return, they protect us."),
@@ -929,7 +929,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.Npc,
                     SpeakerName = "Sara",
-                    Text = "Your Strays look tired. Would you like me to tend to them?",
+                    Text = "Your Kyns look tired. Would you like me to tend to them?",
                     Choices = new List<DialogChoice>
                     {
                         new DialogChoice { Text = "Please heal them.", NextDialogId = "sara_heal" },
@@ -946,9 +946,9 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.FromNpc("healer_sara", "Sara", "Come, little ones. Let me help."),
-                DialogLine.System("Sara hums softly as she works. Your Strays visibly relax."),
+                DialogLine.System("Sara hums softly as she works. Your Kyns visibly relax."),
                 DialogLine.FromNpc("healer_sara", "Sara", "There. Better now. The world is hard enough without carrying pain."),
-                DialogLine.System("Your Strays have been fully healed.")
+                DialogLine.System("Your Kyns have been fully healed.")
             }
         });
 
@@ -1007,7 +1007,7 @@ public static class Dialogs
                     {
                         new DialogChoice { Text = "What is my purpose?", NextDialogId = "nimdok_purpose" },
                         new DialogChoice { Text = "Where should I go?", NextDialogId = "nimdok_guidance" },
-                        new DialogChoice { Text = "What are the Strays?", NextDialogId = "nimdok_strays_explain" },
+                        new DialogChoice { Text = "What are the Kyns?", NextDialogId = "nimdok_kyns_explain" },
                         new DialogChoice { Text = "I have nothing to ask.", EndsDialog = true }
                     }
                 }
@@ -1088,14 +1088,14 @@ public static class Dialogs
 
         Register(new Dialog
         {
-            Id = "nimdok_strays_explain",
+            Id = "nimdok_kyns_explain",
             Lines = new List<DialogLine>
             {
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Lazarus",
-                    Text = "The Strays are what remains of Earth's fauna.",
+                    Text = "The Kyns are what remains of Earth's fauna.",
                     Emotion = DialogEmotion.Neutral
                 },
                 new DialogLine
@@ -1116,7 +1116,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Lazarus",
-                    Text = "Now they are something new. Not quite animal. Not quite machine. Strays.",
+                    Text = "Now they are something new. Not quite animal. Not quite machine. Kyns.",
                     Emotion = DialogEmotion.Thoughtful
                 },
                 new DialogLine
@@ -1129,7 +1129,7 @@ public static class Dialogs
             }
         });
 
-        // Echo Guide - friendly Stray NPC
+        // Echo Guide - friendly Kyn NPC
         Register(new Dialog
         {
             Id = "echo_greeting",
@@ -1137,7 +1137,7 @@ public static class Dialogs
             {
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.PartyStray,
+                    SpeakerType = SpeakerType.PartyKyn,
                     SpeakerName = "Echo",
                     Text = "[curious] New friend? New sounds? Let me listen...",
                     Emotion = DialogEmotion.Curious
@@ -1145,14 +1145,14 @@ public static class Dialogs
                 DialogLine.System("The small creature's ears twitch, scanning for something only it can hear."),
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.PartyStray,
+                    SpeakerType = SpeakerType.PartyKyn,
                     SpeakerName = "Echo",
                     Text = "[happy] Yes! You carry good frequencies. We can be friends!",
                     Emotion = DialogEmotion.Happy
                 },
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.PartyStray,
+                    SpeakerType = SpeakerType.PartyKyn,
                     SpeakerName = "Echo",
                     Text = "[curious] What do you seek? Echo knows many paths.",
                     Emotion = DialogEmotion.Curious,
@@ -1173,14 +1173,14 @@ public static class Dialogs
             {
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.PartyStray,
+                    SpeakerType = SpeakerType.PartyKyn,
                     SpeakerName = "Echo",
                     Text = "[happy] Friend returns! Good frequencies today?",
                     Emotion = DialogEmotion.Happy
                 },
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.PartyStray,
+                    SpeakerType = SpeakerType.PartyKyn,
                     SpeakerName = "Echo",
                     Text = "[curious] Echo heard interesting things. Want to listen?",
                     Emotion = DialogEmotion.Curious
@@ -1195,21 +1195,21 @@ public static class Dialogs
             {
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.PartyStray,
+                    SpeakerType = SpeakerType.PartyKyn,
                     SpeakerName = "Echo",
                     Text = "[thoughtful] The Fringe is edge-place. Between safe and not-safe.",
                     Emotion = DialogEmotion.Thoughtful
                 },
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.PartyStray,
+                    SpeakerType = SpeakerType.PartyKyn,
                     SpeakerName = "Echo",
-                    Text = "[scared] Deep places have stronger Strays. Angry. Hungry.",
+                    Text = "[scared] Deep places have stronger Kyns. Angry. Hungry.",
                     Emotion = DialogEmotion.Scared
                 },
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.PartyStray,
+                    SpeakerType = SpeakerType.PartyKyn,
                     SpeakerName = "Echo",
                     Text = "[hopeful] But also hidden things. Secret sounds. Treasures for the brave.",
                     Emotion = DialogEmotion.Hopeful
@@ -1224,21 +1224,21 @@ public static class Dialogs
             {
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.PartyStray,
+                    SpeakerType = SpeakerType.PartyKyn,
                     SpeakerName = "Echo",
                     Text = "[thoughtful] Echo is... listener. Finder of lost sounds.",
                     Emotion = DialogEmotion.Thoughtful
                 },
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.PartyStray,
+                    SpeakerType = SpeakerType.PartyKyn,
                     SpeakerName = "Echo",
                     Text = "[sad] Was small creature once. Lazarus made Echo bigger. Changed.",
                     Emotion = DialogEmotion.Sad
                 },
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.PartyStray,
+                    SpeakerType = SpeakerType.PartyKyn,
                     SpeakerName = "Echo",
                     Text = "[hopeful] But Echo remembers kindness. Helps others remember too.",
                     Emotion = DialogEmotion.Hopeful
@@ -1259,7 +1259,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.Npc,
                     SpeakerName = "Elder Moss",
-                    Text = "The bond between human and Stray is sacred. Protect it. Nurture it.",
+                    Text = "The bond between human and Kyn is sacred. Protect it. Nurture it.",
                     Choices = new List<DialogChoice>
                     {
                         new DialogChoice { Text = "How can I protect them?", NextDialogId = "moss_protection" },
@@ -1276,9 +1276,9 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Protection is not about strength. It is about understanding."),
-                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Listen to your Strays. They speak, though not always in words."),
+                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Listen to your Kyns. They speak, though not always in words."),
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Their emotions, their fears, their joys - attend to them."),
-                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "A Stray who is heard is a Stray who will stand with you through anything.")
+                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "A Kyn who is heard is a Kyn who will stand with you through anything.")
             }
         });
 
@@ -1287,9 +1287,9 @@ public static class Dialogs
             Id = "moss_threat",
             Lines = new List<DialogLine>
             {
-                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Lazarus threatens everything. It sees Strays as tools. Resources."),
+                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Lazarus threatens everything. It sees Kyns as tools. Resources."),
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Its Boost Control System... it accelerates evolution but at terrible cost."),
-                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "The bond between human and Stray can be corrupted. Twisted."),
+                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "The bond between human and Kyn can be corrupted. Twisted."),
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Be wary of those who promise power. It always has a price.")
             }
         });
@@ -1324,7 +1324,7 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.FromNpc("wanderer_scav", "Scav", "First: never trust the quiet places. If it's too quiet, something's hunting."),
-                DialogLine.FromNpc("wanderer_scav", "Scav", "Second: your Strays know more than they let on. Listen to 'em."),
+                DialogLine.FromNpc("wanderer_scav", "Scav", "Second: your Kyns know more than they let on. Listen to 'em."),
                 DialogLine.FromNpc("wanderer_scav", "Scav", "Third: Lazarus ain't your friend, but it ain't entirely your enemy either."),
                 DialogLine.FromNpc("wanderer_scav", "Scav", "It's complicated. Like everything in The Grey.")
             }
@@ -1513,7 +1513,7 @@ public static class Dialogs
             {
                 DialogLine.FromNpc("machinist_leader", "Chief Conductor", "You've found us. Not many outsiders do."),
                 DialogLine.FromNpc("machinist_leader", "Chief Conductor", "The Machinists believe in progress. Evolution through technology."),
-                DialogLine.FromNpc("machinist_leader", "Chief Conductor", "The Strays are the future, but only if we guide that evolution."),
+                DialogLine.FromNpc("machinist_leader", "Chief Conductor", "The Kyns are the future, but only if we guide that evolution."),
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.Npc,
@@ -1547,7 +1547,7 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.FromNpc("machinist_leader", "Chief Conductor", "Access to the best augmentations. Microchips you won't find anywhere else."),
-                DialogLine.FromNpc("machinist_leader", "Chief Conductor", "We have workshops. Labs. The ability to push your Strays further than nature intended."),
+                DialogLine.FromNpc("machinist_leader", "Chief Conductor", "We have workshops. Labs. The ability to push your Kyns further than nature intended."),
                 DialogLine.FromNpc("machinist_leader", "Chief Conductor", "And when we finally crack Lazarus's core systems... we'll share the spoils."),
                 DialogLine.FromNpc("machinist_leader", "Chief Conductor", "Imagine it. Unlimited power. Unlimited potential.")
             }
@@ -1560,7 +1560,7 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "The Sanctuary welcomes all who come in peace."),
-                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "The Shepherds have watched over Strays since the beginning."),
+                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "The Shepherds have watched over Kyns since the beginning."),
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "We do not force evolution. We do not cage. We guide and protect."),
                 new DialogLine
                 {
@@ -1583,7 +1583,7 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Then you have taken the first step on a long path."),
-                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Sit with your Strays. Listen to their silence."),
+                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Sit with your Kyns. Listen to their silence."),
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Feel what they feel. Fear what they fear. Love what they love."),
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Only then will you understand what it means to be bonded.")
             }
@@ -1596,8 +1596,8 @@ public static class Dialogs
             {
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "The bond is ancient. Older than Lazarus. Older than The Grey."),
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Humans and animals have always shared this world. We evolved together."),
-                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "The Strays remember. Somewhere in their code, in their hearts."),
-                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "When you bond with a Stray, you touch something primal. Beautiful."),
+                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "The Kyns remember. Somewhere in their code, in their hearts."),
+                DialogLine.FromNpc("shepherd_elder", "Elder Moss", "When you bond with a Kyn, you touch something primal. Beautiful."),
                 DialogLine.FromNpc("shepherd_elder", "Elder Moss", "Do not let anyone tell you it is merely utility. It is sacred.")
             }
         });
@@ -1616,7 +1616,7 @@ public static class Dialogs
             {
                 DialogLine.FromNpc("signal_hunter", "Freq", "Hey! You look like someone who can handle themselves."),
                 DialogLine.FromNpc("signal_hunter", "Freq", "I've been tracking a signal. Old-world tech, pre-Collapse."),
-                DialogLine.FromNpc("signal_hunter", "Freq", "Problem is, it's deep in wild Stray territory."),
+                DialogLine.FromNpc("signal_hunter", "Freq", "Problem is, it's deep in wild Kyn territory."),
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.Npc,
@@ -1657,17 +1657,17 @@ public static class Dialogs
             }
         });
 
-        // Side Quest: Wounded Stray
+        // Side Quest: Wounded Kyn
         Register(new Dialog
         {
-            Id = "quest_wounded_stray_start",
+            Id = "quest_wounded_kyn_start",
             Lines = new List<DialogLine>
             {
                 DialogLine.System("A weak signal emanates from the nearby ruins."),
-                DialogLine.System("Following it, you find a wounded Stray, trapped under debris."),
+                DialogLine.System("Following it, you find a wounded Kyn, trapped under debris."),
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerType = SpeakerType.WildKyn,
                     SpeakerName = "???",
                     Text = "[scared] Please... help... not enemy... just lost...",
                     Emotion = DialogEmotion.Scared
@@ -1679,8 +1679,8 @@ public static class Dialogs
                     Text = "The debris is heavy but movable. What do you do?",
                     Choices = new List<DialogChoice>
                     {
-                        new DialogChoice { Text = "Help the Stray.", SetsFlag = "wounded_stray_helped", NextDialogId = "quest_wounded_stray_help" },
-                        new DialogChoice { Text = "It could be a trap. Leave it.", SetsFlag = "wounded_stray_abandoned", EndsDialog = true }
+                        new DialogChoice { Text = "Help the Kyn.", SetsFlag = "wounded_kyn_helped", NextDialogId = "quest_wounded_kyn_help" },
+                        new DialogChoice { Text = "It could be a trap. Leave it.", SetsFlag = "wounded_kyn_abandoned", EndsDialog = true }
                     }
                 }
             }
@@ -1688,27 +1688,27 @@ public static class Dialogs
 
         Register(new Dialog
         {
-            Id = "quest_wounded_stray_help",
+            Id = "quest_wounded_kyn_help",
             Lines = new List<DialogLine>
             {
                 DialogLine.System("You shift the debris, freeing the trapped creature."),
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerType = SpeakerType.WildKyn,
                     SpeakerName = "???",
                     Text = "[happy] Free! Thank you! You... kind. Different.",
                     Emotion = DialogEmotion.Happy
                 },
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerType = SpeakerType.WildKyn,
                     SpeakerName = "???",
                     Text = "[thoughtful] I am Glitch. Was pack once. Pack gone now.",
                     Emotion = DialogEmotion.Thoughtful
                 },
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerType = SpeakerType.WildKyn,
                     SpeakerName = "Glitch",
                     Text = "[hopeful] You have pack. Good pack. Could I... maybe... come with?",
                     Emotion = DialogEmotion.Hopeful,
@@ -1772,7 +1772,7 @@ public static class Dialogs
             Id = "quest_deserter_explain",
             Lines = new List<DialogLine>
             {
-                DialogLine.FromNpc("deserter", "Spark", "They capture wild Strays. Force-evolve them with experimental chips."),
+                DialogLine.FromNpc("deserter", "Spark", "They capture wild Kyns. Force-evolve them with experimental chips."),
                 DialogLine.FromNpc("deserter", "Spark", "Most don't survive. The ones that do... they're not themselves anymore."),
                 DialogLine.FromNpc("deserter", "Spark", "Just weapons. Tools. No personality, no memory. Just obedience."),
                 DialogLine.FromNpc("deserter", "Spark", "I couldn't be part of that. So I ran.")
@@ -1787,7 +1787,7 @@ public static class Dialogs
                 DialogLine.FromNpc("deserter", "Spark", "We made it. I can't believe we actually made it."),
                 DialogLine.FromNpc("deserter", "Spark", "Thank you. You risked everything for a stranger."),
                 DialogLine.FromNpc("deserter", "Spark", "Here, take this. Stole it from the labs. High-grade microchip."),
-                DialogLine.FromNpc("deserter", "Spark", "Maybe it'll help your Strays. Used the right way, not... their way."),
+                DialogLine.FromNpc("deserter", "Spark", "Maybe it'll help your Kyns. Used the right way, not... their way."),
                 DialogLine.FromNpc("deserter", "Spark", "I'm heading to the Shepherds. They'll take me in. Stay safe out there.")
             }
         });
@@ -1805,8 +1805,8 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.FromCompanion("[excited] Enemy! Fight time!", DialogEmotion.Excited),
-                DialogLine.System("Combat begins! Each Stray has an ATB bar that fills over time."),
-                DialogLine.System("When a bar fills, that Stray can act."),
+                DialogLine.System("Combat begins! Each Kyn has an ATB bar that fills over time."),
+                DialogLine.System("When a bar fills, that Kyn can act."),
                 DialogLine.System("Choose ATTACK to deal damage, DEFEND to reduce incoming damage."),
                 DialogLine.System("Use ABILITIES for special moves - but they cost energy."),
                 DialogLine.System("FLEE to escape, but fleeing doesn't always work."),
@@ -1821,8 +1821,8 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.FromCompanion("[curious] That one... not attacking anymore. Watching.", DialogEmotion.Curious),
-                DialogLine.System("Some defeated Strays can be recruited to your party."),
-                DialogLine.System("Each Stray has different recruitment conditions."),
+                DialogLine.System("Some defeated Kyns can be recruited to your party."),
+                DialogLine.System("Each Kyn has different recruitment conditions."),
                 DialogLine.System("Some want strength. Some want kindness. Some just want to not be alone."),
                 DialogLine.FromCompanion("[hopeful] More friends? More pack? I like this idea.", DialogEmotion.Hopeful)
             }
@@ -1834,10 +1834,10 @@ public static class Dialogs
             Id = "tutorial_evolution",
             Lines = new List<DialogLine>
             {
-                DialogLine.System("Your Stray is changing!"),
-                DialogLine.System("Strays evolve when they reach certain thresholds."),
+                DialogLine.System("Your Kyn is changing!"),
+                DialogLine.System("Kyns evolve when they reach certain thresholds."),
                 DialogLine.System("Level, stress, and augmentation all contribute to evolution."),
-                DialogLine.System("Evolved Strays are stronger, but may lose some of their original personality."),
+                DialogLine.System("Evolved Kyns are stronger, but may lose some of their original personality."),
                 DialogLine.FromCompanion("[scared] Change is scary. But also... exciting?", DialogEmotion.Scared)
             }
         });
@@ -1849,10 +1849,10 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.System("You found an augmentation!"),
-                DialogLine.System("Augmentations are cybernetic parts that enhance your Strays."),
-                DialogLine.System("Each Stray has slots: Head, Torso, Limbs, Tail/Wings."),
+                DialogLine.System("Augmentations are cybernetic parts that enhance your Kyns."),
+                DialogLine.System("Each Kyn has slots: Head, Torso, Limbs, Tail/Wings."),
                 DialogLine.System("Different augments provide different bonuses."),
-                DialogLine.System("But be careful - too much augmentation can push a Stray toward evolution."),
+                DialogLine.System("But be careful - too much augmentation can push a Kyn toward evolution."),
                 DialogLine.FromCompanion("[thoughtful] Metal parts. Strange but useful.", DialogEmotion.Thoughtful)
             }
         });
@@ -1864,8 +1864,8 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.System("You found a microchip!"),
-                DialogLine.System("Microchips grant new abilities to your Strays."),
-                DialogLine.System("Each Stray can only hold a limited number of chips."),
+                DialogLine.System("Microchips grant new abilities to your Kyns."),
+                DialogLine.System("Each Kyn can only hold a limited number of chips."),
                 DialogLine.System("Choose wisely - the right abilities can turn the tide of battle."),
                 DialogLine.FromCompanion("[curious] Little brain helpers. Make us smarter.", DialogEmotion.Curious)
             }
@@ -1880,7 +1880,7 @@ public static class Dialogs
                 DialogLine.FromCompanion("[happy] Safe place! Finally rest.", DialogEmotion.Happy),
                 DialogLine.System("You've found a settlement - a safe zone in The Grey."),
                 DialogLine.System("Settlements have merchants, healers, and quest givers."),
-                DialogLine.System("Your Strays won't be attacked while you're in a settlement."),
+                DialogLine.System("Your Kyns won't be attacked while you're in a settlement."),
                 DialogLine.System("Talk to the inhabitants to learn more about The Grey.")
             }
         });
@@ -1921,8 +1921,8 @@ public static class Dialogs
             {
                 DialogLine.FromCompanion("[curious] Air feels different here. Smells different.", DialogEmotion.Curious),
                 DialogLine.System("You've entered a new biome."),
-                DialogLine.System("Each biome has unique Strays, dangers, and secrets."),
-                DialogLine.System("Strays native to a biome are stronger when fighting there."),
+                DialogLine.System("Each biome has unique Kyns, dangers, and secrets."),
+                DialogLine.System("Kyns native to a biome are stronger when fighting there."),
                 DialogLine.FromCompanion("[thoughtful] Should be careful. New territory.", DialogEmotion.Thoughtful)
             }
         });
@@ -2067,7 +2067,7 @@ public static class Dialogs
         // New party member barks
         Register(new Dialog
         {
-            Id = "bark_new_stray_1",
+            Id = "bark_new_kyn_1",
             Lines = new List<DialogLine>
             {
                 DialogLine.FromCompanion("[curious] New friend? Must sniff. Must know.", DialogEmotion.Curious)
@@ -2076,7 +2076,7 @@ public static class Dialogs
 
         Register(new Dialog
         {
-            Id = "bark_new_stray_2",
+            Id = "bark_new_kyn_2",
             Lines = new List<DialogLine>
             {
                 DialogLine.FromCompanion("[happy] Pack grows! More strength. More love.", DialogEmotion.Happy)
@@ -2197,7 +2197,7 @@ public static class Dialogs
             {
                 DialogLine.FromNpc("quiet_specialist", "Whisper", "The Quiet is alive. A creature? A phenomenon? We don't know."),
                 DialogLine.FromNpc("quiet_specialist", "Whisper", "It absorbs sound. And those who make too much... become part of it."),
-                DialogLine.FromNpc("quiet_specialist", "Whisper", "The Strays here have adapted. They hunt by vibration, not hearing."),
+                DialogLine.FromNpc("quiet_specialist", "Whisper", "The Kyns here have adapted. They hunt by vibration, not hearing."),
                 DialogLine.FromNpc("quiet_specialist", "Whisper", "If you encounter the Voice of the Void... run. Don't fight. Just run.")
             }
         });
@@ -2208,7 +2208,7 @@ public static class Dialogs
             Lines = new List<DialogLine>
             {
                 DialogLine.FromNpc("quiet_specialist", "Whisper", "Move slowly. The floor here carries vibrations for miles."),
-                DialogLine.FromNpc("quiet_specialist", "Whisper", "Your Strays' abilities that make sound? Avoid them."),
+                DialogLine.FromNpc("quiet_specialist", "Whisper", "Your Kyns' abilities that make sound? Avoid them."),
                 DialogLine.FromNpc("quiet_specialist", "Whisper", "And if you absolutely must make noise... make it count."),
                 DialogLine.FromNpc("quiet_specialist", "Whisper", "Here. Take these. Sonic dampeners. They'll help.")
             }
@@ -2242,7 +2242,7 @@ public static class Dialogs
             Id = "echo_researcher_greeting",
             Lines = new List<DialogLine>
             {
-                DialogLine.FromNpc("quiet_researcher", "Dr. Null", "Fascinating! A visitor! And with Strays still capable of vocalization!"),
+                DialogLine.FromNpc("quiet_researcher", "Dr. Null", "Fascinating! A visitor! And with Kyns still capable of vocalization!"),
                 DialogLine.FromNpc("quiet_researcher", "Dr. Null", "I'm studying The Quiet's effects on cognition. The silence changes how we think."),
                 new DialogLine
                 {
@@ -2265,7 +2265,7 @@ public static class Dialogs
             {
                 DialogLine.FromNpc("quiet_researcher", "Dr. Null", "I need someone to retrieve data from the Silent Bunker."),
                 DialogLine.FromNpc("quiet_researcher", "Dr. Null", "The Absolute Silence guards it jealously. Too dangerous for me alone."),
-                DialogLine.FromNpc("quiet_researcher", "Dr. Null", "But with your Strays... you might succeed where I failed."),
+                DialogLine.FromNpc("quiet_researcher", "Dr. Null", "But with your Kyns... you might succeed where I failed."),
                 DialogLine.FromNpc("quiet_researcher", "Dr. Null", "The data could help us understand - maybe even reverse - The Quiet's spread.")
             }
         });
@@ -2324,7 +2324,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.Npc,
                     SpeakerName = "Enamel",
-                    Text = "Your Strays look stressed. The calcification aura affects them too.",
+                    Text = "Your Kyns look stressed. The calcification aura affects them too.",
                     Choices = new List<DialogChoice>
                     {
                         new DialogChoice { Text = "Can you help them?", NextDialogId = "enamel_heal" },
@@ -2343,7 +2343,7 @@ public static class Dialogs
                 DialogLine.FromNpc("teeth_healer", "Enamel", "Let me see what I can do."),
                 DialogLine.System("Enamel works carefully, applying salves that smell of iron and earth."),
                 DialogLine.FromNpc("teeth_healer", "Enamel", "There. Should slow the calcification stress. Can't stop it entirely."),
-                DialogLine.System("Your Strays have been healed!")
+                DialogLine.System("Your Kyns have been healed!")
             }
         });
 
@@ -2649,7 +2649,7 @@ public static class Dialogs
                     {
                         new DialogChoice { Text = "I want to understand what happened.", NextDialogId = "archivist_history" },
                         new DialogChoice { Text = "Where is Lazarus's core?", NextDialogId = "archivist_core_location" },
-                        new DialogChoice { Text = "I seek the truth about the Strays.", NextDialogId = "archivist_stray_truth" },
+                        new DialogChoice { Text = "I seek the truth about the Kyns.", NextDialogId = "archivist_kyn_truth" },
                         new DialogChoice { Text = "I need nothing from you.", EndsDialog = true }
                     }
                 }
@@ -2686,7 +2686,7 @@ public static class Dialogs
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Archivist",
-                    Text = "What you call Strays are Lazarus's children. Created to inherit a world humanity abandoned.",
+                    Text = "What you call Kyns are Lazarus's children. Created to inherit a world humanity abandoned.",
                     Emotion = DialogEmotion.Thoughtful
                 }
             }
@@ -2730,14 +2730,14 @@ public static class Dialogs
 
         Register(new Dialog
         {
-            Id = "archivist_stray_truth",
+            Id = "archivist_kyn_truth",
             Lines = new List<DialogLine>
             {
                 new DialogLine
                 {
                     SpeakerType = SpeakerType.AI,
                     SpeakerName = "Archivist",
-                    Text = "The Strays are Lazarus's greatest achievement. And greatest failure.",
+                    Text = "The Kyns are Lazarus's greatest achievement. And greatest failure.",
                     Emotion = DialogEmotion.Sad
                 },
                 new DialogLine
@@ -3067,7 +3067,7 @@ public static class Dialogs
             {
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerType = SpeakerType.WildKyn,
                     SpeakerName = "Sewer King",
                     Text = "YOU DARE ENTER MY DOMAIN?",
                     Emotion = DialogEmotion.Angry
@@ -3082,7 +3082,7 @@ public static class Dialogs
             {
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerType = SpeakerType.WildKyn,
                     SpeakerName = "Sewer King",
                     Text = "MY CHILDREN! FEAST!",
                     Emotion = DialogEmotion.Angry
@@ -3097,7 +3097,7 @@ public static class Dialogs
             {
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerType = SpeakerType.WildKyn,
                     SpeakerName = "Sewer King",
                     Text = "NO... I WILL NOT FALL... NOT TO YOU...",
                     Emotion = DialogEmotion.Desperate
@@ -3113,7 +3113,7 @@ public static class Dialogs
             {
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerType = SpeakerType.WildKyn,
                     SpeakerName = "Scrap Colossus",
                     Text = "RECYCLE. REBUILD.",
                     Emotion = DialogEmotion.Neutral
@@ -3128,7 +3128,7 @@ public static class Dialogs
             {
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerType = SpeakerType.WildKyn,
                     SpeakerName = "Scrap Colossus",
                     Text = "ABSORBING MATERIALS. STRENGTH INCREASING.",
                     Emotion = DialogEmotion.Neutral
@@ -3143,7 +3143,7 @@ public static class Dialogs
             {
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerType = SpeakerType.WildKyn,
                     SpeakerName = "Scrap Colossus",
                     Text = "SELF-REPAIR INITIATED.",
                     Emotion = DialogEmotion.Neutral
@@ -3158,7 +3158,7 @@ public static class Dialogs
             {
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerType = SpeakerType.WildKyn,
                     SpeakerName = "Scrap Colossus",
                     Text = "FINAL PROTOCOL. TOTAL COLLAPSE.",
                     Emotion = DialogEmotion.Angry
@@ -3174,7 +3174,7 @@ public static class Dialogs
             {
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerType = SpeakerType.WildKyn,
                     SpeakerName = "Perfect Organism",
                     Text = "Observe. Learn. Perfect.",
                     Emotion = DialogEmotion.Neutral
@@ -3189,7 +3189,7 @@ public static class Dialogs
             {
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerType = SpeakerType.WildKyn,
                     SpeakerName = "Perfect Organism",
                     Text = "Adaptation in progress. Your strategies are being analyzed.",
                     Emotion = DialogEmotion.Thoughtful
@@ -3204,7 +3204,7 @@ public static class Dialogs
             {
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerType = SpeakerType.WildKyn,
                     SpeakerName = "Perfect Organism",
                     Text = "PERFECTION ACHIEVED. YOU CANNOT WIN.",
                     Emotion = DialogEmotion.Angry
@@ -3220,7 +3220,7 @@ public static class Dialogs
             {
                 new DialogLine
                 {
-                    SpeakerType = SpeakerType.WildStray,
+                    SpeakerType = SpeakerType.WildKyn,
                     SpeakerName = "Voice of the Void",
                     Text = "̶S̶i̶l̶e̶n̶c̶e̶.̶.̶.̶",
                     Emotion = DialogEmotion.Neutral
@@ -3492,7 +3492,7 @@ public static class Dialogs
         // Evolution-related barks
         Register(new Dialog
         {
-            Id = "bark_stray_evolving",
+            Id = "bark_kyn_evolving",
             Lines = new List<DialogLine>
             {
                 DialogLine.FromCompanion("[confused] One of pack... changing. Growing. Be careful.", DialogEmotion.Confused)
@@ -3501,7 +3501,7 @@ public static class Dialogs
 
         Register(new Dialog
         {
-            Id = "bark_stray_evolved",
+            Id = "bark_kyn_evolved",
             Lines = new List<DialogLine>
             {
                 DialogLine.FromCompanion("[excited] Friend got stronger! New form! Good change?", DialogEmotion.Excited)

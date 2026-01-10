@@ -623,18 +623,18 @@ public class GameWorld
                 LevelRange = levelRange
             };
 
-            // Add native Strays from biome
-            foreach (var stray in biomeDef.NativeStrays)
+            // Add native Kyns from biome
+            foreach (var kyn in biomeDef.NativeKyns)
             {
-                encounter.PossibleStrays.Add(stray);
+                encounter.PossibleKyns.Add(kyn);
             }
 
-            // Small chance to add rare Strays
+            // Small chance to add rare Kyns
             if (_random.NextDouble() < 0.1)
             {
-                foreach (var rareStray in biomeDef.RareStrays)
+                foreach (var rareKyn in biomeDef.RareKyns)
                 {
-                    encounter.PossibleStrays.Add(rareStray);
+                    encounter.PossibleKyns.Add(rareKyn);
                 }
             }
 

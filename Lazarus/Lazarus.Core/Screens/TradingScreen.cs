@@ -565,7 +565,7 @@ public class TradingScreen : GameScreen
                     ConsumableEffect.HealHpPercent => $"Heals {consumable.EffectPower}% HP",
                     ConsumableEffect.RestoreEnergy => $"Restores {consumable.EffectPower} EP",
                     ConsumableEffect.ReduceStress => $"Reduces stress by {consumable.EffectPower}",
-                    ConsumableEffect.ReviveStray => $"Revives with {consumable.EffectPower}% HP",
+                    ConsumableEffect.ReviveKyn => $"Revives with {consumable.EffectPower}% HP",
                     _ => ""
                 };
 

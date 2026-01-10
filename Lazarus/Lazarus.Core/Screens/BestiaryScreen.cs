@@ -418,7 +418,7 @@ public class BestiaryScreen : GameScreen
         }
 
         var entry = _currentEntries[_selectedEntryIndex];
-        var definition = StrayDefinitions.Get(entry.DefinitionId);
+        var definition = KynDefinitions.Get(entry.DefinitionId);
 
         int y = bounds.Y + 10;
 

@@ -113,7 +113,7 @@ public class GameStateService
     }
 
     /// <summary>
-    /// Gets the bestiary (Stray encyclopedia) for this save.
+    /// Gets the bestiary (Kyn encyclopedia) for this save.
     /// </summary>
     public Bestiary Bestiary
     {
@@ -678,8 +678,8 @@ public class GameStateService
                 PlayTime = TimeSpan.FromSeconds(data.TotalPlayTimeSeconds),
                 CurrentAct = data.CurrentAct,
                 CurrentBiome = data.CurrentBiome,
-                PartyCount = data.PartyStrayIds.Count,
-                TotalStrays = data.OwnedStrays.Count,
+                PartyCount = data.PartyKynIds.Count,
+                TotalKyns = data.OwnedKyns.Count,
                 CompletedQuests = data.CompletedQuests.Count
             };
         }
@@ -883,11 +883,11 @@ public class GameStateService
     }
 
     /// <summary>
-    /// Records recruiting a Stray.
+    /// Records recruiting a Kyn.
     /// </summary>
-    public void RecordStrayRecruited()
+    public void RecordKynRecruited()
     {
-        _currentData.TotalStraysRecruited++;
+        _currentData.TotalKynsRecruited++;
     }
 
     /// <summary>
@@ -1051,20 +1051,20 @@ public class GameStateService
     }
 
     /// <summary>
-    /// Exports recruited Stray definition IDs for NG+ carry-over.
+    /// Exports recruited Kyn definition IDs for NG+ carry-over.
     /// </summary>
-    public System.Collections.Generic.List<string> ExportRecruitedStrays()
+    public System.Collections.Generic.List<string> ExportRecruitedKyns()
     {
-        return new System.Collections.Generic.List<string>(_currentData.OwnedStrays.Keys);
+        return new System.Collections.Generic.List<string>(_currentData.OwnedKyns.Keys);
     }
 
     /// <summary>
-    /// Exports Stray levels for NG+ carry-over.
+    /// Exports Kyn levels for NG+ carry-over.
     /// </summary>
-    public System.Collections.Generic.Dictionary<string, int> ExportStrayLevels()
+    public System.Collections.Generic.Dictionary<string, int> ExportKynLevels()
     {
         var result = new System.Collections.Generic.Dictionary<string, int>();
-        foreach (var kvp in _currentData.OwnedStrays)
+        foreach (var kvp in _currentData.OwnedKyns)
         {
             result[kvp.Key] = kvp.Value.Level;
         }
@@ -1108,7 +1108,7 @@ public static class StoryFlags
     public const string ReachedNimdokCore = "reached_nimdok_core";
     public const string PerformedMaintenance = "performed_maintenance";
     public const string LearnedBioShellTruth = "learned_bioshell_truth";
-    public const string RequestedStrayFix = "requested_stray_fix";
+    public const string RequestedKynFix = "requested_kyn_fix";
 
     // Act 2 Major Beats
     public const string BoostControlActivated = "boost_control_activated";
@@ -1169,14 +1169,14 @@ public class SaveSlotInfo
     public BiomeType CurrentBiome { get; init; }
 
     /// <summary>
-    /// Number of Strays in the party.
+    /// Number of Kyns in the party.
     /// </summary>
     public int PartyCount { get; init; }
 
     /// <summary>
-    /// Total number of owned Strays.
+    /// Total number of owned Kyns.
     /// </summary>
-    public int TotalStrays { get; init; }
+    public int TotalKyns { get; init; }
 
     /// <summary>
     /// Number of completed quests.
@@ -1201,7 +1201,7 @@ public class SaveSlotInfo
     /// <summary>
     /// Gets a summary description for the save.
     /// </summary>
-    public string Summary => $"{GetActDisplayName(CurrentAct)} - {CurrentBiome} | {PartyCount} Strays | {FormattedPlayTime}";
+    public string Summary => $"{GetActDisplayName(CurrentAct)} - {CurrentBiome} | {PartyCount} Kyns | {FormattedPlayTime}";
 
     private static string GetActDisplayName(ActState act) => act switch
     {

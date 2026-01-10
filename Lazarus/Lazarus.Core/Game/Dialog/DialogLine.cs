@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Lazarus.Core.Game.Dialog;
 
 /// <summary>
-/// Emotion/tone tags that can be used in Stray speech.
+/// Emotion/tone tags that can be used in Kyn speech.
 /// </summary>
 public enum DialogEmotion
 {
@@ -38,9 +38,9 @@ public enum SpeakerType
     Companion,
 
     /// <summary>
-    /// A party Stray.
+    /// A party Kyn.
     /// </summary>
-    PartyStray,
+    PartyKyn,
 
     /// <summary>
     /// An NPC.
@@ -48,9 +48,9 @@ public enum SpeakerType
     Npc,
 
     /// <summary>
-    /// A wild or enemy Stray.
+    /// A wild or enemy Kyn.
     /// </summary>
-    WildStray,
+    WildKyn,
 
     /// <summary>
     /// System/narrator text.
@@ -115,7 +115,7 @@ public class DialogLine
     public SpeakerType SpeakerType { get; init; } = SpeakerType.System;
 
     /// <summary>
-    /// ID of the specific speaker (NPC ID, Stray ID, etc.).
+    /// ID of the specific speaker (NPC ID, Kyn ID, etc.).
     /// </summary>
     public string? SpeakerId { get; init; }
 
@@ -125,7 +125,7 @@ public class DialogLine
     public string? SpeakerName { get; init; }
 
     /// <summary>
-    /// The emotion/tone of this line (for Stray speech patterns).
+    /// The emotion/tone of this line (for Kyn speech patterns).
     /// </summary>
     public DialogEmotion Emotion { get; init; } = DialogEmotion.Neutral;
 
@@ -222,7 +222,7 @@ public class DialogLine
     }
 
     /// <summary>
-    /// Gets the formatted text with emotion tag for Stray speech.
+    /// Gets the formatted text with emotion tag for Kyn speech.
     /// </summary>
     public string GetFormattedText()
     {

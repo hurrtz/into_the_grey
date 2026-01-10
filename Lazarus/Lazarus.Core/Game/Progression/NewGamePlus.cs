@@ -58,8 +58,8 @@ public enum NewGamePlusCarryOver
     Augmentations = 1 << 4,
     Bestiary = 1 << 5,
     Achievements = 1 << 6,
-    RecruitedStrays = 1 << 7,
-    StrayLevels = 1 << 8,
+    RecruitedKyns = 1 << 7,
+    KynLevels = 1 << 8,
     FactionReputation = 1 << 9,
     UnlockedAbilities = 1 << 10,
     PlayTime = 1 << 11,
@@ -72,7 +72,7 @@ public enum NewGamePlusCarryOver
     /// <summary>
     /// Full carry-over (everything possible).
     /// </summary>
-    Full = Standard | RecruitedStrays | StrayLevels | FactionReputation | UnlockedAbilities
+    Full = Standard | RecruitedKyns | KynLevels | FactionReputation | UnlockedAbilities
 }
 
 /// <summary>
@@ -382,14 +382,14 @@ public class NewGamePlusManager
             startData.Achievements = currentState.ExportAchievements();
         }
 
-        if (CarryOverSettings.HasFlag(NewGamePlusCarryOver.RecruitedStrays))
+        if (CarryOverSettings.HasFlag(NewGamePlusCarryOver.RecruitedKyns))
         {
-            startData.RecruitedStrayIds = currentState.ExportRecruitedStrays();
+            startData.RecruitedKynIds = currentState.ExportRecruitedKyns();
         }
 
-        if (CarryOverSettings.HasFlag(NewGamePlusCarryOver.StrayLevels))
+        if (CarryOverSettings.HasFlag(NewGamePlusCarryOver.KynLevels))
         {
-            startData.StrayLevels = currentState.ExportStrayLevels();
+            startData.KynLevels = currentState.ExportKynLevels();
         }
 
         if (CarryOverSettings.HasFlag(NewGamePlusCarryOver.FactionReputation))
@@ -416,7 +416,7 @@ public class NewGamePlusManager
     /// <summary>
     /// Applies NG+ modifiers to enemy stats.
     /// </summary>
-    public void ApplyEnemyModifiers(Stray enemy)
+    public void ApplyEnemyModifiers(Kyn enemy)
     {
         var diff = GetCurrentDifficulty();
 
@@ -425,7 +425,7 @@ public class NewGamePlusManager
         enemy.SetLevel(newLevel);
 
         // Note: The actual stat multipliers would need to be applied
-        // during combat calculations, not directly to the Stray
+        // during combat calculations, not directly to the Kyn
     }
 
     /// <summary>
@@ -550,8 +550,8 @@ public class NewGamePlusStartData
     public List<string> Augmentations { get; set; } = new();
     public HashSet<string> BestiaryUnlocks { get; set; } = new();
     public HashSet<string> Achievements { get; set; } = new();
-    public List<string> RecruitedStrayIds { get; set; } = new();
-    public Dictionary<string, int> StrayLevels { get; set; } = new();
+    public List<string> RecruitedKynIds { get; set; } = new();
+    public Dictionary<string, int> KynLevels { get; set; } = new();
     public Dictionary<string, int> FactionReputation { get; set; } = new();
     public HashSet<string> PermanentFlags { get; set; } = new();
     public TimeSpan PreviousPlayTime { get; set; } = TimeSpan.Zero;

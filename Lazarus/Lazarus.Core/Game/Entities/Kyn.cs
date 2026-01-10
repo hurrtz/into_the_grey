@@ -10,7 +10,7 @@ using Lazarus.Core.Game.Stats;
 namespace Lazarus.Core.Game.Entities;
 
 /// <summary>
-/// Combat row positioning for a Stray.
+/// Combat row positioning for a Kyn.
 /// </summary>
 public enum CombatRow
 {
@@ -26,33 +26,33 @@ public enum CombatRow
 }
 
 /// <summary>
-/// Represents an individual Stray instance - a recruited or wild cybernetic creature.
-/// Strays are half-biological, half-cybernetic animals created by Lazarus.
+/// Represents an individual Kyn instance - a recruited or wild cybernetic creature.
+/// Kyns are half-biological, half-cybernetic animals created by Lazarus.
 /// </summary>
-public class Stray
+public class Kyn
 {
     private static int _nextInstanceId = 1;
 
     /// <summary>
-    /// The complete stat profile for this Stray.
+    /// The complete stat profile for this Kyn.
     /// </summary>
-    private readonly StrayStats _stats = new();
+    private readonly KynStats _stats = new();
 
     /// <summary>
-    /// Unique instance ID for this specific Stray.
+    /// Unique instance ID for this specific Kyn.
     /// </summary>
     public string InstanceId { get; }
 
     /// <summary>
-    /// Gets the complete stat profile for this Stray.
+    /// Gets the complete stat profile for this Kyn.
     /// Use this to access all 61 stats with base/bonus/total values.
     /// </summary>
-    public StrayStats Stats => _stats;
+    public KynStats Stats => _stats;
 
     /// <summary>
-    /// The definition (species/type) of this Stray.
+    /// The definition (species/type) of this Kyn.
     /// </summary>
-    public StrayDefinition Definition { get; private set; }
+    public KynDefinition Definition { get; private set; }
 
     /// <summary>
     /// Custom nickname (null = use default name).
@@ -140,7 +140,7 @@ public class Stray
     public float EnergyPercent => MaxEnergy > 0 ? (float)CurrentEnergy / MaxEnergy : 0f;
 
     /// <summary>
-    /// Whether this Stray is alive.
+    /// Whether this Kyn is alive.
     /// </summary>
     public bool IsAlive => CurrentHp > 0;
 
@@ -150,7 +150,7 @@ public class Stray
     public int EvolutionStage { get; private set; } = 0;
 
     /// <summary>
-    /// Whether this Stray has evolved at least once.
+    /// Whether this Kyn has evolved at least once.
     /// </summary>
     public bool IsEvolved { get; private set; } = false;
 
@@ -161,7 +161,7 @@ public class Stray
 
     /// <summary>
     /// Bond level with the protagonist (0-100).
-    /// Affects loyalty, combat bonuses, and recruitment of similar Strays.
+    /// Affects loyalty, combat bonuses, and recruitment of similar Kyns.
     /// </summary>
     public int BondLevel { get; set; } = 0;
 
@@ -184,7 +184,7 @@ public class Stray
     public List<string> EquippedMicrochips { get; } = new();
 
     /// <summary>
-    /// Microchip sockets for this Stray.
+    /// Microchip sockets for this Kyn.
     /// </summary>
     public MicrochipSocket[] MicrochipSockets { get; private set; } = Array.Empty<MicrochipSocket>();
 
@@ -250,7 +250,7 @@ public class Stray
         var previousChip = socket.EquippedChip;
 
         // Unequip from previous location if already equipped
-        if (chip.IsEquipped && chip.EquippedToStrayId == InstanceId)
+        if (chip.IsEquipped && chip.EquippedToKynId == InstanceId)
         {
             UnequipMicrochip(chip.SocketIndex);
         }
@@ -259,14 +259,14 @@ public class Stray
         if (previousChip != null)
         {
             previousChip.IsEquipped = false;
-            previousChip.EquippedToStrayId = null;
+            previousChip.EquippedToKynId = null;
             previousChip.SocketIndex = -1;
         }
 
         // Equip new chip
         socket.EquippedChip = chip;
         chip.IsEquipped = true;
-        chip.EquippedToStrayId = InstanceId;
+        chip.EquippedToKynId = InstanceId;
         chip.SocketIndex = socketIndex;
 
         // Recalculate stat modifiers from equipment
@@ -291,7 +291,7 @@ public class Stray
         if (chip != null)
         {
             chip.IsEquipped = false;
-            chip.EquippedToStrayId = null;
+            chip.EquippedToKynId = null;
             chip.SocketIndex = -1;
             socket.EquippedChip = null;
 
@@ -420,7 +420,7 @@ public class Stray
     }
 
     /// <summary>
-    /// Initializes the augmentation slots for this Stray based on its category.
+    /// Initializes the augmentation slots for this Kyn based on its category.
     /// </summary>
     private void InitializeAugmentationSlots()
     {
@@ -440,7 +440,7 @@ public class Stray
     }
 
     /// <summary>
-    /// Gets all available slots for this Stray (universal + category-specific).
+    /// Gets all available slots for this Kyn (universal + category-specific).
     /// </summary>
     public IEnumerable<SlotReference> GetAvailableSlots()
     {
@@ -554,7 +554,7 @@ public class Stray
     }
 
     /// <summary>
-    /// Gets all abilities this Stray has (innate + augmentation-granted + microchip-granted).
+    /// Gets all abilities this Kyn has (innate + augmentation-granted + microchip-granted).
     /// </summary>
     public IEnumerable<string> GetAllAbilities()
     {
@@ -564,7 +564,7 @@ public class Stray
     }
 
     /// <summary>
-    /// Whether this Stray is hostile (enemy in combat).
+    /// Whether this Kyn is hostile (enemy in combat).
     /// </summary>
     public bool IsHostile { get; set; } = false;
 
@@ -574,13 +574,13 @@ public class Stray
     public Vector2 CombatPosition { get; set; }
 
     /// <summary>
-    /// Creates a new Stray from a definition.
+    /// Creates a new Kyn from a definition.
     /// </summary>
-    /// <param name="definition">The Stray definition to use.</param>
+    /// <param name="definition">The Kyn definition to use.</param>
     /// <param name="level">Starting level.</param>
-    public Stray(StrayDefinition definition, int level = 1)
+    public Kyn(KynDefinition definition, int level = 1)
     {
-        InstanceId = $"stray_{_nextInstanceId++}";
+        InstanceId = $"kyn_{_nextInstanceId++}";
         Definition = definition;
         Level = Math.Max(1, level);
         InitializeAugmentationSlots();
@@ -591,20 +591,20 @@ public class Stray
     }
 
     /// <summary>
-    /// Creates a Stray from a definition ID.
+    /// Creates a Kyn from a definition ID.
     /// </summary>
     /// <param name="definitionId">The definition ID.</param>
     /// <param name="level">Starting level.</param>
-    public static Stray? Create(string definitionId, int level = 1)
+    public static Kyn? Create(string definitionId, int level = 1)
     {
-        var definition = StrayDefinitions.Get(definitionId);
+        var definition = KynDefinitions.Get(definitionId);
 
         if (definition == null)
         {
             return null;
         }
 
-        return new Stray(definition, level);
+        return new Kyn(definition, level);
     }
 
     /// <summary>
@@ -913,7 +913,7 @@ public class Stray
     }
 
     /// <summary>
-    /// Heals the Stray.
+    /// Heals the Kyn.
     /// </summary>
     /// <param name="amount">Amount to heal.</param>
     /// <returns>Actual amount healed.</returns>
@@ -925,7 +925,7 @@ public class Stray
     }
 
     /// <summary>
-    /// Fully heals the Stray.
+    /// Fully heals the Kyn.
     /// </summary>
     public void FullHeal()
     {
@@ -933,7 +933,7 @@ public class Stray
     }
 
     /// <summary>
-    /// Revives the Stray with a percentage of max HP.
+    /// Revives the Kyn with a percentage of max HP.
     /// </summary>
     /// <param name="hpPercent">Percentage of max HP to revive with (0-1).</param>
     public void Revive(float hpPercent = 0.5f)
@@ -945,7 +945,7 @@ public class Stray
     }
 
     /// <summary>
-    /// Checks if this Stray can evolve.
+    /// Checks if this Kyn can evolve.
     /// </summary>
     public bool CanEvolve()
     {
@@ -964,7 +964,7 @@ public class Stray
     }
 
     /// <summary>
-    /// Evolves the Stray to its next form.
+    /// Evolves the Kyn to its next form.
     /// </summary>
     /// <returns>True if evolution succeeded.</returns>
     public bool TryEvolve()
@@ -994,10 +994,10 @@ public class Stray
     }
 
     /// <summary>
-    /// Evolves the Stray to a new definition (used by EvolutionSystem).
+    /// Evolves the Kyn to a new definition (used by EvolutionSystem).
     /// </summary>
     /// <param name="newDefinition">The new definition for the evolved form.</param>
-    public void Evolve(StrayDefinition newDefinition)
+    public void Evolve(KynDefinition newDefinition)
     {
         Definition = newDefinition;
         EvolutionStage++;
@@ -1037,7 +1037,7 @@ public class Stray
     }
 
     /// <summary>
-    /// Draws the Stray (placeholder visual).
+    /// Draws the Kyn (placeholder visual).
     /// </summary>
     /// <param name="spriteBatch">SpriteBatch to draw with.</param>
     /// <param name="pixelTexture">1x1 white pixel texture.</param>
@@ -1054,7 +1054,7 @@ public class Stray
             color = color * 0.3f;
         }
 
-        // Draw the Stray as a colored circle (square for simplicity)
+        // Draw the Kyn as a colored circle (square for simplicity)
         var drawRect = new Rectangle(
             (int)(position.X - size / 2),
             (int)(position.Y - size / 2),
@@ -1096,9 +1096,9 @@ public class Stray
     }
 
     /// <summary>
-    /// Creates save data for this Stray.
+    /// Creates save data for this Kyn.
     /// </summary>
-    public StraySaveData ToSaveData()
+    public KynSaveData ToSaveData()
     {
         // Convert AugmentationSlot keys to strings for serialization
         var augmentationData = new Dictionary<string, string?>();
@@ -1107,7 +1107,7 @@ public class Stray
             augmentationData[kvp.Key.ToString()] = kvp.Value;
         }
 
-        return new StraySaveData
+        return new KynSaveData
         {
             InstanceId = InstanceId,
             DefinitionId = Definition.Id,
@@ -1123,15 +1123,15 @@ public class Stray
     }
 
     /// <summary>
-    /// Creates a Stray from save data.
+    /// Creates a Kyn from save data.
     /// </summary>
-    public static Stray? FromSaveData(StraySaveData data)
+    public static Kyn? FromSaveData(KynSaveData data)
     {
-        var definition = StrayDefinitions.Get(data.DefinitionId);
+        var definition = KynDefinitions.Get(data.DefinitionId);
         if (definition == null)
             return null;
 
-        var stray = new Stray(definition, data.Level)
+        var kyn = new Kyn(definition, data.Level)
         {
             Nickname = data.Nickname,
             CurrentHp = data.CurrentHp,
@@ -1139,20 +1139,20 @@ public class Stray
             BondLevel = data.BondLevel
         };
 
-        stray.Experience = data.Experience;
+        kyn.Experience = data.Experience;
 
         // Restore augmentations from string keys (e.g., "U_Dermis", "C_Chassis")
         foreach (var aug in data.EquippedAugmentations)
         {
-            // Only restore if the slot key is valid for this Stray
-            if (stray.EquippedAugmentations.ContainsKey(aug.Key))
+            // Only restore if the slot key is valid for this Kyn
+            if (kyn.EquippedAugmentations.ContainsKey(aug.Key))
             {
-                stray.EquippedAugmentations[aug.Key] = aug.Value;
+                kyn.EquippedAugmentations[aug.Key] = aug.Value;
             }
         }
 
-        stray.EquippedMicrochips.AddRange(data.EquippedMicrochips);
+        kyn.EquippedMicrochips.AddRange(data.EquippedMicrochips);
 
-        return stray;
+        return kyn;
     }
 }

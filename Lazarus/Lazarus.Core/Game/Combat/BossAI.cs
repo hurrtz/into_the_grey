@@ -657,16 +657,16 @@ public class BossAI
     }
 
     /// <summary>
-    /// Creates a BossAI for a specific Stray definition.
+    /// Creates a BossAI for a specific Kyn definition.
     /// </summary>
-    public static BossAI? CreateForStray(string strayId, CombatAI baseCombatAI)
+    public static BossAI? CreateForKyn(string kynId, CombatAI baseCombatAI)
     {
-        var bossType = strayId.ToLowerInvariant() switch
+        var bossType = kynId.ToLowerInvariant() switch
         {
             "diadem_guardian" or "nimdok_herald" => BossType.DiademGuardian,
             "liminal" or "boss_liminal" => BossType.Liminal,
             "hyper_evolved_bandit" or "corrupted_bandit" => BossType.HyperEvolvedBandit,
-            _ when strayId.Contains("boss") => BossType.Generic,
+            _ when kynId.Contains("boss") => BossType.Generic,
             _ => (BossType?)null
         };
 

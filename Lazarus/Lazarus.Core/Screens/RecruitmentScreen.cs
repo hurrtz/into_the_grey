@@ -10,7 +10,7 @@ using Lazarus.ScreenManagers;
 namespace Lazarus.Screens;
 
 /// <summary>
-/// Screen for attempting to recruit a Stray after combat.
+/// Screen for attempting to recruit a Kyn after combat.
 /// </summary>
 public class RecruitmentScreen : GameScreen
 {
@@ -22,7 +22,7 @@ public class RecruitmentScreen : GameScreen
         Result
     }
 
-    private readonly Stray _stray;
+    private readonly Kyn _kyn;
     private readonly RecruitmentManager _recruitmentManager;
 
     private Texture2D? _pixelTexture;
@@ -36,7 +36,7 @@ public class RecruitmentScreen : GameScreen
     private string _conditionFailureMessage = "";
 
     // Animation
-    private float _strayBobTimer;
+    private float _kynBobTimer;
     private float _fadeInProgress;
 
     // Input
@@ -47,9 +47,9 @@ public class RecruitmentScreen : GameScreen
     /// </summary>
     public event EventHandler<RecruitmentResult>? RecruitmentComplete;
 
-    public RecruitmentScreen(Stray stray, RecruitmentManager recruitmentManager)
+    public RecruitmentScreen(Kyn kyn, RecruitmentManager recruitmentManager)
     {
-        _stray = stray;
+        _kyn = kyn;
         _recruitmentManager = recruitmentManager;
 
         IsPopup = true;
@@ -68,7 +68,7 @@ public class RecruitmentScreen : GameScreen
 
         // Initial state
         _state = RecruitmentState.CheckingConditions;
-        _conditionsMet = _recruitmentManager.CanAttemptRecruitment(_stray, out _conditionFailureMessage);
+        _conditionsMet = _recruitmentManager.CanAttemptRecruitment(_kyn, out _conditionFailureMessage);
         _state = RecruitmentState.Introduction;
     }
 
@@ -132,12 +132,12 @@ public class RecruitmentScreen : GameScreen
         {
             if (_selectedOption == 0) // Yes, recruit
             {
-                _result = _recruitmentManager.AttemptRecruitment(_stray, out _resultMessage);
+                _result = _recruitmentManager.AttemptRecruitment(_kyn, out _resultMessage);
             }
             else // No, leave it
             {
                 _result = RecruitmentResult.Refused;
-                _resultMessage = "You decided not to recruit the Stray.";
+                _resultMessage = "You decided not to recruit the Kyn.";
             }
             _state = RecruitmentState.Result;
         }
@@ -162,7 +162,7 @@ public class RecruitmentScreen : GameScreen
 
         float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-        _strayBobTimer += deltaTime;
+        _kynBobTimer += deltaTime;
         _fadeInProgress = Math.Min(1f, _fadeInProgress + deltaTime * 3f);
     }
 
@@ -220,27 +220,27 @@ public class RecruitmentScreen : GameScreen
 
         float centerX = panelRect.X + panelRect.Width / 2;
 
-        var title = "A Stray Approaches...";
+        var title = "A Kyn Approaches...";
         var titleSize = _font.MeasureString(title);
         var titlePos = new Vector2(centerX - titleSize.X / 2, panelRect.Y + 15);
         spriteBatch.DrawString(_font, title, titlePos, Color.Yellow * TransitionAlpha);
 
-        float strayY = panelRect.Y + 70;
-        float bob = (float)Math.Sin(_strayBobTimer * 3) * 3;
-        var strayRect = new Rectangle((int)(centerX - 30), (int)(strayY + bob), 60, 60);
-        spriteBatch.Draw(_pixelTexture, strayRect, _stray.Definition.PlaceholderColor * TransitionAlpha);
+        float kynY = panelRect.Y + 70;
+        float bob = (float)Math.Sin(_kynBobTimer * 3) * 3;
+        var kynRect = new Rectangle((int)(centerX - 30), (int)(kynY + bob), 60, 60);
+        spriteBatch.Draw(_pixelTexture, kynRect, _kyn.Definition.PlaceholderColor * TransitionAlpha);
 
-        var strayName = _stray.DisplayName;
-        var nameSize = _font.MeasureString(strayName);
-        var namePos = new Vector2(centerX - nameSize.X / 2, strayY + 70);
-        spriteBatch.DrawString(_font, strayName, namePos, Color.White * TransitionAlpha);
+        var kynName = _kyn.DisplayName;
+        var nameSize = _font.MeasureString(kynName);
+        var namePos = new Vector2(centerX - nameSize.X / 2, kynY + 70);
+        spriteBatch.DrawString(_font, kynName, namePos, Color.White * TransitionAlpha);
 
-        var levelText = $"Level {_stray.Level}";
+        var levelText = $"Level {_kyn.Level}";
         var levelSize = _font.MeasureString(levelText);
-        var levelPos = new Vector2(centerX - levelSize.X / 2, strayY + 90);
+        var levelPos = new Vector2(centerX - levelSize.X / 2, kynY + 90);
         spriteBatch.DrawString(_font, levelText, levelPos, Color.Gray * TransitionAlpha);
         
-        var dialogue = _stray.Definition.RecruitmentDialogue.TryGetValue("introduction", out var introDialogue)
+        var dialogue = _kyn.Definition.RecruitmentDialogue.TryGetValue("introduction", out var introDialogue)
             ? introDialogue
             : new System.Collections.Generic.List<string> { "It watches you silently." };
         var prompt = string.Join("\n", dialogue);
@@ -266,8 +266,8 @@ public class RecruitmentScreen : GameScreen
         var titlePos = new Vector2(centerX - titleSize.X / 2, panelRect.Y + 15);
         spriteBatch.DrawString(_font, title, titlePos, Color.Yellow * TransitionAlpha);
 
-        var condition = _stray.Definition.RecruitCondition;
-        var prompt = condition?.FailureMessage ?? "Will you accept this Stray?";
+        var condition = _kyn.Definition.RecruitCondition;
+        var prompt = condition?.FailureMessage ?? "Will you accept this Kyn?";
         
         var wrappedPrompt = WrapText(prompt, panelRect.Width - 40);
         var promptSize = _font.MeasureString(wrappedPrompt);
@@ -311,13 +311,13 @@ public class RecruitmentScreen : GameScreen
         var titlePos = new Vector2(centerX - titleSize.X / 2, panelRect.Y + 30);
         spriteBatch.DrawString(_font, title, titlePos, titleColor * TransitionAlpha);
 
-        float strayY = panelRect.Y + 70;
-        float bob = _result == RecruitmentResult.Success ? (float)Math.Sin(_strayBobTimer * 6) * 5 : 0;
-        var strayRect = new Rectangle((int)(centerX - 25), (int)(strayY + bob), 50, 50);
-        spriteBatch.Draw(_pixelTexture, strayRect, _stray.Definition.PlaceholderColor * TransitionAlpha);
+        float kynY = panelRect.Y + 70;
+        float bob = _result == RecruitmentResult.Success ? (float)Math.Sin(_kynBobTimer * 6) * 5 : 0;
+        var kynRect = new Rectangle((int)(centerX - 25), (int)(kynY + bob), 50, 50);
+        spriteBatch.Draw(_pixelTexture, kynRect, _kyn.Definition.PlaceholderColor * TransitionAlpha);
 
         var dialogueKey = _result == RecruitmentResult.Success ? "success" : "failure";
-        var dialogue = _stray.Definition.RecruitmentDialogue.TryGetValue(dialogueKey, out var resultDialogue)
+        var dialogue = _kyn.Definition.RecruitmentDialogue.TryGetValue(dialogueKey, out var resultDialogue)
             ? resultDialogue
             : new System.Collections.Generic.List<string> { _resultMessage };
         _resultMessage = string.Join("\n", dialogue);

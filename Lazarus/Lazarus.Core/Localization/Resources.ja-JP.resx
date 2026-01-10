@@ -152,28 +152,28 @@
   <data name="Combat_ItemDropped" xml:space="preserve"><value>{0}を手に入れた！</value></data>
   <data name="Combat_LevelUp" xml:space="preserve"><value>レベルアップ！</value></data>
 
-  <!-- Strays -->
-  <data name="Stray_Level" xml:space="preserve"><value>Lv.{0}</value></data>
-  <data name="Stray_HP" xml:space="preserve"><value>HP</value></data>
-  <data name="Stray_Energy" xml:space="preserve"><value>エネルギー</value></data>
-  <data name="Stray_Attack" xml:space="preserve"><value>攻撃力</value></data>
-  <data name="Stray_Defense" xml:space="preserve"><value>防御力</value></data>
-  <data name="Stray_Speed" xml:space="preserve"><value>素早さ</value></data>
-  <data name="Stray_Type" xml:space="preserve"><value>タイプ</value></data>
-  <data name="Stray_Recruited" xml:space="preserve"><value>{0}が仲間になった！</value></data>
-  <data name="Stray_Released" xml:space="preserve"><value>{0}を解放した。</value></data>
-  <data name="Stray_Evolved" xml:space="preserve"><value>{0}が{1}に進化した！</value></data>
-  <data name="Stray_EvolutionAvailable" xml:space="preserve"><value>進化可能！</value></data>
-  <data name="Stray_Abilities" xml:space="preserve"><value>スキル</value></data>
-  <data name="Stray_Stats" xml:space="preserve"><value>ステータス</value></data>
-  <data name="Stray_Info" xml:space="preserve"><value>情報</value></data>
-  <data name="Stray_Recruit" xml:space="preserve"><value>仲間にする</value></data>
-  <data name="Stray_Release" xml:space="preserve"><value>解放</value></data>
-  <data name="Stray_Evolve" xml:space="preserve"><value>進化</value></data>
-  <data name="Stray_ViewDetails" xml:space="preserve"><value>詳細を見る</value></data>
-  <data name="Stray_Wild" xml:space="preserve"><value>野生</value></data>
-  <data name="Stray_Companion" xml:space="preserve"><value>仲間</value></data>
-  <data name="Stray_Boss" xml:space="preserve"><value>ボス</value></data>
+  <!-- Kyns -->
+  <data name="Kyn_Level" xml:space="preserve"><value>Lv.{0}</value></data>
+  <data name="Kyn_HP" xml:space="preserve"><value>HP</value></data>
+  <data name="Kyn_Energy" xml:space="preserve"><value>エネルギー</value></data>
+  <data name="Kyn_Attack" xml:space="preserve"><value>攻撃力</value></data>
+  <data name="Kyn_Defense" xml:space="preserve"><value>防御力</value></data>
+  <data name="Kyn_Speed" xml:space="preserve"><value>素早さ</value></data>
+  <data name="Kyn_Type" xml:space="preserve"><value>タイプ</value></data>
+  <data name="Kyn_Recruited" xml:space="preserve"><value>{0}が仲間になった！</value></data>
+  <data name="Kyn_Released" xml:space="preserve"><value>{0}を解放した。</value></data>
+  <data name="Kyn_Evolved" xml:space="preserve"><value>{0}が{1}に進化した！</value></data>
+  <data name="Kyn_EvolutionAvailable" xml:space="preserve"><value>進化可能！</value></data>
+  <data name="Kyn_Abilities" xml:space="preserve"><value>スキル</value></data>
+  <data name="Kyn_Stats" xml:space="preserve"><value>ステータス</value></data>
+  <data name="Kyn_Info" xml:space="preserve"><value>情報</value></data>
+  <data name="Kyn_Recruit" xml:space="preserve"><value>仲間にする</value></data>
+  <data name="Kyn_Release" xml:space="preserve"><value>解放</value></data>
+  <data name="Kyn_Evolve" xml:space="preserve"><value>進化</value></data>
+  <data name="Kyn_ViewDetails" xml:space="preserve"><value>詳細を見る</value></data>
+  <data name="Kyn_Wild" xml:space="preserve"><value>野生</value></data>
+  <data name="Kyn_Companion" xml:space="preserve"><value>仲間</value></data>
+  <data name="Kyn_Boss" xml:space="preserve"><value>ボス</value></data>
 
   <!-- Items -->
   <data name="Item_Use" xml:space="preserve"><value>使う</value></data>

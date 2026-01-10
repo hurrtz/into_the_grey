@@ -70,12 +70,12 @@ public class DungeonDefinition
     public List<string> RegularEncounterIds { get; init; } = new();
 
     /// <summary>
-    /// Stray IDs that can appear in regular encounters.
+    /// Kyn IDs that can appear in regular encounters.
     /// </summary>
     public List<string> RegularEnemyIds { get; init; } = new();
 
     /// <summary>
-    /// Stray ID for the mid-boss.
+    /// Kyn ID for the mid-boss.
     /// </summary>
     public string MidBossId { get; init; } = "";
 
@@ -85,7 +85,7 @@ public class DungeonDefinition
     public string MidBossName { get; init; } = "Guardian";
 
     /// <summary>
-    /// Stray ID for the final boss.
+    /// Kyn ID for the final boss.
     /// </summary>
     public string FinalBossId { get; init; } = "";
 

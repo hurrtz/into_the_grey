@@ -14,11 +14,11 @@ using Lazarus.ScreenManagers;
 namespace Lazarus.Screens;
 
 /// <summary>
-/// Screen for managing the player's Stray party and roster.
+/// Screen for managing the player's Kyn party and roster.
 /// </summary>
 public class PartyScreen : GameScreen
 {
-    private readonly StrayRoster _roster;
+    private readonly KynRoster _roster;
     private readonly GameStateService _gameState;
     private SpriteFont _font;
     private SpriteFont _smallFont;
@@ -37,7 +37,7 @@ public class PartyScreen : GameScreen
     private const int PartySlots = 5;
     private const int MaxVisibleStats = 10;
 
-    public PartyScreen(StrayRoster roster, GameStateService gameState)
+    public PartyScreen(KynRoster roster, GameStateService gameState)
     {
         _roster = roster;
         _gameState = gameState;
@@ -119,7 +119,7 @@ public class PartyScreen : GameScreen
             }
         }
 
-        // E key to open equipment screen for selected Stray
+        // E key to open equipment screen for selected Kyn
         if (input.IsNewKeyPress(Keys.E, ControllingPlayer, out _) && !_swapMode)
         {
             OpenEquipmentScreen();
@@ -162,14 +162,14 @@ public class PartyScreen : GameScreen
 
     private void TogglePosition()
     {
-        Stray? selectedStray = null;
+        Kyn? selectedKyn = null;
 
         if (_inRosterView)
         {
-            var storedStrays = _roster.Storage.ToList();
-            if (_selectedIndex >= 0 && _selectedIndex < storedStrays.Count)
+            var storedKyns = _roster.Storage.ToList();
+            if (_selectedIndex >= 0 && _selectedIndex < storedKyns.Count)
             {
-                selectedStray = storedStrays[_selectedIndex];
+                selectedKyn = storedKyns[_selectedIndex];
             }
         }
         else
@@ -177,13 +177,13 @@ public class PartyScreen : GameScreen
             var partyList = _roster.Party.ToList();
             if (_selectedIndex >= 0 && _selectedIndex < partyList.Count)
             {
-                selectedStray = partyList[_selectedIndex];
+                selectedKyn = partyList[_selectedIndex];
             }
         }
 
-        if (selectedStray != null)
+        if (selectedKyn != null)
         {
-            selectedStray.CombatRow = selectedStray.CombatRow == CombatRow.Front
+            selectedKyn.CombatRow = selectedKyn.CombatRow == CombatRow.Front
                 ? CombatRow.Back
                 : CombatRow.Front;
         }
@@ -191,14 +191,14 @@ public class PartyScreen : GameScreen
 
     private void OpenEquipmentScreen()
     {
-        Stray? selectedStray = null;
+        Kyn? selectedKyn = null;
 
         if (_inRosterView)
         {
-            var storedStrays = _roster.Storage.ToList();
-            if (_selectedIndex >= 0 && _selectedIndex < storedStrays.Count)
+            var storedKyns = _roster.Storage.ToList();
+            if (_selectedIndex >= 0 && _selectedIndex < storedKyns.Count)
             {
-                selectedStray = storedStrays[_selectedIndex];
+                selectedKyn = storedKyns[_selectedIndex];
             }
         }
         else
@@ -206,13 +206,13 @@ public class PartyScreen : GameScreen
             var partyList = _roster.Party.ToList();
             if (_selectedIndex >= 0 && _selectedIndex < partyList.Count)
             {
-                selectedStray = partyList[_selectedIndex];
+                selectedKyn = partyList[_selectedIndex];
             }
         }
 
-        if (selectedStray != null)
+        if (selectedKyn != null)
         {
-            var equipmentScreen = new EquipmentScreen(selectedStray, _gameState);
+            var equipmentScreen = new EquipmentScreen(selectedKyn, _gameState);
             ScreenManager.AddScreen(equipmentScreen, ControllingPlayer);
         }
     }
@@ -237,10 +237,10 @@ public class PartyScreen : GameScreen
         if (_inRosterView)
         {
             // In roster view
-            var storedStrays = _roster.Storage.ToList();
-            if (_selectedIndex >= 0 && _selectedIndex < storedStrays.Count)
+            var storedKyns = _roster.Storage.ToList();
+            if (_selectedIndex >= 0 && _selectedIndex < storedKyns.Count)
             {
-                var stray = storedStrays[_selectedIndex];
+                var kyn = storedKyns[_selectedIndex];
 
                 if (_swapMode && _swapSourceIndex >= 0)
                 {
@@ -248,7 +248,7 @@ public class PartyScreen : GameScreen
                     var partyMember = _roster.Party.ElementAtOrDefault(_swapSourceIndex);
                     if (partyMember != null)
                     {
-                        _roster.SwapStrays(partyMember, stray);
+                        _roster.SwapKyns(partyMember, kyn);
                     }
                     _swapMode = false;
                     _swapSourceIndex = -1;
@@ -258,7 +258,7 @@ public class PartyScreen : GameScreen
                     // Add to party if there's room
                     if (_roster.Party.Count < PartySlots)
                     {
-                        _roster.MoveToParty(stray);
+                        _roster.MoveToParty(kyn);
                     }
                 }
             }
@@ -301,7 +301,7 @@ public class PartyScreen : GameScreen
         spriteBatch.Draw(_pixelTexture, new Rectangle(0, 0, viewport.Width, viewport.Height), Color.Black * 0.85f);
 
         // Title
-        string title = _showStatsDetail ? "Stray Stats" : "Party Management";
+        string title = _showStatsDetail ? "Kyn Stats" : "Party Management";
         var titleSize = _font.MeasureString(title);
         spriteBatch.DrawString(_font, title, new Vector2((viewport.Width - titleSize.X) / 2, 20), Color.White);
 
@@ -352,8 +352,8 @@ public class PartyScreen : GameScreen
         {
             if (i < partyList.Count)
             {
-                var stray = partyList[i];
-                bool isBackRow = stray.CombatRow == CombatRow.Back;
+                var kyn = partyList[i];
+                bool isBackRow = kyn.CombatRow == CombatRow.Back;
                 int indent = isBackRow ? backRowIndent : 0;
 
                 var slotBounds = new Rectangle(bounds.X + 5 + indent, bounds.Y + yOffset + i * 70, bounds.Width - 10 - indent, 65);
@@ -361,7 +361,7 @@ public class PartyScreen : GameScreen
                 bool isSelected = !_inRosterView && i == _selectedIndex;
                 bool isSwapSource = _swapMode && i == _swapSourceIndex;
 
-                DrawStraySlot(spriteBatch, slotBounds, stray, isSelected, isSwapSource);
+                DrawKynSlot(spriteBatch, slotBounds, kyn, isSelected, isSwapSource);
             }
             else
             {
@@ -389,13 +389,13 @@ public class PartyScreen : GameScreen
         DrawBorder(spriteBatch, bounds, _inRosterView ? Color.Cyan : Color.Gray);
 
         // Title
-        var storedStrays = _roster.Storage.ToList();
-        string title = $"Stray Roster ({storedStrays.Count})";
+        var storedKyns = _roster.Storage.ToList();
+        string title = $"Kyn Roster ({storedKyns.Count})";
         spriteBatch.DrawString(_smallFont, title, new Vector2(bounds.X + 10, bounds.Y + 5), Color.Yellow);
 
-        if (storedStrays.Count == 0)
+        if (storedKyns.Count == 0)
         {
-            string emptyText = "No Strays in storage";
+            string emptyText = "No Kyns in storage";
             var textSize = _smallFont.MeasureString(emptyText);
             spriteBatch.DrawString(_smallFont, emptyText,
                 new Vector2(bounds.X + (bounds.Width - textSize.X) / 2, bounds.Y + bounds.Height / 2),
@@ -405,14 +405,14 @@ public class PartyScreen : GameScreen
 
         // Draw visible roster entries
         int yOffset = 35;
-        for (int i = 0; i < MaxVisibleRoster && i + _rosterScrollOffset < storedStrays.Count; i++)
+        for (int i = 0; i < MaxVisibleRoster && i + _rosterScrollOffset < storedKyns.Count; i++)
         {
             int actualIndex = i + _rosterScrollOffset;
-            var stray = storedStrays[actualIndex];
+            var kyn = storedKyns[actualIndex];
             var slotBounds = new Rectangle(bounds.X + 5, bounds.Y + yOffset + i * 50, bounds.Width - 10, 45);
 
             bool isSelected = _inRosterView && actualIndex == _selectedIndex;
-            DrawStraySlotCompact(spriteBatch, slotBounds, stray, isSelected);
+            DrawKynSlotCompact(spriteBatch, slotBounds, kyn, isSelected);
         }
 
         // Draw scroll indicators
@@ -420,13 +420,13 @@ public class PartyScreen : GameScreen
         {
             spriteBatch.DrawString(_smallFont, "^", new Vector2(bounds.X + bounds.Width - 20, bounds.Y + 30), Color.White);
         }
-        if (_rosterScrollOffset + MaxVisibleRoster < storedStrays.Count)
+        if (_rosterScrollOffset + MaxVisibleRoster < storedKyns.Count)
         {
             spriteBatch.DrawString(_smallFont, "v", new Vector2(bounds.X + bounds.Width - 20, bounds.Y + bounds.Height - 20), Color.White);
         }
     }
 
-    private void DrawStraySlot(SpriteBatch spriteBatch, Rectangle bounds, Stray stray, bool isSelected, bool isSwapSource)
+    private void DrawKynSlot(SpriteBatch spriteBatch, Rectangle bounds, Kyn kyn, bool isSelected, bool isSwapSource)
     {
         // Background
         Color bgColor = isSwapSource ? Color.DarkOrange * 0.5f : (isSelected ? Color.DarkBlue * 0.5f : Color.DarkSlateGray * 0.3f);
@@ -437,32 +437,32 @@ public class PartyScreen : GameScreen
         DrawBorder(spriteBatch, bounds, borderColor);
 
         // Position indicator (Front/Back)
-        bool isBackRow = stray.CombatRow == CombatRow.Back;
+        bool isBackRow = kyn.CombatRow == CombatRow.Back;
         string posIndicator = isBackRow ? "BACK" : "FRONT";
         Color posColor = isBackRow ? Color.CornflowerBlue : Color.OrangeRed;
         spriteBatch.DrawString(_smallFont, posIndicator, new Vector2(bounds.X + bounds.Width - 45, bounds.Y + 5), posColor);
 
-        // Stray placeholder color
+        // Kyn placeholder color
         var colorRect = new Rectangle(bounds.X + 5, bounds.Y + 5, 30, 30);
-        spriteBatch.Draw(_pixelTexture, colorRect, stray.Definition.PlaceholderColor);
+        spriteBatch.Draw(_pixelTexture, colorRect, kyn.Definition.PlaceholderColor);
 
         // Name and level
-        string nameText = $"{stray.DisplayName} Lv.{stray.Level}";
+        string nameText = $"{kyn.DisplayName} Lv.{kyn.Level}";
         spriteBatch.DrawString(_smallFont, nameText, new Vector2(bounds.X + 45, bounds.Y + 5), Color.White);
 
         // Category and role
-        string typeText = $"{stray.Definition.Category} / {stray.Definition.Role}";
+        string typeText = $"{kyn.Definition.Category} / {kyn.Definition.Role}";
         spriteBatch.DrawString(_smallFont, typeText, new Vector2(bounds.X + 45, bounds.Y + 22), Color.LightGray);
 
         // HP bar
-        DrawHpBar(spriteBatch, new Rectangle(bounds.X + 45, bounds.Y + 42, 120, 12), stray.CurrentHp, stray.MaxHp);
+        DrawHpBar(spriteBatch, new Rectangle(bounds.X + 45, bounds.Y + 42, 120, 12), kyn.CurrentHp, kyn.MaxHp);
 
         // Stats summary
-        string statsText = $"ATK:{stray.Attack} DEF:{stray.Defense} SPD:{stray.Speed}";
+        string statsText = $"ATK:{kyn.Attack} DEF:{kyn.Defense} SPD:{kyn.Speed}";
         spriteBatch.DrawString(_smallFont, statsText, new Vector2(bounds.X + 180, bounds.Y + 22), Color.Gray);
     }
 
-    private void DrawStraySlotCompact(SpriteBatch spriteBatch, Rectangle bounds, Stray stray, bool isSelected)
+    private void DrawKynSlotCompact(SpriteBatch spriteBatch, Rectangle bounds, Kyn kyn, bool isSelected)
     {
         // Background
         Color bgColor = isSelected ? Color.DarkBlue * 0.5f : Color.DarkSlateGray * 0.3f;
@@ -471,19 +471,19 @@ public class PartyScreen : GameScreen
         // Border
         DrawBorder(spriteBatch, bounds, isSelected ? Color.Yellow : Color.Gray);
 
-        // Stray placeholder color
+        // Kyn placeholder color
         var colorRect = new Rectangle(bounds.X + 5, bounds.Y + 5, 20, 20);
-        spriteBatch.Draw(_pixelTexture, colorRect, stray.Definition.PlaceholderColor);
+        spriteBatch.Draw(_pixelTexture, colorRect, kyn.Definition.PlaceholderColor);
 
         // Name and level
-        string nameText = $"{stray.DisplayName} Lv.{stray.Level}";
+        string nameText = $"{kyn.DisplayName} Lv.{kyn.Level}";
         spriteBatch.DrawString(_smallFont, nameText, new Vector2(bounds.X + 30, bounds.Y + 5), Color.White);
 
         // HP bar
-        DrawHpBar(spriteBatch, new Rectangle(bounds.X + 30, bounds.Y + 25, 80, 8), stray.CurrentHp, stray.MaxHp);
+        DrawHpBar(spriteBatch, new Rectangle(bounds.X + 30, bounds.Y + 25, 80, 8), kyn.CurrentHp, kyn.MaxHp);
 
         // Creature type
-        string typeText = stray.Definition.CreatureType.ToString();
+        string typeText = kyn.Definition.CreatureType.ToString();
         spriteBatch.DrawString(_smallFont, typeText, new Vector2(bounds.X + 120, bounds.Y + 5), Color.Gray);
     }
 
@@ -518,12 +518,12 @@ public class PartyScreen : GameScreen
 
     private void DrawStatsDetailView(SpriteBatch spriteBatch, Viewport viewport)
     {
-        // Get selected Stray
-        Stray? selectedStray = GetSelectedStray();
+        // Get selected Kyn
+        Kyn? selectedKyn = GetSelectedKyn();
 
-        if (selectedStray == null)
+        if (selectedKyn == null)
         {
-            string noSelection = "No Stray selected";
+            string noSelection = "No Kyn selected";
             var textSize = _font.MeasureString(noSelection);
             spriteBatch.DrawString(_font, noSelection,
                 new Vector2((viewport.Width - textSize.X) / 2, viewport.Height / 2),
@@ -539,9 +539,9 @@ public class PartyScreen : GameScreen
         spriteBatch.Draw(_pixelTexture, panelBounds, Color.DarkSlateGray * 0.6f);
         DrawBorder(spriteBatch, panelBounds, Color.Cyan);
 
-        // Stray header info
+        // Kyn header info
         int yPos = panelBounds.Y + 10;
-        string headerText = $"{selectedStray.DisplayName} (Lv.{selectedStray.Level}) - {selectedStray.Definition.Category} / {selectedStray.Definition.Role}";
+        string headerText = $"{selectedKyn.DisplayName} (Lv.{selectedKyn.Level}) - {selectedKyn.Definition.Category} / {selectedKyn.Definition.Role}";
         spriteBatch.DrawString(_smallFont, headerText, new Vector2(panelBounds.X + 10, yPos), Color.White);
         yPos += 25;
 
@@ -569,7 +569,7 @@ public class PartyScreen : GameScreen
 
         // Get stats for selected category
         var statsInCategory = GetStatsForCategory(_selectedStatCategory);
-        var stats = selectedStray.Stats;
+        var stats = selectedKyn.Stats;
 
         foreach (var statType in statsInCategory)
         {
@@ -692,14 +692,14 @@ public class PartyScreen : GameScreen
         };
     }
 
-    private Stray? GetSelectedStray()
+    private Kyn? GetSelectedKyn()
     {
         if (_inRosterView)
         {
-            var storedStrays = _roster.Storage.ToList();
-            if (_selectedIndex >= 0 && _selectedIndex < storedStrays.Count)
+            var storedKyns = _roster.Storage.ToList();
+            if (_selectedIndex >= 0 && _selectedIndex < storedKyns.Count)
             {
-                return storedStrays[_selectedIndex];
+                return storedKyns[_selectedIndex];
             }
         }
         else

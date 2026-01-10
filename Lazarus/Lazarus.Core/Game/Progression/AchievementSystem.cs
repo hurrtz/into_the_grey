@@ -373,14 +373,14 @@ public class AchievementSystem
         // Collection Achievements
         Register(new AchievementDefinition
         {
-            Id = "ach_first_stray",
+            Id = "ach_first_kyn",
             Name = "New Friend",
-            Description = "Recruit your first Stray",
+            Description = "Recruit your first Kyn",
             UnlockedDescription = "The first of many companions.",
             Category = AchievementCategory.Collection,
             Rarity = AchievementRarity.Common,
             Points = 15,
-            TrackedStat = "strays_recruited",
+            TrackedStat = "kyns_recruited",
             TargetCount = 1,
             IconColor = Color.LimeGreen
         });
@@ -389,12 +389,12 @@ public class AchievementSystem
         {
             Id = "ach_collector",
             Name = "Collector",
-            Description = "Recruit 20 different Strays",
+            Description = "Recruit 20 different Kyns",
             UnlockedDescription = "Your roster grows impressive.",
             Category = AchievementCategory.Collection,
             Rarity = AchievementRarity.Uncommon,
             Points = 40,
-            TrackedStat = "unique_strays",
+            TrackedStat = "unique_kyns",
             TargetCount = 20,
             IconColor = Color.Green
         });
@@ -403,12 +403,12 @@ public class AchievementSystem
         {
             Id = "ach_completionist",
             Name = "Completionist",
-            Description = "Recruit 50 different Strays",
-            UnlockedDescription = "Master of Strays.",
+            Description = "Recruit 50 different Kyns",
+            UnlockedDescription = "Master of Kyns.",
             Category = AchievementCategory.Collection,
             Rarity = AchievementRarity.Epic,
             Points = 100,
-            TrackedStat = "unique_strays",
+            TrackedStat = "unique_kyns",
             TargetCount = 50,
             IconColor = Color.ForestGreen
         });

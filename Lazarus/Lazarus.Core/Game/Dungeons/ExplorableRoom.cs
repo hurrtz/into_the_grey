@@ -18,7 +18,7 @@ public class DungeonEnemy
     public int Id { get; init; }
 
     /// <summary>
-    /// The Stray definition ID for this enemy.
+    /// The Kyn definition ID for this enemy.
     /// </summary>
     public string DefinitionId { get; init; } = "";
 
@@ -52,7 +52,7 @@ public class DungeonEnemy
     {
         get
         {
-            var def = StrayDefinitions.Get(DefinitionId);
+            var def = KynDefinitions.Get(DefinitionId);
             return def?.Name ?? FormatName(DefinitionId);
         }
     }
@@ -64,7 +64,7 @@ public class DungeonEnemy
     {
         get
         {
-            var def = StrayDefinitions.Get(DefinitionId);
+            var def = KynDefinitions.Get(DefinitionId);
             return def?.PlaceholderColor ?? Color.Red;
         }
     }

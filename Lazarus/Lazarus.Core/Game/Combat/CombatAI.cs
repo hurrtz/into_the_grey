@@ -507,7 +507,7 @@ public class CombatAI
     }
 
     /// <summary>
-    /// Gets AI behavior for a Stray based on its creature category.
+    /// Gets AI behavior for a Kyn based on its creature category.
     /// </summary>
     public static AIBehavior GetBehaviorForCategory(Data.CreatureCategory category)
     {

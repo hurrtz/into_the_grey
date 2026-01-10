@@ -149,8 +149,8 @@ public static class AdditionalQuests
         {
             Id = "side_hunt_fringe",
             Name = "Fringe Predator",
-            Description = "The Fringe has too many hostile Strays. Thin their numbers.",
-            Summary = "Hunt hostile Strays in the Fringe",
+            Description = "The Fringe has too many hostile Kyns. Thin their numbers.",
+            Summary = "Hunt hostile Kyns in the Fringe",
             Type = QuestType.Side,
             Act = ActState.Act1_Denial,
             BiomeId = "fringe",
@@ -160,7 +160,7 @@ public static class AdditionalQuests
             IsRepeatable = true,
             Objectives = new List<QuestObjective>
             {
-                new() { Id = "hunt", Description = "Defeat hostile Strays (0/10)", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_fringe_random", RequiredCount = 10 }
+                new() { Id = "hunt", Description = "Defeat hostile Kyns (0/10)", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_fringe_random", RequiredCount = 10 }
             },
             Reward = new QuestReward
             {
@@ -174,7 +174,7 @@ public static class AdditionalQuests
         {
             Id = "side_hunt_elite_1",
             Name = "Elite Hunter: Rustwing Terror",
-            Description = "A particularly dangerous Stray known as the Rustwing Terror has been spotted in The Rust.",
+            Description = "A particularly dangerous Kyn known as the Rustwing Terror has been spotted in The Rust.",
             Summary = "Hunt the Rustwing Terror",
             Type = QuestType.Side,
             Act = ActState.Act1_Denial,
@@ -250,13 +250,13 @@ public static class AdditionalQuests
             }
         });
 
-        // Rare Stray Hunt
+        // Rare Kyn Hunt
         QuestDefinitions.Register(new QuestDefinition
         {
-            Id = "side_hunt_legendary_strays",
+            Id = "side_hunt_legendary_kyns",
             Name = "The Legendary Hunt",
-            Description = "Legends speak of three legendary Strays that predate Lazarus. Find and face them.",
-            Summary = "Encounter the three legendary Strays",
+            Description = "Legends speak of three legendary Kyns that predate Lazarus. Find and face them.",
+            Summary = "Encounter the three legendary Kyns",
             Type = QuestType.Side,
             Act = ActState.Act3_Irreversibility,
             RequiredFlags = new List<string> { "archive_worthy" },
@@ -478,7 +478,7 @@ public static class AdditionalQuests
         {
             Id = "side_challenge_solo",
             Name = "Lone Wolf",
-            Description = "Fight alone, without any recruited Strays. Prove your independence.",
+            Description = "Fight alone, without any recruited Kyns. Prove your independence.",
             Summary = "Complete battles solo",
             Type = QuestType.Side,
             Act = ActState.Act2_Responsibility,
@@ -558,8 +558,8 @@ public static class AdditionalQuests
         {
             Id = "side_bond_1",
             Name = "Growing Trust",
-            Description = "Your first recruited Stray seems to want something. Pay attention to its needs.",
-            Summary = "Build trust with your first Stray",
+            Description = "Your first recruited Kyn seems to want something. Pay attention to its needs.",
+            Summary = "Build trust with your first Kyn",
             Type = QuestType.Side,
             Act = ActState.Act1_Denial,
             RequiredFlags = new List<string> { StoryFlags.RecruitedEchoPup },
@@ -567,8 +567,8 @@ public static class AdditionalQuests
             SortOrder = 540,
             Objectives = new List<QuestObjective>
             {
-                new() { Id = "feed", Description = "Feed your Stray their favorite food", Type = ObjectiveType.Interact, TargetId = "interactable_feed_stray" },
-                new() { Id = "play", Description = "Spend time with your Stray", Type = ObjectiveType.TalkTo, TargetId = "recruited_stray_1" },
+                new() { Id = "feed", Description = "Feed your Kyn their favorite food", Type = ObjectiveType.Interact, TargetId = "interactable_feed_kyn" },
+                new() { Id = "play", Description = "Spend time with your Kyn", Type = ObjectiveType.TalkTo, TargetId = "recruited_kyn_1" },
                 new() { Id = "battle", Description = "Win 5 battles together", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_any", RequiredCount = 5 }
             },
             Reward = new QuestReward
@@ -637,7 +637,7 @@ public static class AdditionalQuests
         {
             Id = "side_full_party",
             Name = "Strength in Numbers",
-            Description = "Recruit a full party of Strays and lead them into battle together.",
+            Description = "Recruit a full party of Kyns and lead them into battle together.",
             Summary = "Fill your party and win together",
             Type = QuestType.Side,
             Act = ActState.Act1_Denial,
@@ -646,7 +646,7 @@ public static class AdditionalQuests
             SortOrder = 543,
             Objectives = new List<QuestObjective>
             {
-                new() { Id = "recruit", Description = "Recruit 4 Strays total", Type = ObjectiveType.RecruitStray, TargetId = "any_stray", RequiredCount = 4 },
+                new() { Id = "recruit", Description = "Recruit 4 Kyns total", Type = ObjectiveType.RecruitKyn, TargetId = "any_kyn", RequiredCount = 4 },
                 new() { Id = "battle", Description = "Win a battle with a full party", Type = ObjectiveType.DefeatEncounter, TargetId = "enc_any_with_full_party" }
             },
             Reward = new QuestReward

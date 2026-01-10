@@ -71,7 +71,7 @@ public enum WeatherType
     MemoryBleed,      // Archive Scar special - causes visual distortions
     MachineBreath,    // Rust special - hot gusts from vents
     PollenDrift,      // Green special - reduces visibility, attracts insects
-    StaticDischarge   // Glow special - random lightning, powers up electric Strays
+    StaticDischarge   // Glow special - random lightning, powers up electric Kyns
 }
 
 /// <summary>
@@ -211,10 +211,10 @@ public class BiomeDefinition
     public List<FactionType> PresentFactions { get; init; } = new();
 
     // Content
-    public List<string> NativeStrays { get; init; } = new();
-    public List<string> RareStrays { get; init; } = new();
-    public List<string> NightOnlyStrays { get; init; } = new();
-    public List<string> BossStrays { get; init; } = new();
+    public List<string> NativeKyns { get; init; } = new();
+    public List<string> RareKyns { get; init; } = new();
+    public List<string> NightOnlyKyns { get; init; } = new();
+    public List<string> BossKyns { get; init; } = new();
     public List<BiomeLandmark> Landmarks { get; init; } = new();
 
     // Environment
@@ -254,7 +254,7 @@ public static class BiomeData
             AtmosphericText = "The pods stretch endlessly, each one a question mark. Some are empty. Some aren't.",
             LoreEntry = "The Fringe was never meant to be seen. It's where Lazarus tested its theories about " +
                        "synthetic life - thousands of pods, each containing a different approach to consciousness. " +
-                       "Most failed. Those that didn't became Strays, wandering away from their birthplace into " +
+                       "Most failed. Those that didn't became Kyns, wandering away from their birthplace into " +
                        "a world that was never designed for them. The pods still activate sometimes. " +
                        "Lazarus hasn't stopped trying.",
 
@@ -303,14 +303,14 @@ public static class BiomeData
             DominantFaction = FactionType.None,
             PresentFactions = new() { FactionType.Harvesters, FactionType.Ferals },
 
-            NativeStrays = new()
+            NativeKyns = new()
             {
                 "echo_pup", "circuit_crow", "relay_rodent", "rust_rat", "glitch_moth",
                 "pod_slug", "wire_worm", "static_sparrow", "blank_hare"
             },
-            RareStrays = new() { "circuit_cat", "scrap_hound", "genesis_stray" },
-            NightOnlyStrays = new() { "nightmare_pup", "void_crow" },
-            BossStrays = new() { "awakened_prototype" },
+            RareKyns = new() { "circuit_cat", "scrap_hound", "genesis_kyn" },
+            NightOnlyKyns = new() { "nightmare_pup", "void_crow" },
+            BossKyns = new() { "awakened_prototype" },
 
             Landmarks = new()
             {
@@ -428,14 +428,14 @@ public static class BiomeData
             DominantFaction = FactionType.Lazarus,
             PresentFactions = new() { FactionType.Lazarus, FactionType.Harvesters, FactionType.Machinists },
 
-            NativeStrays = new()
+            NativeKyns = new()
             {
                 "rust_rat", "scrap_hound", "gear_beetle", "piston_snake", "forge_spider",
                 "conveyor_centipede", "press_crab", "welding_wasp", "pipe_python"
             },
-            RareStrays = new() { "crane_raptor", "furnace_golem", "assembly_angel" },
-            NightOnlyStrays = new() { "night_shift_specter", "overtime_owl" },
-            BossStrays = new() { "the_foreman", "production_line_prime" },
+            RareKyns = new() { "crane_raptor", "furnace_golem", "assembly_angel" },
+            NightOnlyKyns = new() { "night_shift_specter", "overtime_owl" },
+            BossKyns = new() { "the_foreman", "production_line_prime" },
 
             Landmarks = new()
             {
@@ -506,11 +506,11 @@ public static class BiomeData
             Type = BiomeType.Green,
             Name = "The Green",
             Theme = "Life without permission",
-            Description = "Reclaimed wilderness adapted around machines. Where players learn to care about Strays.",
+            Description = "Reclaimed wilderness adapted around machines. Where players learn to care about Kyns.",
             AtmosphericText = "Nature didn't reclaim this place. It evolved to fit between the cracks.",
             LoreEntry = "The Green is what happens when you give life a million years in a hundred. " +
                        "Plants evolved to process industrial runoff. Animals learned to digest metal. " +
-                       "The Strays here are the most 'natural' - if that word means anything anymore. " +
+                       "The Kyns here are the most 'natural' - if that word means anything anymore. " +
                        "They've achieved what Lazarus never could: they've made this place home. " +
                        "The Green teaches you that survival isn't about returning to what was. " +
                        "It's about becoming what's needed.",
@@ -566,14 +566,14 @@ public static class BiomeData
             DominantFaction = FactionType.Ferals,
             PresentFactions = new() { FactionType.Ferals, FactionType.Shepherds, FactionType.Independents },
 
-            NativeStrays = new()
+            NativeKyns = new()
             {
                 "vine_serpent", "bloom_moth", "moss_bear", "thorn_cat", "spore_toad",
                 "root_hound", "canopy_monkey", "petal_butterfly", "bark_beetle", "sap_slime"
             },
-            RareStrays = new() { "ancient_oak_deer", "chloro_phoenix", "garden_guardian" },
-            NightOnlyStrays = new() { "moonflower_moth", "nocturnal_prowler", "fungal_horror" },
-            BossStrays = new() { "the_overgrowth", "mother_tree" },
+            RareKyns = new() { "ancient_oak_deer", "chloro_phoenix", "garden_guardian" },
+            NightOnlyKyns = new() { "moonflower_moth", "nocturnal_prowler", "fungal_horror" },
+            BossKyns = new() { "the_overgrowth", "mother_tree" },
 
             Landmarks = new()
             {
@@ -589,7 +589,7 @@ public static class BiomeData
                     Id = "sanctuary_grove",
                     Name = "Sanctuary Grove",
                     Description = "The Sanctuary faction's main settlement. A place of healing.",
-                    LoreText = "They believe Strays have souls. They might be right."
+                    LoreText = "They believe Kyns have souls. They might be right."
                 },
                 new BiomeLandmark
                 {
@@ -604,7 +604,7 @@ public static class BiomeData
                     Name = "Evolution Pool",
                     Description = "The water here changes things. Sometimes for the better.",
                     IsHidden = true,
-                    LoreText = "Strays that drink here sometimes... become more."
+                    LoreText = "Kyns that drink here sometimes... become more."
                 },
                 new BiomeLandmark
                 {
@@ -650,7 +650,7 @@ public static class BiomeData
                        "because its data says this is what humans wanted. Clean lawns. Neat houses. Safe streets. " +
                        "But it doesn't understand why. The maintenance drones trim hedges into perfect shapes " +
                        "and remove any 'debris' - including anything that looks like it doesn't belong. " +
-                       "The Strays here learned to look like lawn ornaments. It's that or be 'cleaned up.'",
+                       "The Kyns here learned to look like lawn ornaments. It's that or be 'cleaned up.'",
 
             BackgroundColor = new Color(226, 232, 240),
             AccentColor = new Color(148, 163, 184),
@@ -704,14 +704,14 @@ public static class BiomeData
             DominantFaction = FactionType.Lazarus,
             PresentFactions = new() { FactionType.Lazarus, FactionType.Independents },
 
-            NativeStrays = new()
+            NativeKyns = new()
             {
                 "house_cat", "lawn_drone", "sprinkler_serpent", "mailbox_mimic", "garage_guardian",
                 "pool_lurker", "garden_gnome", "porch_prowler", "attic_specter"
             },
-            RareStrays = new() { "suburb_sentinel", "perfect_pet", "homeowner_horror" },
-            NightOnlyStrays = new() { "neighborhood_watch", "curfew_enforcer" },
-            BossStrays = new() { "the_hoa_president", "model_home" },
+            RareKyns = new() { "suburb_sentinel", "perfect_pet", "homeowner_horror" },
+            NightOnlyKyns = new() { "neighborhood_watch", "curfew_enforcer" },
+            BossKyns = new() { "the_hoa_president", "model_home" },
 
             Landmarks = new()
             {
@@ -788,7 +788,7 @@ public static class BiomeData
                        "Automated turrets that never run out of ammunition. Kill zones that have killed nothing " +
                        "for centuries but remain ready. Lazarus maintains it all because the protocols demand it. " +
                        "The threat level has been 'MAXIMUM' for so long the warning lights burned out. " +
-                       "The Strays here are the ones that learned to survive being shot at. They're not friendly.",
+                       "The Kyns here are the ones that learned to survive being shot at. They're not friendly.",
 
             BackgroundColor = new Color(26, 32, 44),
             AccentColor = new Color(55, 65, 81),
@@ -842,14 +842,14 @@ public static class BiomeData
             DominantFaction = FactionType.Lazarus,
             PresentFactions = new() { FactionType.Lazarus, FactionType.Harvesters, FactionType.Machinists },
 
-            NativeStrays = new()
+            NativeKyns = new()
             {
                 "turret_hawk", "razor_hound", "bunker_bear", "wall_crawler", "sentry_spider",
                 "barricade_beetle", "patrol_panther", "minefield_mouse", "tripwire_serpent"
             },
-            RareStrays = new() { "fortress_titan", "siege_wyrm", "general_hound" },
-            NightOnlyStrays = new() { "infiltrator_cat", "night_ops_owl" },
-            BossStrays = new() { "the_final_defense", "automated_general" },
+            RareKyns = new() { "fortress_titan", "siege_wyrm", "general_hound" },
+            NightOnlyKyns = new() { "infiltrator_cat", "night_ops_owl" },
+            BossKyns = new() { "the_final_defense", "automated_general" },
 
             Landmarks = new()
             {
@@ -925,7 +925,7 @@ public static class BiomeData
             AtmosphericText = "The heat of a million calculations. Lazarus dreams here, and its dreams have teeth.",
             LoreEntry = "The Glow is Lazarus's mind - or as close to it as geography allows. Server farms " +
                        "stretching to the horizon, all humming with processes no one understands anymore. " +
-                       "The heat alone would kill most organic life, but Strays evolved here have circuits " +
+                       "The heat alone would kill most organic life, but Kyns evolved here have circuits " +
                        "fused into their flesh. They're more Lazarus than animal now. When you enter the Glow, " +
                        "you enter Lazarus's attention. It knows you're here. It has opinions about that.",
 
@@ -981,14 +981,14 @@ public static class BiomeData
             DominantFaction = FactionType.Lazarus,
             PresentFactions = new() { FactionType.Lazarus, FactionType.Ascendants },
 
-            NativeStrays = new()
+            NativeKyns = new()
             {
                 "server_sprite", "data_worm", "cache_cat", "firewall_fox", "bandwidth_bat",
                 "cooling_serpent", "process_spider", "memory_moth", "core_hound", "algorithm_ant"
             },
-            RareStrays = new() { "kernel_dragon", "root_access_bear", "admin_angel" },
-            NightOnlyStrays = new() { "batch_job_horror", "defrag_demon" },
-            BossStrays = new() { "lazarus_avatar", "the_update" },
+            RareKyns = new() { "kernel_dragon", "root_access_bear", "admin_angel" },
+            NightOnlyKyns = new() { "batch_job_horror", "defrag_demon" },
+            BossKyns = new() { "lazarus_avatar", "the_update" },
 
             Landmarks = new()
             {
@@ -1066,7 +1066,7 @@ public static class BiomeData
             LoreEntry = "The Archive Scar is where Lazarus tried to delete something. Something big. " +
                        "The data was too integrated, too fundamental to remove cleanly. It leaked. " +
                        "Now this place is a wound in reality where simulation bleeds into physical space. " +
-                       "The Strays here aren't entirely real - some are memories of Strays that existed in " +
+                       "The Kyns here aren't entirely real - some are memories of Kyns that existed in " +
                        "abandoned timelines. The Archive Scar shows you what could have been. " +
                        "Sometimes what should have been. Sometimes what must never be.",
 
@@ -1122,14 +1122,14 @@ public static class BiomeData
             DominantFaction = FactionType.None,
             PresentFactions = new() { }, // No factions dare establish here
 
-            NativeStrays = new()
+            NativeKyns = new()
             {
                 "memory_ghost", "deleted_dog", "corrupted_cat", "null_serpent", "void_moth",
                 "echo_hound", "fragment_fox", "paradox_parrot", "glitch_gecko", "timeline_tortoise"
             },
-            RareStrays = new() { "ancient_backup", "original_instance", "the_undeleted" },
-            NightOnlyStrays = new() { "nightmare_version", "what_could_have_been" },
-            BossStrays = new() { "the_deleted_one", "memory_of_lazarus" },
+            RareKyns = new() { "ancient_backup", "original_instance", "the_undeleted" },
+            NightOnlyKyns = new() { "nightmare_version", "what_could_have_been" },
+            BossKyns = new() { "the_deleted_one", "memory_of_lazarus" },
 
             Landmarks = new()
             {
@@ -1253,24 +1253,24 @@ public static class BiomeData
     public static List<BiomeType> GetConnectedBiomes(BiomeType biome) => GetDefinition(biome).ConnectedBiomes;
 
     /// <summary>
-    /// Gets native Strays that commonly appear in a biome.
+    /// Gets native Kyns that commonly appear in a biome.
     /// </summary>
-    public static List<string> GetNativeStrays(BiomeType biome) => GetDefinition(biome).NativeStrays;
+    public static List<string> GetNativeKyns(BiomeType biome) => GetDefinition(biome).NativeKyns;
 
     /// <summary>
-    /// Gets rare Strays that can appear in a biome.
+    /// Gets rare Kyns that can appear in a biome.
     /// </summary>
-    public static List<string> GetRareStrays(BiomeType biome) => GetDefinition(biome).RareStrays;
+    public static List<string> GetRareKyns(BiomeType biome) => GetDefinition(biome).RareKyns;
 
     /// <summary>
-    /// Gets Strays that only appear at night in a biome.
+    /// Gets Kyns that only appear at night in a biome.
     /// </summary>
-    public static List<string> GetNightOnlyStrays(BiomeType biome) => GetDefinition(biome).NightOnlyStrays;
+    public static List<string> GetNightOnlyKyns(BiomeType biome) => GetDefinition(biome).NightOnlyKyns;
 
     /// <summary>
-    /// Gets boss Strays for a biome.
+    /// Gets boss Kyns for a biome.
     /// </summary>
-    public static List<string> GetBossStrays(BiomeType biome) => GetDefinition(biome).BossStrays;
+    public static List<string> GetBossKyns(BiomeType biome) => GetDefinition(biome).BossKyns;
 
     /// <summary>
     /// Gets possible weather types for a biome.

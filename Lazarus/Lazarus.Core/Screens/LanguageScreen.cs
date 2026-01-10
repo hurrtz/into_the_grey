@@ -353,7 +353,7 @@ public class LanguageScreen : GameScreen
             ("Menu_Settings", "Settings"),
             ("Combat_Attack", "Attack"),
             ("Combat_Victory", "Victory!"),
-            ("Stray_Recruit", "Recruit"),
+            ("Kyn_Recruit", "Recruit"),
             ("Item_Use", "Use")
         };
 

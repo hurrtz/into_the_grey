@@ -45,9 +45,9 @@ public class Encounter
     public (int Min, int Max) LevelRange { get; set; } = (1, 5);
 
     /// <summary>
-    /// IDs of Stray definitions that can appear in this encounter.
+    /// IDs of Kyn definitions that can appear in this encounter.
     /// </summary>
-    public List<string> PossibleStrays { get; } = new();
+    public List<string> PossibleKyns { get; } = new();
 
     /// <summary>
     /// Number of enemies in this encounter.
@@ -122,22 +122,22 @@ public class Encounter
     /// Generates the enemy party for combat.
     /// </summary>
     /// <param name="random">Random number generator.</param>
-    /// <returns>List of Stray definition IDs to spawn.</returns>
+    /// <returns>List of Kyn definition IDs to spawn.</returns>
     public List<(string DefinitionId, int Level)> GenerateEnemyParty(Random random)
     {
         var result = new List<(string, int)>();
 
         for (int i = 0; i < EnemyCount; i++)
         {
-            // Pick a random Stray from possible list
-            string strayId = PossibleStrays.Count > 0
-                ? PossibleStrays[random.Next(PossibleStrays.Count)]
-                : "wild_stray"; // Default placeholder
+            // Pick a random Kyn from possible list
+            string kynId = PossibleKyns.Count > 0
+                ? PossibleKyns[random.Next(PossibleKyns.Count)]
+                : "wild_kyn"; // Default placeholder
 
             // Pick a random level in range
             int level = random.Next(LevelRange.Min, LevelRange.Max + 1);
 
-            result.Add((strayId, level));
+            result.Add((kynId, level));
         }
 
         return result;
@@ -202,9 +202,9 @@ public class EncounterResult
     public int ExperienceGained { get; set; }
 
     /// <summary>
-    /// ID of a Stray that was recruited (null if none).
+    /// ID of a Kyn that was recruited (null if none).
     /// </summary>
-    public string? RecruitedStrayId { get; set; }
+    public string? RecruitedKynId { get; set; }
 
     /// <summary>
     /// Items dropped from the battle.

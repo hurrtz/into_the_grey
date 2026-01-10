@@ -69,7 +69,7 @@ public static class Dungeons
         {
             Id = "fringe_sewers",
             Name = "The Forgotten Sewers",
-            Description = "Beneath the suburban ruins, a network of tunnels hides feral Strays and forgotten technology.",
+            Description = "Beneath the suburban ruins, a network of tunnels hides feral Kyns and forgotten technology.",
             Biome = BiomeType.Fringe,
             MinLevel = 3,
             MaxLevel = 8,
@@ -92,7 +92,7 @@ public static class Dungeons
         {
             Id = "fringe_warehouse",
             Name = "Abandoned Warehouse",
-            Description = "A crumbling storage facility now home to territorial Strays and scavenger gangs.",
+            Description = "A crumbling storage facility now home to territorial Kyns and scavenger gangs.",
             Biome = BiomeType.Fringe,
             MinLevel = 5,
             MaxLevel = 12,

@@ -5,9 +5,9 @@ using System.Linq;
 namespace Lazarus.Core.Game.Stats;
 
 /// <summary>
-/// Represents a Stray's complete stat profile including base stats and modifiers.
+/// Represents a Kyn's complete stat profile including base stats and modifiers.
 /// </summary>
-public class StrayStats
+public class KynStats
 {
     private readonly Dictionary<StatType, float> _baseStats = new();
     private readonly List<StatModifier> _modifiers = new();
@@ -17,7 +17,7 @@ public class StrayStats
     /// <summary>
     /// Creates a new stat container with default values.
     /// </summary>
-    public StrayStats()
+    public KynStats()
     {
         InitializeDefaults();
     }
@@ -25,7 +25,7 @@ public class StrayStats
     /// <summary>
     /// Creates a copy of another stat container.
     /// </summary>
-    public StrayStats(StrayStats other)
+    public KynStats(KynStats other)
     {
         foreach (var kvp in other._baseStats)
         {

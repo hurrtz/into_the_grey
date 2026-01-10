@@ -111,12 +111,12 @@ public enum SoundEffect
     ShopBuy,
     ShopSell,
 
-    // Stray
-    StrayRecruit,
-    StrayEvolution,
-    StrayLevelUp,
-    StrayCall,
-    StrayDismiss,
+    // Kyn
+    KynRecruit,
+    KynEvolution,
+    KynLevelUp,
+    KynCall,
+    KynDismiss,
 
     // Ambient
     AmbientWind,

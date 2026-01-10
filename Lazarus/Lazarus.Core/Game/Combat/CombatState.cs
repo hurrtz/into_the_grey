@@ -202,9 +202,9 @@ public class CombatState
     public int CurrencyEarned { get; private set; } = 0;
 
     /// <summary>
-    /// Stray that can be recruited after victory (if any).
+    /// Kyn that can be recruited after victory (if any).
     /// </summary>
-    public Stray? RecruitableStray { get; private set; }
+    public Kyn? RecruitableKyn { get; private set; }
 
     /// <summary>
     /// Timer for displaying action results.
@@ -224,10 +224,10 @@ public class CombatState
     /// <summary>
     /// Initializes combat with the party and enemies.
     /// </summary>
-    /// <param name="partyStrays">Player's party Strays.</param>
-    /// <param name="enemyStrays">Enemy Strays.</param>
+    /// <param name="partyKyns">Player's party Kyns.</param>
+    /// <param name="enemyKyns">Enemy Kyns.</param>
     /// <param name="encounter">The encounter that triggered combat.</param>
-    public void Initialize(IEnumerable<Stray> partyStrays, IEnumerable<Stray> enemyStrays, Encounter? encounter = null)
+    public void Initialize(IEnumerable<Kyn> partyKyns, IEnumerable<Kyn> enemyKyns, Encounter? encounter = null)
     {
         Party.Clear();
         Enemies.Clear();
@@ -237,7 +237,7 @@ public class CombatState
         ExperienceEarned = 0;
         CurrencyEarned = 0;
         TelemetryUnitsEarned = 0;
-        RecruitableStray = null;
+        RecruitableKyn = null;
 
         // Reset companion intervention tracking
         _interventionTimer = 0f;
@@ -255,9 +255,9 @@ public class CombatState
         float partyYSpacing = 70;
 
         int i = 0;
-        foreach (var stray in partyStrays.Where(s => s.IsAlive))
+        foreach (var kyn in partyKyns.Where(s => s.IsAlive))
         {
-            var combatant = new Combatant(stray, isEnemy: false)
+            var combatant = new Combatant(kyn, isEnemy: false)
             {
                 Position = new Vector2(partyX, partyYStart + i * partyYSpacing)
             };
@@ -271,9 +271,9 @@ public class CombatState
         float enemyYSpacing = 70;
 
         i = 0;
-        foreach (var stray in enemyStrays)
+        foreach (var kyn in enemyKyns)
         {
-            var combatant = new Combatant(stray, isEnemy: true)
+            var combatant = new Combatant(kyn, isEnemy: true)
             {
                 Position = new Vector2(enemyX, enemyYStart + i * enemyYSpacing)
             };
@@ -433,8 +433,8 @@ public class CombatState
     {
         foreach (var enemy in Enemies.Where(e => e.IsReady && e.SelectedAction == null))
         {
-            // Get AI behavior based on Stray category
-            var behavior = CombatAI.GetBehaviorForCategory(enemy.Stray.Definition.Category);
+            // Get AI behavior based on Kyn category
+            var behavior = CombatAI.GetBehaviorForCategory(enemy.Kyn.Definition.Category);
 
             // Use combat AI to select action
             var action = CombatAI.SelectAction(
@@ -456,7 +456,7 @@ public class CombatState
     /// <summary>
     /// List of chips that leveled up during this combat.
     /// </summary>
-    public List<(string strayName, string chipName, FirmwareLevel newLevel)> ChipsLeveledUp { get; } = new();
+    public List<(string kynName, string chipName, FirmwareLevel newLevel)> ChipsLeveledUp { get; } = new();
 
     /// <summary>
     /// Checks if combat has ended.
@@ -496,30 +496,30 @@ public class CombatState
                 // Boss "regenerates" - restore to full HP
                 foreach (var enemy in Enemies)
                 {
-                    enemy.Stray.CurrentHp = enemy.Stray.MaxHp;
+                    enemy.Kyn.CurrentHp = enemy.Kyn.MaxHp;
                 }
                 return;
             }
 
             // Calculate experience
-            ExperienceEarned = Enemies.Sum(e => e.Stray.Level * 20);
+            ExperienceEarned = Enemies.Sum(e => e.Kyn.Level * 20);
 
             // Calculate currency earned (based on enemy levels, slightly more than XP)
-            CurrencyEarned = Enemies.Sum(e => e.Stray.Level * 15 + 10);
+            CurrencyEarned = Enemies.Sum(e => e.Kyn.Level * 15 + 10);
 
             // Calculate TU earned based on enemy levels
-            TelemetryUnitsEarned = Enemies.Sum(e => 5 + e.Stray.Level);
+            TelemetryUnitsEarned = Enemies.Sum(e => 5 + e.Kyn.Level);
 
             // Award TU to all equipped chips on party members
             AwardBattleTu();
 
-            // Check for recruitable Stray
+            // Check for recruitable Kyn
             if (SourceEncounter?.CanRecruit == true && Enemies.Count > 0)
             {
                 var defeated = Enemies[_random.Next(Enemies.Count)];
-                if (defeated.Stray.Definition.CanRecruit)
+                if (defeated.Kyn.Definition.CanRecruit)
                 {
-                    RecruitableStray = defeated.Stray;
+                    RecruitableKyn = defeated.Kyn;
                 }
             }
 
@@ -537,10 +537,10 @@ public class CombatState
 
         foreach (var combatant in Party.Where(c => c.IsAlive))
         {
-            var leveledChips = combatant.Stray.AwardBattleTu(TelemetryUnitsEarned);
+            var leveledChips = combatant.Kyn.AwardBattleTu(TelemetryUnitsEarned);
             foreach (var chip in leveledChips)
             {
-                ChipsLeveledUp.Add((combatant.Stray.DisplayName, chip.Definition.Name, chip.FirmwareLevel));
+                ChipsLeveledUp.Add((combatant.Kyn.DisplayName, chip.Definition.Name, chip.FirmwareLevel));
             }
         }
     }
@@ -804,7 +804,7 @@ public class CombatState
 
         // Position modifier for attacker (physical damage dealt)
         // Front row: +20% damage, Back row: -20% damage
-        float attackerPositionMod = action.Source.Stray.CombatRow == Entities.CombatRow.Front ? 1.2f : 0.8f;
+        float attackerPositionMod = action.Source.Kyn.CombatRow == Entities.CombatRow.Front ? 1.2f : 0.8f;
 
         // Random variance (90-110%)
         float variance = 0.9f + (float)_random.NextDouble() * 0.2f;
@@ -819,7 +819,7 @@ public class CombatState
 
         // Position modifier for defender (physical damage taken)
         // Front row: +20% damage taken, Back row: -20% damage taken
-        float defenderPositionMod = action.Target.Stray.CombatRow == Entities.CombatRow.Front ? 1.2f : 0.8f;
+        float defenderPositionMod = action.Target.Kyn.CombatRow == Entities.CombatRow.Front ? 1.2f : 0.8f;
         damage = (int)(damage * defenderPositionMod);
 
         // Apply damage

@@ -252,11 +252,11 @@ public class QuestLog
     }
 
     /// <summary>
-    /// Notifies that the player recruited a Stray.
+    /// Notifies that the player recruited a Kyn.
     /// </summary>
-    public void NotifyRecruitedStray(string strayId)
+    public void NotifyRecruitedKyn(string kynId)
     {
-        NotifyProgress(ObjectiveType.RecruitStray, strayId);
+        NotifyProgress(ObjectiveType.RecruitKyn, kynId);
     }
 
     /// <summary>
@@ -342,7 +342,7 @@ public class QuestLog
         // Add experience to party
         if (reward.Experience > 0)
         {
-            // Experience is handled by StrayRoster elsewhere
+            // Experience is handled by KynRoster elsewhere
         }
 
         // Add currency
@@ -358,10 +358,10 @@ public class QuestLog
             _gameState.SetFlag($"item_{itemId}");
         }
 
-        // Unlock Strays
-        foreach (var strayId in reward.UnlockedStrayIds)
+        // Unlock Kyns
+        foreach (var kynId in reward.UnlockedKynIds)
         {
-            _gameState.SetFlag($"stray_unlocked_{strayId}");
+            _gameState.SetFlag($"kyn_unlocked_{kynId}");
         }
 
         // Set reputation

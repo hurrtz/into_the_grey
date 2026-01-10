@@ -126,33 +126,33 @@ public static class GameStrings
 
     #endregion
 
-    #region Strays
+    #region Kyns
 
-    public const string Stray_Level = "Stray_Level";
-    public const string Stray_HP = "Stray_HP";
-    public const string Stray_Energy = "Stray_Energy";
-    public const string Stray_Attack = "Stray_Attack";
-    public const string Stray_Defense = "Stray_Defense";
-    public const string Stray_Speed = "Stray_Speed";
-    public const string Stray_Type = "Stray_Type";
+    public const string Kyn_Level = "Kyn_Level";
+    public const string Kyn_HP = "Kyn_HP";
+    public const string Kyn_Energy = "Kyn_Energy";
+    public const string Kyn_Attack = "Kyn_Attack";
+    public const string Kyn_Defense = "Kyn_Defense";
+    public const string Kyn_Speed = "Kyn_Speed";
+    public const string Kyn_Type = "Kyn_Type";
 
-    public const string Stray_Recruited = "Stray_Recruited";
-    public const string Stray_Released = "Stray_Released";
-    public const string Stray_Evolved = "Stray_Evolved";
-    public const string Stray_EvolutionAvailable = "Stray_EvolutionAvailable";
+    public const string Kyn_Recruited = "Kyn_Recruited";
+    public const string Kyn_Released = "Kyn_Released";
+    public const string Kyn_Evolved = "Kyn_Evolved";
+    public const string Kyn_EvolutionAvailable = "Kyn_EvolutionAvailable";
 
-    public const string Stray_Abilities = "Stray_Abilities";
-    public const string Stray_Stats = "Stray_Stats";
-    public const string Stray_Info = "Stray_Info";
+    public const string Kyn_Abilities = "Kyn_Abilities";
+    public const string Kyn_Stats = "Kyn_Stats";
+    public const string Kyn_Info = "Kyn_Info";
 
-    public const string Stray_Recruit = "Stray_Recruit";
-    public const string Stray_Release = "Stray_Release";
-    public const string Stray_Evolve = "Stray_Evolve";
-    public const string Stray_ViewDetails = "Stray_ViewDetails";
+    public const string Kyn_Recruit = "Kyn_Recruit";
+    public const string Kyn_Release = "Kyn_Release";
+    public const string Kyn_Evolve = "Kyn_Evolve";
+    public const string Kyn_ViewDetails = "Kyn_ViewDetails";
 
-    public const string Stray_Wild = "Stray_Wild";
-    public const string Stray_Companion = "Stray_Companion";
-    public const string Stray_Boss = "Stray_Boss";
+    public const string Kyn_Wild = "Kyn_Wild";
+    public const string Kyn_Companion = "Kyn_Companion";
+    public const string Kyn_Boss = "Kyn_Boss";
 
     #endregion
 
@@ -328,7 +328,7 @@ public static class GameStrings
     public const string Tutorial_Combat = "Tutorial_Combat";
     public const string Tutorial_Inventory = "Tutorial_Inventory";
     public const string Tutorial_Quests = "Tutorial_Quests";
-    public const string Tutorial_Strays = "Tutorial_Strays";
+    public const string Tutorial_Kyns = "Tutorial_Kyns";
     public const string Tutorial_Map = "Tutorial_Map";
     public const string Tutorial_Skip = "Tutorial_Skip";
     public const string Tutorial_SkipConfirm = "Tutorial_SkipConfirm";

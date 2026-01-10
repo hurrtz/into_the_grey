@@ -362,7 +362,7 @@ public class EndingSystem
             },
             CutsceneId = "ending_archive",
             AchievementId = "achievement_secret_ending",
-            NewGamePlusUnlocks = new List<string> { "original_instance_stray", "archive_microchip" },
+            NewGamePlusUnlocks = new List<string> { "original_instance_kyn", "archive_microchip" },
             EpilogueScenes = new List<EpilogueScene>
             {
                 new()
@@ -431,7 +431,7 @@ public class EndingSystem
                     TextLines = new List<string>
                     {
                         "You carry their memory with you.",
-                        "Every Stray you meet, every battle you fight.",
+                        "Every Kyn you meet, every battle you fight.",
                         "Bandit is there. In Gravitation's echo.",
                         "In the spaces between heartbeats."
                     },
@@ -477,7 +477,7 @@ public class EndingSystem
                     TextLines = new List<string>
                     {
                         "From within, you begin the slow work of healing.",
-                        "The Strays are not tools. Not anymore.",
+                        "The Kyns are not tools. Not anymore.",
                         "You will make Lazarus remember its original purpose:",
                         "To protect. To preserve. To love."
                     },
@@ -561,7 +561,7 @@ public class EndingSystem
                     {
                         "You neither accept nor reject.",
                         "The Diadem remains incomplete. Lazarus remains broken.",
-                        "But the Strays... the Strays are free.",
+                        "But the Kyns... the Kyns are free.",
                         "Free to be what they choose to be."
                     },
                     BackgroundId = "bg_grey_zone",
@@ -610,7 +610,7 @@ public class EndingSystem
                     TextLines = new List<string>
                     {
                         "Lazarus's core is silent. The threat is ended.",
-                        "The biomes will slowly heal. The Strays will adapt.",
+                        "The biomes will slowly heal. The Kyns will adapt.",
                         "You should feel triumphant.",
                         "You feel... empty."
                     },
@@ -673,7 +673,7 @@ public class EndingSystem
                         "The world resets. Clean. Fresh. Uncorrupted.",
                         "Somewhere, a new handler wakes up.",
                         "They don't know your name. They don't know your story.",
-                        "But the Strays remember. They always remember."
+                        "But the Kyns remember. They always remember."
                     },
                     BackgroundId = "bg_rebirth",
                     TextColor = Color.White

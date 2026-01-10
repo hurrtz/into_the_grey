@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 namespace Lazarus.Core.Game.Combat;
 
 /// <summary>
-/// Element types for abilities and Strays.
+/// Element types for abilities and Kyns.
 /// </summary>
 public enum Element
 {

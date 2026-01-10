@@ -100,7 +100,7 @@ public class DungeonRoom
     public string Description { get; init; } = "";
 
     /// <summary>
-    /// Enemy Stray IDs for this room's encounter.
+    /// Enemy Kyn IDs for this room's encounter.
     /// </summary>
     public List<string> EnemyIds { get; init; } = new();
 

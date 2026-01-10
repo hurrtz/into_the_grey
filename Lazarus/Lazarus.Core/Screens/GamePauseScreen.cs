@@ -18,7 +18,7 @@ namespace Lazarus.Screens;
 /// </summary>
 class GamePauseScreen : GameScreen
 {
-    private readonly StrayRoster _roster;
+    private readonly KynRoster _roster;
     private readonly GameStateService _gameState;
     private readonly FactionReputation _factionReputation;
 
@@ -50,7 +50,7 @@ class GamePauseScreen : GameScreen
     /// <summary>
     /// Creates a new game pause screen.
     /// </summary>
-    public GamePauseScreen(StrayRoster roster, GameStateService gameState, FactionReputation factionReputation)
+    public GamePauseScreen(KynRoster roster, GameStateService gameState, FactionReputation factionReputation)
     {
         _roster = roster;
         _gameState = gameState;

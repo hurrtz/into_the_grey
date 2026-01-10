@@ -68,9 +68,9 @@ public class SaveSlotPreview
     public DateTime SaveDate { get; init; }
 
     /// <summary>
-    /// Number of Strays recruited.
+    /// Number of Kyns recruited.
     /// </summary>
-    public int StraysRecruited { get; init; }
+    public int KynsRecruited { get; init; }
 
     /// <summary>
     /// Completion percentage.
@@ -204,7 +204,7 @@ public class SaveLoadScreen : GameScreen
                 Level = saveData.Level,
                 PlayTime = TimeSpan.FromSeconds(saveData.PlayTimeSeconds),
                 SaveDate = saveData.SaveDate,
-                StraysRecruited = saveData.StraysRecruited,
+                KynsRecruited = saveData.KynsRecruited,
                 CompletionPercent = saveData.CompletionPercent,
                 PartyMembers = saveData.PartyMembers ?? new List<string>(),
                 StoryStatus = saveData.StoryStatus ?? ""
@@ -488,7 +488,7 @@ public class SaveLoadScreen : GameScreen
         // Right column
         string playTime = FormatPlayTime(slot.PlayTime);
         spriteBatch.DrawString(font, $"Time: {playTime}", new Vector2(rightColumn, row1), _textColor * alpha * 0.8f);
-        spriteBatch.DrawString(font, $"Strays: {slot.StraysRecruited}", new Vector2(rightColumn, row2), _textColor * alpha * 0.8f);
+        spriteBatch.DrawString(font, $"Kyns: {slot.KynsRecruited}", new Vector2(rightColumn, row2), _textColor * alpha * 0.8f);
         spriteBatch.DrawString(font, $"Completion: {slot.CompletionPercent:F1}%", new Vector2(rightColumn, row3), _textColor * alpha * 0.8f);
 
         // Save date
@@ -585,7 +585,7 @@ public class SaveGameData
     public int Level { get; set; }
     public double PlayTimeSeconds { get; set; }
     public DateTime SaveDate { get; set; }
-    public int StraysRecruited { get; set; }
+    public int KynsRecruited { get; set; }
     public float CompletionPercent { get; set; }
     public List<string>? PartyMembers { get; set; }
     public string? StoryStatus { get; set; }

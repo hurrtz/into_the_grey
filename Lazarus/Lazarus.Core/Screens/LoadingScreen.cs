@@ -49,19 +49,19 @@ public class LoadingScreen : GameScreen
     // Loading tips
     private static readonly string[] LoadingTips =
     {
-        "Recruit Strays to expand your party and discover new abilities.",
-        "Different biomes contain unique Strays - explore to find them all!",
-        "Microchips can be upgraded to enhance your Strays' powers.",
+        "Recruit Kyns to expand your party and discover new abilities.",
+        "Different biomes contain unique Kyns - explore to find them all!",
+        "Microchips can be upgraded to enhance your Kyns' powers.",
         "Pay attention to type matchups in combat for super effective attacks.",
-        "Some Strays can evolve into more powerful forms at higher levels.",
+        "Some Kyns can evolve into more powerful forms at higher levels.",
         "Visit merchants in settlements to stock up on healing items.",
         "Keep an eye on faction reputation - it affects NPC interactions.",
         "The mini-map shows nearby points of interest and quest markers.",
         "Auto-save occurs when entering new areas. Manual saves are recommended!",
         "Weather affects combat - Data Storms boost certain elemental attacks.",
         "Your companion will intervene in dire situations through Gravitation.",
-        "Corrupted Strays are more powerful but may have unpredictable behavior.",
-        "Check the Bestiary to track Stray encounters and evolution requirements.",
+        "Corrupted Kyns are more powerful but may have unpredictable behavior.",
+        "Check the Bestiary to track Kyn encounters and evolution requirements.",
         "Some quests have multiple solutions based on your choices.",
         "The Archive Scar is the most dangerous region - prepare carefully!"
     };

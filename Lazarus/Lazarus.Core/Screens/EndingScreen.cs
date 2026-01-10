@@ -127,7 +127,7 @@ public class EndingScreen : GameScreen
             new() { Text = "", Color = Color.White, Scale = 1f },
             new() { Text = "The MonoGame Community", Color = Color.White, Scale = 1f },
             new() { Text = "", Color = Color.White, Scale = 1f },
-            new() { Text = "All the Strays who journeyed with us", Color = Color.LimeGreen, Scale = 1f },
+            new() { Text = "All the Kyns who journeyed with us", Color = Color.LimeGreen, Scale = 1f },
             new() { Text = "", Color = Color.White, Scale = 1f },
             new() { Text = "", Color = Color.White, Scale = 1f },
         };

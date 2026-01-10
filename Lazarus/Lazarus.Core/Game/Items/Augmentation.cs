@@ -21,7 +21,7 @@ public enum ItemRarity
 }
 
 /// <summary>
-/// Definition of an augmentation that can be equipped to a Stray.
+/// Definition of an augmentation that can be equipped to a Kyn.
 /// </summary>
 public class AugmentationDefinition
 {
@@ -165,14 +165,14 @@ public class Augmentation
     public const int MaxUpgradeLevel = 5;
 
     /// <summary>
-    /// Whether this is equipped to a Stray.
+    /// Whether this is equipped to a Kyn.
     /// </summary>
     public bool IsEquipped { get; set; } = false;
 
     /// <summary>
-    /// ID of the Stray this is equipped to (if any).
+    /// ID of the Kyn this is equipped to (if any).
     /// </summary>
-    public string? EquippedToStrayId { get; set; }
+    public string? EquippedToKynId { get; set; }
 
     public Augmentation(AugmentationDefinition definition)
     {
@@ -216,18 +216,18 @@ public class Augmentation
     }
 
     /// <summary>
-    /// Checks if a Stray can equip this augmentation.
+    /// Checks if a Kyn can equip this augmentation.
     /// </summary>
-    public bool CanEquip(Entities.Stray stray)
+    public bool CanEquip(Entities.Kyn kyn)
     {
-        if (stray.Level < Definition.MinLevel)
+        if (kyn.Level < Definition.MinLevel)
             return false;
 
-        if (!Definition.IsCompatibleWith(stray.Definition.Category))
+        if (!Definition.IsCompatibleWith(kyn.Definition.Category))
             return false;
 
-        // Verify the slot is valid for this Stray's category
-        if (!Definition.Slot.IsValidForCategory(stray.Definition.Category))
+        // Verify the slot is valid for this Kyn's category
+        if (!Definition.Slot.IsValidForCategory(kyn.Definition.Category))
             return false;
 
         return true;

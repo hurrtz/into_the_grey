@@ -72,7 +72,7 @@ public enum RecruitmentConditionType
 }
 
 /// <summary>
-/// A condition that must be met to recruit a Stray.
+/// A condition that must be met to recruit a Kyn.
 /// </summary>
 public class RecruitmentCondition
 {
@@ -99,7 +99,7 @@ public class RecruitmentCondition
     /// <summary>
     /// Checks if this condition is met.
     /// </summary>
-    public bool IsMet(GameStateService gameState, StrayRoster roster)
+    public bool IsMet(GameStateService gameState, KynRoster roster)
     {
         return Type switch
         {
@@ -130,16 +130,16 @@ public class RecruitmentCondition
                (RequiredValue <= 50 && gameState.HasFlag($"reputation_{TargetId}_medium"));
     }
 
-    private bool CheckPartyMember(StrayRoster roster)
+    private bool CheckPartyMember(KynRoster roster)
     {
         if (string.IsNullOrEmpty(TargetId))
             return true;
 
-        foreach (var stray in roster.Party)
+        foreach (var kyn in roster.Party)
         {
-            if (stray.Definition.Id == TargetId ||
-                stray.Definition.CreatureType.ToString() == TargetId ||
-                stray.Definition.Category.ToString() == TargetId)
+            if (kyn.Definition.Id == TargetId ||
+                kyn.Definition.CreatureType.ToString() == TargetId ||
+                kyn.Definition.Category.ToString() == TargetId)
                 return true;
         }
 
@@ -237,7 +237,7 @@ public enum RecruitmentResult
     Success,
 
     /// <summary>
-    /// The Stray refused to join.
+    /// The Kyn refused to join.
     /// </summary>
     Refused,
 
@@ -252,54 +252,54 @@ public enum RecruitmentResult
     PartyFull,
 
     /// <summary>
-    /// This Stray cannot be recruited.
+    /// This Kyn cannot be recruited.
     /// </summary>
     NotRecruitaible,
 
     /// <summary>
-    /// The Stray fled before recruitment could be attempted.
+    /// The Kyn fled before recruitment could be attempted.
     /// </summary>
     Fled
 }
 
 /// <summary>
-/// Manages the recruitment process for Strays.
+/// Manages the recruitment process for Kyns.
 /// </summary>
 public class RecruitmentManager
 {
     private readonly GameStateService _gameState;
-    private readonly StrayRoster _roster;
+    private readonly KynRoster _roster;
     private readonly Random _random = new();
 
-    public RecruitmentManager(GameStateService gameState, StrayRoster roster)
+    public RecruitmentManager(GameStateService gameState, KynRoster roster)
     {
         _gameState = gameState;
         _roster = roster;
     }
 
     /// <summary>
-    /// Checks if a Stray can be recruited.
+    /// Checks if a Kyn can be recruited.
     /// </summary>
-    public bool CanAttemptRecruitment(Stray stray, out string? failureReason)
+    public bool CanAttemptRecruitment(Kyn kyn, out string? failureReason)
     {
         failureReason = null;
 
-        // Check if Stray is recruitaible
-        if (!stray.Definition.CanRecruit)
+        // Check if Kyn is recruitaible
+        if (!kyn.Definition.CanRecruit)
         {
-            failureReason = "This Stray cannot be recruited.";
+            failureReason = "This Kyn cannot be recruited.";
             return false;
         }
 
         // Check party space
-        if (_roster.Party.Count >= StrayRoster.MaxPartySize && _roster.Storage.Count >= StrayRoster.MaxStorageSize)
+        if (_roster.Party.Count >= KynRoster.MaxPartySize && _roster.Storage.Count >= KynRoster.MaxStorageSize)
         {
-            failureReason = "No room for more Strays!";
+            failureReason = "No room for more Kyns!";
             return false;
         }
 
         // Check conditions
-        var condition = stray.Definition.RecruitCondition;
+        var condition = kyn.Definition.RecruitCondition;
         if (condition != null && !condition.IsMet(_gameState, _roster))
         {
             failureReason = condition.FailureMessage ?? "Recruitment conditions not met.";
@@ -310,73 +310,73 @@ public class RecruitmentManager
     }
 
     /// <summary>
-    /// Attempts to recruit a Stray.
+    /// Attempts to recruit a Kyn.
     /// </summary>
-    public RecruitmentResult AttemptRecruitment(Stray stray, out string message)
+    public RecruitmentResult AttemptRecruitment(Kyn kyn, out string message)
     {
         message = "";
 
-        if (!CanAttemptRecruitment(stray, out var failureReason))
+        if (!CanAttemptRecruitment(kyn, out var failureReason))
         {
-            message = failureReason ?? "Cannot recruit this Stray.";
+            message = failureReason ?? "Cannot recruit this Kyn.";
             return failureReason?.Contains("room") == true ? RecruitmentResult.PartyFull :
                    failureReason?.Contains("cannot be recruited") == true ? RecruitmentResult.NotRecruitaible :
                    RecruitmentResult.ConditionsNotMet;
         }
 
         // Calculate recruitment chance
-        float baseChance = stray.Definition.RecruitChance;
+        float baseChance = kyn.Definition.RecruitChance;
 
-        // Modify by Stray's remaining HP (lower HP = easier to recruit)
-        float hpModifier = 1f + (1f - (float)stray.CurrentHp / stray.MaxHp) * 0.5f;
+        // Modify by Kyn's remaining HP (lower HP = easier to recruit)
+        float hpModifier = 1f + (1f - (float)kyn.CurrentHp / kyn.MaxHp) * 0.5f;
 
         // Modify by level difference
         int avgPartyLevel = _roster.Party.Count > 0
             ? (int)_roster.Party.Average(s => s.Level)
             : 1;
-        float levelModifier = avgPartyLevel >= stray.Level ? 1.2f : 0.8f;
+        float levelModifier = avgPartyLevel >= kyn.Level ? 1.2f : 0.8f;
 
         float finalChance = baseChance * hpModifier * levelModifier;
 
         // Roll for recruitment
         if (_random.NextDouble() < finalChance)
         {
-            // Success! Revive and heal the Stray before adding to party
-            if (!stray.IsAlive)
+            // Success! Revive and heal the Kyn before adding to party
+            if (!kyn.IsAlive)
             {
-                stray.Revive(1.0f); // Revive at full HP
+                kyn.Revive(1.0f); // Revive at full HP
             }
             else
             {
-                stray.FullHeal(); // Heal to full HP
+                kyn.FullHeal(); // Heal to full HP
             }
 
-            _roster.AddStray(stray);
+            _roster.AddKyn(kyn);
 
-            message = $"{stray.DisplayName} joined your party!";
-            _gameState.SetFlag($"recruited_{stray.Definition.Id}");
+            message = $"{kyn.DisplayName} joined your party!";
+            _gameState.SetFlag($"recruited_{kyn.Definition.Id}");
 
             return RecruitmentResult.Success;
         }
         else
         {
             // Failed
-            message = GetRefusalMessage(stray);
+            message = GetRefusalMessage(kyn);
             return RecruitmentResult.Refused;
         }
     }
 
-    private string GetRefusalMessage(Stray stray)
+    private string GetRefusalMessage(Kyn kyn)
     {
         var messages = new[]
         {
-            $"{stray.DisplayName} isn't interested...",
-            $"{stray.DisplayName} backs away warily.",
-            $"{stray.DisplayName} shakes its head.",
-            $"{stray.DisplayName} doesn't trust you yet.",
-            $"{stray.DisplayName} growls and retreats.",
-            $"{stray.DisplayName} looks at you suspiciously.",
-            $"{stray.DisplayName} isn't ready to join you."
+            $"{kyn.DisplayName} isn't interested...",
+            $"{kyn.DisplayName} backs away warily.",
+            $"{kyn.DisplayName} shakes its head.",
+            $"{kyn.DisplayName} doesn't trust you yet.",
+            $"{kyn.DisplayName} growls and retreats.",
+            $"{kyn.DisplayName} looks at you suspiciously.",
+            $"{kyn.DisplayName} isn't ready to join you."
         };
 
         return messages[_random.Next(messages.Length)];
@@ -385,8 +385,8 @@ public class RecruitmentManager
     /// <summary>
     /// Gets dialog text for recruitment attempt.
     /// </summary>
-    public string GetRecruitmentPrompt(Stray stray)
+    public string GetRecruitmentPrompt(Kyn kyn)
     {
-        return $"{stray.DisplayName} seems interested in joining you. Attempt recruitment?";
+        return $"{kyn.DisplayName} seems interested in joining you. Attempt recruitment?";
     }
 }

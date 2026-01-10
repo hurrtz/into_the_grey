@@ -2,7 +2,7 @@ namespace Lazarus.Core.Game.Data;
 
 /// <summary>
 /// The type of companion the player chose at the start.
-/// This determines the form and name of the companion Stray.
+/// This determines the form and name of the companion Kyn.
 /// </summary>
 public enum CompanionType
 {

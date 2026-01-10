@@ -152,28 +152,28 @@
   <data name="Combat_ItemDropped" xml:space="preserve"><value>{0} erhalten!</value></data>
   <data name="Combat_LevelUp" xml:space="preserve"><value>Level aufgestiegen!</value></data>
 
-  <!-- Strays -->
-  <data name="Stray_Level" xml:space="preserve"><value>Stufe {0}</value></data>
-  <data name="Stray_HP" xml:space="preserve"><value>LP</value></data>
-  <data name="Stray_Energy" xml:space="preserve"><value>Energie</value></data>
-  <data name="Stray_Attack" xml:space="preserve"><value>Angriff</value></data>
-  <data name="Stray_Defense" xml:space="preserve"><value>Verteidigung</value></data>
-  <data name="Stray_Speed" xml:space="preserve"><value>Geschwindigkeit</value></data>
-  <data name="Stray_Type" xml:space="preserve"><value>Typ</value></data>
-  <data name="Stray_Recruited" xml:space="preserve"><value>{0} ist deiner Gruppe beigetreten!</value></data>
-  <data name="Stray_Released" xml:space="preserve"><value>{0} wurde freigelassen.</value></data>
-  <data name="Stray_Evolved" xml:space="preserve"><value>{0} hat sich zu {1} entwickelt!</value></data>
-  <data name="Stray_EvolutionAvailable" xml:space="preserve"><value>Entwicklung möglich!</value></data>
-  <data name="Stray_Abilities" xml:space="preserve"><value>Fähigkeiten</value></data>
-  <data name="Stray_Stats" xml:space="preserve"><value>Werte</value></data>
-  <data name="Stray_Info" xml:space="preserve"><value>Info</value></data>
-  <data name="Stray_Recruit" xml:space="preserve"><value>Rekrutieren</value></data>
-  <data name="Stray_Release" xml:space="preserve"><value>Freilassen</value></data>
-  <data name="Stray_Evolve" xml:space="preserve"><value>Entwickeln</value></data>
-  <data name="Stray_ViewDetails" xml:space="preserve"><value>Details ansehen</value></data>
-  <data name="Stray_Wild" xml:space="preserve"><value>Wild</value></data>
-  <data name="Stray_Companion" xml:space="preserve"><value>Begleiter</value></data>
-  <data name="Stray_Boss" xml:space="preserve"><value>Boss</value></data>
+  <!-- Kyns -->
+  <data name="Kyn_Level" xml:space="preserve"><value>Stufe {0}</value></data>
+  <data name="Kyn_HP" xml:space="preserve"><value>LP</value></data>
+  <data name="Kyn_Energy" xml:space="preserve"><value>Energie</value></data>
+  <data name="Kyn_Attack" xml:space="preserve"><value>Angriff</value></data>
+  <data name="Kyn_Defense" xml:space="preserve"><value>Verteidigung</value></data>
+  <data name="Kyn_Speed" xml:space="preserve"><value>Geschwindigkeit</value></data>
+  <data name="Kyn_Type" xml:space="preserve"><value>Typ</value></data>
+  <data name="Kyn_Recruited" xml:space="preserve"><value>{0} ist deiner Gruppe beigetreten!</value></data>
+  <data name="Kyn_Released" xml:space="preserve"><value>{0} wurde freigelassen.</value></data>
+  <data name="Kyn_Evolved" xml:space="preserve"><value>{0} hat sich zu {1} entwickelt!</value></data>
+  <data name="Kyn_EvolutionAvailable" xml:space="preserve"><value>Entwicklung möglich!</value></data>
+  <data name="Kyn_Abilities" xml:space="preserve"><value>Fähigkeiten</value></data>
+  <data name="Kyn_Stats" xml:space="preserve"><value>Werte</value></data>
+  <data name="Kyn_Info" xml:space="preserve"><value>Info</value></data>
+  <data name="Kyn_Recruit" xml:space="preserve"><value>Rekrutieren</value></data>
+  <data name="Kyn_Release" xml:space="preserve"><value>Freilassen</value></data>
+  <data name="Kyn_Evolve" xml:space="preserve"><value>Entwickeln</value></data>
+  <data name="Kyn_ViewDetails" xml:space="preserve"><value>Details ansehen</value></data>
+  <data name="Kyn_Wild" xml:space="preserve"><value>Wild</value></data>
+  <data name="Kyn_Companion" xml:space="preserve"><value>Begleiter</value></data>
+  <data name="Kyn_Boss" xml:space="preserve"><value>Boss</value></data>
 
   <!-- Items -->
   <data name="Item_Use" xml:space="preserve"><value>Benutzen</value></data>

@@ -23,7 +23,7 @@ public enum MiniMapBlipType
     Companion,
 
     /// <summary>
-    /// Party member Stray.
+    /// Party member Kyn.
     /// </summary>
     PartyMember,
 

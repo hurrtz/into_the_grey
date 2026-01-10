@@ -28,7 +28,7 @@ public class WorldScreen : GameScreen
 {
     // Services
     private GameStateService _gameState = null!;
-    private StrayRoster _roster = null!;
+    private KynRoster _roster = null!;
     private QuestLog _questLog = null!;
     private RecruitmentManager _recruitmentManager = null!;
 
@@ -47,7 +47,7 @@ public class WorldScreen : GameScreen
     private Encounter? _triggeredEncounter;
     private NPC? _nearbyNPC;
     private Settlement? _currentSettlement;
-    private Stray? _pendingRecruitment;
+    private Kyn? _pendingRecruitment;
 
     // Biome transition state
     private BiomeType _previousBiome;
@@ -95,20 +95,20 @@ public class WorldScreen : GameScreen
         }
 
         // Create roster
-        _roster = new StrayRoster();
+        _roster = new KynRoster();
 
         // Initialize game state if needed
-        if (_gameState.Data.PartyStrayIds.Count == 0)
+        if (_gameState.Data.PartyKynIds.Count == 0)
         {
             _gameState.NewGame(CompanionType.Dog);
             _gameState.HasExoskeleton = true; // For testing, give exoskeleton immediately
             _gameState.ExoskeletonPowered = true; // And power it
 
-            // Create a starter Stray (Echo Pup)
-            var echoPup = Stray.Create("echo_pup", 5);
+            // Create a starter Kyn (Echo Pup)
+            var echoPup = Kyn.Create("echo_pup", 5);
             if (echoPup != null)
             {
-                _roster.AddStray(echoPup);
+                _roster.AddKyn(echoPup);
             }
 
             // Trigger awakening dialog on first play
@@ -703,10 +703,10 @@ public class WorldScreen : GameScreen
         if (rewards != null)
         {
             // Apply rewards
-            // Experience would be applied to party Strays
-            foreach (var stray in _roster.Party)
+            // Experience would be applied to party Kyns
+            foreach (var kyn in _roster.Party)
             {
-                stray.AddExperience(rewards.Experience / Math.Max(1, _roster.Party.Count));
+                kyn.AddExperience(rewards.Experience / Math.Max(1, _roster.Party.Count));
             }
 
             // Add currency (would need a currency system)
@@ -1212,9 +1212,9 @@ public class WorldScreen : GameScreen
         var enemyData = encounter.GenerateEnemyParty(random);
 
         var enemies = enemyData
-            .Select(e => Stray.Create(e.DefinitionId, e.Level))
+            .Select(e => Kyn.Create(e.DefinitionId, e.Level))
             .Where(s => s != null)
-            .Cast<Stray>()
+            .Cast<Kyn>()
             .ToList();
 
         // If no valid enemies, create generic ones
@@ -1222,9 +1222,9 @@ public class WorldScreen : GameScreen
         {
             for (int i = 0; i < encounter.EnemyCount; i++)
             {
-                var wildStray = Stray.Create("wild_stray", random.Next(encounter.LevelRange.Min, encounter.LevelRange.Max + 1));
-                if (wildStray != null)
-                    enemies.Add(wildStray);
+                var wildKyn = Kyn.Create("wild_kyn", random.Next(encounter.LevelRange.Min, encounter.LevelRange.Max + 1));
+                if (wildKyn != null)
+                    enemies.Add(wildKyn);
             }
         }
 
@@ -1257,10 +1257,10 @@ public class WorldScreen : GameScreen
             _gameState.RecordBattleWon();
 
             // Check for recruitment opportunity
-            if (e.RecruitedStray != null && e.RecruitedStray.Definition.CanRecruit)
+            if (e.RecruitedKyn != null && e.RecruitedKyn.Definition.CanRecruit)
             {
-                _pendingRecruitment = e.RecruitedStray;
-                ShowRecruitmentScreen(e.RecruitedStray);
+                _pendingRecruitment = e.RecruitedKyn;
+                ShowRecruitmentScreen(e.RecruitedKyn);
             }
         }
         else if (e.Fled)
@@ -1279,11 +1279,11 @@ public class WorldScreen : GameScreen
     }
 
     /// <summary>
-    /// Shows the recruitment screen for a defeated Stray.
+    /// Shows the recruitment screen for a defeated Kyn.
     /// </summary>
-    private void ShowRecruitmentScreen(Stray stray)
+    private void ShowRecruitmentScreen(Kyn kyn)
     {
-        var recruitScreen = new RecruitmentScreen(stray, _recruitmentManager);
+        var recruitScreen = new RecruitmentScreen(kyn, _recruitmentManager);
         recruitScreen.RecruitmentComplete += OnRecruitmentComplete;
         ScreenManager.AddScreen(recruitScreen, ControllingPlayer);
     }
@@ -1292,7 +1292,7 @@ public class WorldScreen : GameScreen
     {
         if (result == RecruitmentResult.Success && _pendingRecruitment != null)
         {
-            _questLog.NotifyRecruitedStray(_pendingRecruitment.Definition.Id);
+            _questLog.NotifyRecruitedKyn(_pendingRecruitment.Definition.Id);
         }
         _pendingRecruitment = null;
     }
@@ -1636,9 +1636,9 @@ public class WorldScreen : GameScreen
 
         // Draw party status
         float y = 10;
-        foreach (var stray in _roster.Party)
+        foreach (var kyn in _roster.Party)
         {
-            var text = $"{stray.DisplayName} HP:{stray.CurrentHp}/{stray.MaxHp} Lv{stray.Level}";
+            var text = $"{kyn.DisplayName} HP:{kyn.CurrentHp}/{kyn.MaxHp} Lv{kyn.Level}";
             spriteBatch.DrawString(_font, text, new Vector2(10, y), Color.White);
             y += 20;
         }
@@ -1811,5 +1811,5 @@ public class CombatEndedEventArgs : EventArgs
     public int ExperienceEarned { get; init; }
     public int CurrencyEarned { get; init; }
     public int TelemetryUnitsEarned { get; init; }
-    public Stray? RecruitedStray { get; init; }
+    public Kyn? RecruitedKyn { get; init; }
 }

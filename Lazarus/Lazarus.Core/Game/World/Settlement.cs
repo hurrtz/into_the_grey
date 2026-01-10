@@ -431,7 +431,7 @@ public static class SettlementDefinitions
         {
             Id = "green_sanctuary",
             Name = "Green Sanctuary",
-            Description = "A haven for Strays among the overgrown ruins.",
+            Description = "A haven for Kyns among the overgrown ruins.",
             Biome = BiomeType.Green,
             Faction = Faction.Shepherds,
             Services = SettlementServices.All,

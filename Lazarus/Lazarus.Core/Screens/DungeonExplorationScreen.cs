@@ -23,7 +23,7 @@ public class DungeonExplorationScreen : GameScreen
 {
     // Dependencies
     private readonly DungeonDefinition _definition;
-    private readonly StrayRoster _roster;
+    private readonly KynRoster _roster;
     private readonly GameStateService _gameState;
     private readonly DungeonDifficulty _difficulty;
 
@@ -80,7 +80,7 @@ public class DungeonExplorationScreen : GameScreen
 
     public DungeonExplorationScreen(
         DungeonDefinition definition,
-        StrayRoster roster,
+        KynRoster roster,
         GameStateService gameState,
         DungeonDifficulty difficulty)
     {
@@ -343,19 +343,19 @@ public class DungeonExplorationScreen : GameScreen
         _inCombat = true;
         _currentCombatEnemies = CurrentRoom.GetCombatGroup(enemy);
 
-        // Create enemy Strays for combat
-        var enemies = new List<Stray>();
+        // Create enemy Kyns for combat
+        var enemies = new List<Kyn>();
         foreach (var e in _currentCombatEnemies)
         {
-            var def = StrayDefinitions.Get(e.DefinitionId);
+            var def = KynDefinitions.Get(e.DefinitionId);
             if (def == null)
             {
                 // Create generic enemy if definition not found
-                def = new StrayDefinition
+                def = new KynDefinition
                 {
                     Id = e.DefinitionId,
                     Name = e.DisplayName,
-                    BaseStats = new StrayBaseStats
+                    BaseStats = new KynBaseStats
                     {
                         MaxHp = 50 + e.Level * 10,
                         Attack = 10 + e.Level * 2,
@@ -365,14 +365,14 @@ public class DungeonExplorationScreen : GameScreen
                 };
             }
 
-            var stray = new Stray(def, e.Level);
-            stray.CurrentHp = stray.MaxHp;
-            enemies.Add(stray);
+            var kyn = new Kyn(def, e.Level);
+            kyn.CurrentHp = kyn.MaxHp;
+            enemies.Add(kyn);
         }
 
-        var partyStrays = new List<Stray>(_roster.Party);
+        var partyKyns = new List<Kyn>(_roster.Party);
 
-        var combatScreen = new CombatScreen(partyStrays, enemies, encounter: null, companion: null, gameState: _gameState);
+        var combatScreen = new CombatScreen(partyKyns, enemies, encounter: null, companion: null, gameState: _gameState);
         combatScreen.CombatEnded += OnCombatComplete;
         ScreenManager.AddScreen(combatScreen, ControllingPlayer);
     }
