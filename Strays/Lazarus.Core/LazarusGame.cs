@@ -1,0 +1,152 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using Lazarus.Core.Effects;
+using Lazarus.Core.Localization;
+using Lazarus.Core.Services;
+using Lazarus.Core.Settings;
+using Lazarus.ScreenManagers;
+using Lazarus.Screens;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace Lazarus.Core
+{
+    /// <summary>
+    /// The main class for the game, responsible for managing game components, settings, 
+    /// and platform-specific configurations.
+    /// </summary>
+    /// <remarks>
+    /// This class is the entry point for the game and handles initialization, content loading,
+    /// and screen management.
+    /// </remarks>}
+    public class LazarusGame : Microsoft.Xna.Framework.Game
+    {
+        // Resources for drawing.
+        private GraphicsDeviceManager graphicsDeviceManager;
+
+        // Manages the game's screen transitions and screens.
+        private ScreenManager screenManager;
+
+        // Manages game settings, such as preferences and configurations.
+        private SettingsManager<LazarusSettings> settingsManager;
+
+        // Manages leaderboard data for tracking high scores and achievements.
+        private SettingsManager<LazarusLeaderboard> leaderboardManager;
+
+        // Texture for rendering particles.
+        private Texture2D particleTexture;
+
+        // Manages particle effects in the game.
+        private ParticleManager particleManager;
+
+        // Manages game state, progression, and save/load.
+        private GameStateService gameStateService;
+
+        /// <summary>
+        /// Indicates if the game is running on a mobile platform.
+        /// </summary>
+        public readonly static bool IsMobile = OperatingSystem.IsAndroid() || OperatingSystem.IsIOS();
+
+        /// <summary>
+        /// Indicates if the game is running on a desktop platform.
+        /// </summary>
+        public readonly static bool IsDesktop =
+            OperatingSystem.IsMacOS() || OperatingSystem.IsLinux() || OperatingSystem.IsWindows();
+
+        /// <summary>
+        /// Initializes a new instance of the game. Configures platform-specific settings, 
+        /// initializes services like settings and leaderboard managers, and sets up the 
+        /// screen manager for screen transitions.
+        /// </summary>
+        public LazarusGame()
+        {
+            graphicsDeviceManager = new GraphicsDeviceManager(this);
+
+            // Share GraphicsDeviceManager as a service.
+            Services.AddService(typeof(GraphicsDeviceManager), graphicsDeviceManager);
+
+            // Determine the appropriate settings storage based on the platform.
+            ISettingsStorage storage;
+            if (IsMobile)
+            {
+                storage = new MobileSettingsStorage();
+                graphicsDeviceManager.IsFullScreen = true;
+                IsMouseVisible = false;
+            }
+            else if (IsDesktop)
+            {
+                storage = new DesktopSettingsStorage();
+
+                // Steam Deck native resolution: 1280x800 (16:10 aspect ratio)
+                graphicsDeviceManager.PreferredBackBufferWidth = 1280;
+                graphicsDeviceManager.PreferredBackBufferHeight = 800;
+                graphicsDeviceManager.IsFullScreen = false;
+                IsMouseVisible = true;
+            }
+            else
+            {
+                throw new PlatformNotSupportedException();
+            }
+
+            // Initialize settings and leaderboard managers.
+            settingsManager = new SettingsManager<LazarusSettings>(storage);
+            Services.AddService(typeof(SettingsManager<LazarusSettings>), settingsManager);
+
+            leaderboardManager = new SettingsManager<LazarusLeaderboard>(storage);
+            Services.AddService(typeof(SettingsManager<LazarusLeaderboard>), leaderboardManager);
+
+            Content.RootDirectory = "Content";
+
+            // Configure screen orientations.
+            graphicsDeviceManager.SupportedOrientations =
+                DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+
+            // Initialize the screen manager.
+            screenManager = new ScreenManager(this);
+            Components.Add(screenManager);
+        }
+
+        /// <summary>
+        /// Initializes the game, including setting up localization and adding the 
+        /// initial screens to the ScreenManager.
+        /// </summary>
+        protected override void Initialize()
+        {
+            base.Initialize();
+
+            // Set language from settings (Language int maps directly to GameLanguage enum)
+            var languageIndex = settingsManager.Settings.Language;
+            if (languageIndex >= 0 && languageIndex < Enum.GetValues<GameLanguage>().Length)
+            {
+                LocalizationManager.Instance.SetLanguage((GameLanguage)languageIndex);
+            }
+            else
+            {
+                LocalizationManager.Instance.SetLanguage(GameLanguage.English);
+            }
+
+            // Initialize game state service
+            gameStateService = new GameStateService();
+            Services.AddService(typeof(GameStateService), gameStateService);
+
+            // Start with main menu
+            screenManager.AddScreen(new MainMenuScreen(), null);
+        }
+
+        /// <summary>
+        /// Loads game content, such as textures and particle systems.
+        /// </summary>
+        protected override void LoadContent()
+        {
+            base.LoadContent();
+
+            // Load a texture for particles and initialize the particle manager.
+            particleTexture = Content.Load<Texture2D>("Sprites/blank");
+            particleManager = new ParticleManager(particleTexture, new Vector2(400, 200));
+
+            // Share the particle manager as a service.
+            Services.AddService(typeof(ParticleManager), particleManager);
+        }
+    }
+}

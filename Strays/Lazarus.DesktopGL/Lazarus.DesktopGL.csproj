@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <PublishReadyToRun>false</PublishReadyToRun>
+        <TieredCompilation>false</TieredCompilation>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <ApplicationIcon>../Lazarus.Core/Content/Icon.ico</ApplicationIcon>
+        <AssemblyName>Lazarus</AssemblyName>
+    </PropertyGroup>
+    <ItemGroup>
+        <MonoGameContentReference Include="..\Lazarus.Core\Content\Lazarus.mgcb">
+            <Link>Content\Lazarus.mgcb</Link>
+        </MonoGameContentReference>
+    </ItemGroup>
+    <!-- Copy protagonist sprite sheets -->
+    <ItemGroup>
+        <Content Include="..\Lazarus.Core\Content\Sprites\DefaultMale\spritesheets\**\*">
+            <Link>Content\Sprites\DefaultMale\spritesheets\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Lazarus.Core\Lazarus.Core.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.*"/>
+        <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.*"/>
+    </ItemGroup>
+</Project>
