@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strays.DesktopGL", "Strays\Strays.DesktopGL\Strays.DesktopGL.csproj", "{BADB48E9-DE69-447E-8945-6B746FF07718}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lazarus.DesktopGL", "Lazarus\Lazarus.DesktopGL\Lazarus.DesktopGL.csproj", "{BADB48E9-DE69-447E-8945-6B746FF07718}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strays.Core", "Strays\Strays.Core\Strays.Core.csproj", "{1930676C-F694-4B4A-9153-65067C881D6B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lazarus.Core", "Lazarus\Lazarus.Core\Lazarus.Core.csproj", "{1930676C-F694-4B4A-9153-65067C881D6B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,8 +1,8 @@
-# Strays - Claude Code Project Guide
+# Lazarus - Claude Code Project Guide
 
 ## Project Overview
 
-**Strays** is a cross-platform 2D game built with **C# and MonoGame 3.8**, targeting .NET 9.0. The game features two gameplay modes:
+**Lazarus** is a cross-platform 2D game built with **C# and MonoGame 3.8**, targeting .NET 9.0. The game features two gameplay modes:
 1. **Classic Platformer** - Tile-based levels with gems, enemies, and platforming mechanics
 2. **Top-Down Exploration** - 8-directional movement with Tiled map support (newer feature)
 
@@ -10,11 +10,11 @@
 
 ### Solution Structure
 ```
-Strays/
-├── Strays.sln                    # Main solution
-├── Strays/
-│   ├── Strays.Core/              # Shared game logic (this is the main codebase)
-│   │   ├── StraysGame.cs         # Main game class entry point
+Lazarus/
+├── Lazarus.sln                    # Main solution
+├── Lazarus/
+│   ├── Lazarus.Core/              # Shared game logic (this is the main codebase)
+│   │   ├── LazarusGame.cs         # Main game class entry point
 │   │   ├── Game/                 # Core game mechanics
 │   │   ├── Screens/              # UI and gameplay screens
 │   │   ├── ScreenManagers/       # Screen state management
@@ -23,13 +23,13 @@ Strays/
 │   │   ├── Inputs/               # Input handling
 │   │   ├── Localization/         # Multi-language support
 │   │   └── Content/              # Game assets (sprites, sounds, levels)
-│   └── Strays.DesktopGL/         # Desktop platform launcher
+│   └── Lazarus.DesktopGL/         # Desktop platform launcher
 └── Tiled/                        # Tiled map editor files (.tmx, .tsx)
 ```
 
 ### Key Entry Points
-- **Game Initialization**: `Strays.Core/StraysGame.cs`
-- **Desktop Launcher**: `Strays.DesktopGL/Program.cs`
+- **Game Initialization**: `Lazarus.Core/LazarusGame.cs`
+- **Desktop Launcher**: `Lazarus.DesktopGL/Program.cs`
 - **Current Start Screen**: `TopDownGameplayScreen` (development mode - normally `MainMenuScreen`)
 
 ## Architecture Overview
@@ -84,9 +84,9 @@ All screens inherit from `GameScreen` base class and are managed by `ScreenManag
 3. Add to screen stack via `ScreenManager.AddScreen()`
 
 ### Adding New Content/Assets
-1. Place assets in `Strays.Core/Content/` appropriate subfolder
+1. Place assets in `Lazarus.Core/Content/` appropriate subfolder
 2. For sprites loaded at runtime: use `Texture2D.FromStream()`
-3. For MGCB-managed assets: add to `Content/Strays.mgcb`
+3. For MGCB-managed assets: add to `Content/Lazarus.mgcb`
 
 ### Working with Tiled Maps
 - Map files: `Tiled/biomes/*.tmx`
@@ -102,15 +102,15 @@ All screens inherit from `GameScreen` base class and are managed by `ScreenManag
 
 ```bash
 # From solution root
-cd Strays
-dotnet build Strays.DesktopGL
-dotnet run --project Strays.DesktopGL
+cd Lazarus
+dotnet build Lazarus.DesktopGL
+dotnet run --project Lazarus.DesktopGL
 ```
 
 ## Project Conventions
 
 ### Naming
-- **Namespaces**: `Strays.Core.{System}` (e.g., `Strays.Core.Settings`)
+- **Namespaces**: `Lazarus.Core.{System}` (e.g., `Lazarus.Core.Settings`)
 - **Classes**: PascalCase
 - **Private fields**: camelCase (sometimes with underscore prefix)
 
@@ -123,7 +123,7 @@ dotnet run --project Strays.DesktopGL
 ### Code Style
 - XML documentation comments on public members
 - Debug output via `System.Diagnostics.Debug.WriteLine()`
-- Platform checks via `StraysGame.IsMobile` / `StraysGame.IsDesktop`
+- Platform checks via `LazarusGame.IsMobile` / `LazarusGame.IsDesktop`
 
 ## Important Constants
 
@@ -145,15 +145,15 @@ dotnet run --project Strays.DesktopGL
 
 | What | Where |
 |------|-------|
-| Main game class | `Strays.Core/StraysGame.cs` |
-| All screens | `Strays.Core/Screens/` |
-| Game mechanics | `Strays.Core/Game/` |
-| Sprite assets | `Strays.Core/Content/Sprites/` |
-| Level files | `Strays.Core/Content/Levels/` |
+| Main game class | `Lazarus.Core/LazarusGame.cs` |
+| All screens | `Lazarus.Core/Screens/` |
+| Game mechanics | `Lazarus.Core/Game/` |
+| Sprite assets | `Lazarus.Core/Content/Sprites/` |
+| Level files | `Lazarus.Core/Content/Levels/` |
 | Tiled maps | `Tiled/biomes/` |
-| Sound effects | `Strays.Core/Content/Sounds/` |
-| Fonts | `Strays.Core/Content/Fonts/` |
-| Settings code | `Strays.Core/Settings/` |
+| Sound effects | `Lazarus.Core/Content/Sounds/` |
+| Fonts | `Lazarus.Core/Content/Fonts/` |
+| Settings code | `Lazarus.Core/Settings/` |
 
 ## Current Development State
 
